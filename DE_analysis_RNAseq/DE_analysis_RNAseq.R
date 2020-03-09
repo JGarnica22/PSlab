@@ -1,6 +1,7 @@
 #This script is to perform DE analysis with RNAseq data
 #It was created for R 3.6.2 version (2019-12-12)
 #Copyright (C) 2020  Patricia Solé Sánchez
+##########################################################
 
 # Check if required packages are installed, if not install:
 cran.packages <- c("ggplot2", "ggrepel")
