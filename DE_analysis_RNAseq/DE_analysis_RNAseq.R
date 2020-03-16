@@ -40,7 +40,7 @@ setwd("/Users/patri/Desktop/R class/Prova_GitHub_DE_analysis")
 expfile <- "Partek_TFH_Raw_counts.txt"
 ## Indicate populations of interest, to be compared:
 #First indicate control population, then sample:
-pop <- c("TH0", "TFH")
+pop <- c("Th0", "TFH")
 
 
 # Load data:
