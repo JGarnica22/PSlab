@@ -30,7 +30,7 @@ library(ggplot2)
 library(ggrepel)
 library(DESeq2)
 library(biomaRt)
-library(readxl)
+library(writexl)
 
 # Set your working directory (the project you are working in):
 setwd("/Users/patri/Desktop/R class/Prova_GitHub_DE_analysis")
