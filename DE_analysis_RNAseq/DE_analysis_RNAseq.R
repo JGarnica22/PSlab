@@ -40,7 +40,7 @@ setwd("/Users/patri/Desktop/R class/Prova_GitHub_DE_analysis")
 expfile <- "Partek_TFH_Raw_counts.txt"
 ## Indicate populations of interest, to be compared:
 #First indicate control population, then sample:
-pop <- c("TH0", "TFH")
+pop <- c("Th0", "TFH")
 
 
 # Load data:
@@ -218,4 +218,17 @@ DesBM <- merge(x= as.data.frame(resOrdered), y=BM,
                all.x = T)
 write.table(DesBM, paste0("output/DESeq2_", resultsNames(dds)[2], ".txt"), 
             quote = F, dec = ".", sep = "\t")
+# HEATMAP:
+DEgenes <- DesBM[which(abs(DesBM$log2FoldChange)>2 & DesBM$padj<0.01), "Row.names"]
 
+pheatmap(rlog.norm.counts[DEgenes,], scale = "row",
+         rev(brewer.pal(8, ("PiYG"))),
+         # cluster_rows = F, cluster_cols = F, na_col = "white",
+         # border_color = "black",
+         # cellwidth = 20, cellheight = 10,
+         # main = "Table 1", 
+         # fontsize = 10,
+         # fontsize_row = 9,
+         # fontsize_col = 12, angle_col = 90,
+         # width = 800, height = 4000)
+)
