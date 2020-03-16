@@ -109,6 +109,7 @@ plot(x = pc$x[,1], y= pc$x[,2],
      ylab = paste0("PC2 = ", round(PC2_varexpl*100,1), "%"),
      las = 1,
      main = "PCA of seq. depth normalized \n and rlog - transformed read counts ")
+legend(x=-52,y=16, c(pop[2],pop[1]),cex=0.8,col=c("red","blue"),pch=16,)
 dev.off()
 
 #Apply DESeq to do differential expression
