@@ -30,7 +30,7 @@ library(ggplot2)
 library(ggrepel)
 library(DESeq2)
 library(biomaRt)
-
+library(readxl)
 
 # Set your working directory (the project you are working in):
 setwd("/Users/patri/Desktop/R class/Prova_GitHub_DE_analysis")
@@ -49,7 +49,6 @@ counts <- read.table(paste0("data/", expfile),
                      sep = "\t",
                      quote = "", 
                      dec = ".")
-
 head(counts)
 
 #Set gene_name as rows labels
@@ -63,14 +62,12 @@ names (counts2) <- c(paste0(rep(pop[1], length(grep(pop[1],colnames(counts2)))),
                      paste0(rep(pop[2], length(grep(pop[2],colnames(counts2)))),
                             1:length(grep(pop[2],colnames(counts2)))))
 head(counts2)
-
 #Create conditions:
 sample_info <- data.frame(cell_type = c(rep(pop[1], length(grep(pop[1], colnames(counts2)))), 
                                         rep(pop[2], length(grep(pop[2], colnames(counts2))))),
                           replicates = c(1:length(grep(pop[1],colnames(counts2))),
                                          1:length(grep(pop[2],colnames(counts2)))),
                           row.names = names (counts2))
-
 #Transform the matrix by rounding the counts and transforming the values from "numeric" to "integer"
 counts2_r <- apply(counts2, c(1,2), round)
 counts2_i <- apply(counts2_r, c(1,2), as.integer)
@@ -81,7 +78,6 @@ dds <- DESeqDataSetFromMatrix (countData = counts2_i,
                                design = ~ cell_type)
 head(dds)
 counts(dds)
-
 #Remove genes with very low counts:
 dds <- dds[ rowSums (counts(dds)) > 10, ]
 counts(dds)
@@ -96,9 +92,7 @@ sizeFactors(DESeq.ds_f)
 #depth and transformed to log2 scale:
 DESeq.rlog <- rlog(DESeq.ds_f, blind = TRUE)
 rlog.norm.counts <- assay (DESeq.rlog)
-write.table(rlog.norm.counts, file = "output/rlog_normalized_DESeq.txt", quote = FALSE, sep = "\t", dec = ".")
-
-
+write_xlsx(rlog.norm.counts, "output/rlog_normalized_DESeq.xlsx")
 
 #Plot PCA with prcomp():
 #prcomp calculates principal components
@@ -122,22 +116,16 @@ dds <- DESeq(dds)
 #Show dataframe from differential expression analysis. If you want, change
 #the direction of comparison
 res <- results(dds, contrast=c("cell_type", pop[2], pop[1]))
-res
 
 ####CHECK ORDER OF COMPARISON
 #Clean up genes with low counts and high variability with Shrinkage
 resLFC <- lfcShrink(dds, coef=resultsNames(dds)[2], type="apeglm")
 head(resLFC)
-
 #Order genes based on their pvalue
 resOrdered <- resLFC[order(resLFC$log2FoldChange, decreasing = T),]
-
-
 #VOLCANO PLOT:
 Vol <- data.frame(FC= resOrdered$log2FoldChange,
                   sig= -log10(resOrdered$padj))
-head(Vol)
-
 plot <- ggplot(Vol, aes(x=FC, y=sig))
 
 pdf(file = "figs/VOLCANO.pdf", width = 5, height = 5 )
@@ -164,7 +152,6 @@ dev.off()
 #geom_label
 #geom_text
 #http://www.sthda.com/english/wiki/ggplot2-texts-add-text-annotations-to-a-graph-in-r-software
-
 
 #If you want to show gene names for a particular set of genes:
 #Change txt file to the one containing a list of genes that you want to show in volcano
@@ -198,7 +185,6 @@ dev.off()
 #                strsplit(resultsNames(dds)[2], "_")[[1]][5])) +
 # xlab("log2FC") + ylab("-log10(padj)")
 
-
 # BIOMART:
 #select mart:
 ensembl <- useMart("ENSEMBL_MART_ENSEMBL")
@@ -216,8 +202,10 @@ BM <- getBM(attributes=c("ensembl_gene_id","gene_biotype",
 DesBM <- merge(x= as.data.frame(resOrdered), y=BM, 
                by.x="row.names", by.y = "external_gene_name", 
                all.x = T)
-write.table(DesBM, paste0("output/DESeq2_", resultsNames(dds)[2], ".txt"), 
-            quote = F, dec = ".", sep = "\t")
+write_xlsx(DesBM, paste0("output/DESeq2_", 
+                        strsplit(resultsNames(dds)[2], "_")[[1]][3], "_vs_",
+                        strsplit(resultsNames(dds)[2], "_")[[1]][5], ".xlsx"))
+                         
 # HEATMAP:
 DEgenes <- DesBM[which(abs(DesBM$log2FoldChange)>2 & DesBM$padj<0.01), "Row.names"]
 
