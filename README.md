@@ -2,7 +2,7 @@
 
 This repository contains all scripts used in the lab to perform RNAseq, ATACseq, and ChIPseq data analysis.
 
-BEFORE STARTING
+BEFORE STARTING <br />
 Create in your computer a folder for your project, this folder must contain the following subfolders names:
   data -> it will contain all your raw data to be analyzed
   doc -> documentation useful for the project (papers, manuals...)
