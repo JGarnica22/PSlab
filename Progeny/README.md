@@ -1,6 +1,6 @@
 # PROGENY ANALYSIS :octocat:
 Pathway RespOnsive GENes (PROGENy) is a bioinformatic tool to infer pathway activity based on transcriptomic data.  
-Based on experiments, it gives scores to each gene involved in a pathway depending on how correlates each gene to each pathway activation and then infer pathway activity based on upregulation of these genes in your sample(s).
+Based on experiments, it gives scores to each gene involved in a pathway depending on how correlates each gene to each pathway activation. Then it infers pathway activity based on upregulation of these genes in your sample(s).
 
 Analysis is performed both on raw counts data to assess how behave each replicate and also on DESeq2 data.
 
