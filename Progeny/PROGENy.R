@@ -2,8 +2,8 @@
 #It was created for R 3.6.2 version (2019-03-30)
 #Copyright (C) 2020  Patricia Sole Sanchez
 # Check if required packages are installed, if not install:
-cran.packages <- c("BiocManager","ggplot2", "ggrepel", "pheatmap", "RColorBrewer",
-                   "broom", "readr", "gem_point", "writexl")
+cran.packages <- c("BiocManager","ggplot2", "ggrepel", "pheatmap", "RColorBrewer", "dplyr",
+                   "broom", "readr", "writexl")
 for (i in cran.packages) {
   if(!require(i, character.only = TRUE)) {
     install.packages(i)
@@ -22,6 +22,7 @@ for (i in bioc.packages) {
     print(paste(i,"was already installed"))
   }
 }
+
 # Load packages:
 library(ggplot2)
 library(ggrepel)
@@ -31,44 +32,54 @@ library(DESeq2)
 library(biomaRt)
 library(writexl)
 library(progeny)
-library(magrittr) #To use command like %%
+library(magrittr)
 library(dplyr)
-library(writexl)
 
 # Set your working directory (the project you are working in):
-setwd("C:/Users/jgarn/OneDrive - Universitat de Barcelona/Documentos/Bioinformatics/Functionals/Progeny")
-# Specify parameters to be used along the script:
-## Indicate name of txt file containing expression data (raw counts)
+setwd("/Users/patri/Desktop/R class/Prova_GitHub_DE_analysis")
+
+## Specify parameters to be used along the script:
+# Indicate name of txt file containing expression data (raw counts)
 expfile <- "Partek_TFH_Raw_counts.txt"
-##Indicate name of txt file containing DESeq2 analysis result previously performed
-Desq2file <- "Deseq2_TFH_vs_Th0.txt"
-## Indicate populations of interest, to be compared:
+# Indicate name of txt file containing DESeq2 analysis result previously performed
+Desq2file <- "DESeq2_TFH_vs_TH0.txt"
+# Indicate populations of interest, to be compared:
 # First indicate control population, then sample:
 pop <- c("Th0", "TFH")
-#Indicate "human" or "mouse" experiment
+# Indicate "human" or "mouse" experiment
 species <- "mouse"
+
+# Read weight matrix (@model)
 model <- read.table(paste0("data/progeny_matrix_",species,".txt"), header = TRUE, sep = "\t", dec = ".", quote = "") 
-#Prepare the gene expression matrix for PROGENy:
+
+# Read raw counts:
 counts <- read.table(paste0("data/",expfile),
-                               header = T,
-                               sep = "\t",
-                               quote = "", 
-                               dec = ".")
-#Prepare the DESeq2 results
+                     header = T,
+                     sep = "\t",
+                     quote = "",
+                     dec = ".")
+
+# Read the DESeq2 results
 DESeq2 <- read.table (file = paste0("data/",Desq2file),
                       sep = "\t", 
                       quote = "",
-                      dec = ".")
+                      dec = ".", 
+                      header = T, row.names = "Gene")
 
+## Prepare weight matrix to be used
+row.names(model) <- model[,1]
+model <- model[,-c(1)]
+
+## Prepare the gene expression matrix for PROGENy from counts data
 # Set gene_name as rows labels
 row.names(counts) <- counts$gene_name
 # Eliminate unnecessary columns, we only want gene_name and counts for the different populations.
 counts2 <- counts[, c(grep(pop[1], colnames(counts)), grep(pop[2], colnames(counts)))]
 # Change names of columns to shorter, easier ones:
 names (counts2) <- c(paste0(rep(pop[1], length(grep(pop[1],colnames(counts2)))),
-                             1:length(grep(pop[1],colnames(counts2)))), 
-                      paste0(rep(pop[2], length(grep(pop[2],colnames(counts2)))),
-                             1:length(grep(pop[2],colnames(counts2)))))
+                            1:length(grep(pop[1],colnames(counts2)))), 
+                     paste0(rep(pop[2], length(grep(pop[2],colnames(counts2)))),
+                            1:length(grep(pop[2],colnames(counts2)))))
 # Create conditions:
 sample_info <- data.frame(cell_type = c(rep(pop[1], length(grep(pop[1], colnames(counts2)))), 
                                         rep(pop[2], length(grep(pop[2], colnames(counts2))))),
@@ -86,11 +97,9 @@ dset <- estimateSizeFactors(dset)
 dset <- estimateDispersions(dset)
 emat <- getVarianceStabilizedData(dset)
 
-#We can not use the progeny function to score the expression matrix, because that was made for
-#human. It will be done using a scoring matrix for mouse:
-#Read the scoring matrix for progeny:
-row.names(model) <- model[,1]
-model <- model[,-c(1)]
+
+## We will calculate pathway activity by a matrix multiplication of the expression matrix and the weight matrix
+
 #Select gene names that appear both in the expression matrix and in the scoring matrix:
 common_genes <- intersect(rownames(emat), rownames(model))
 #Filter both matrixes to only contain the genes that are shared
@@ -113,21 +122,26 @@ progeny_scores = emat_matched %*% model_matched
 #We will scale by pathways. For that, we use the function "scale", which directly scales by columns (pathways)
 progeny_scores_scaled = scale(progeny_scores, scale = TRUE)
 
+##HEATMAP
+pheatmap(progeny_scores_scaled, scale = "column")
+
 #Checking for differences between the groups:
 #We check if the control is different to the treated condition using a linear model:
 #Stablish control samples
 controls <- sample_info$cell_type == pop[1]
+
 #Perform linear regression to calculate enrichment of pathways:
 result <- apply(t(progeny_scores_scaled), 1, function(x) {
   broom::tidy(lm(x ~ !controls)) %>%
     filter(term == "!controlsTRUE") %>%
     select(-term)
 })
+
 result <- mutate(Pathway=names(result), bind_rows(result))
 results <- as.data.frame(result[,c(5,1:4)])
-row.names(results)<-results$Pathway
-results <- results[,-1]
-write_xlsx(results, "output/Progeny_scores_scaled.xlsx")
+
+# We don't export results here because we will better use the permutation (next) strategy
+# to get significant results:
 
 #To check significance of progeny pathway scorings, we will perform Progeny on several (usually n=1000)
 #permutations: use `runProgenyFast` function:
@@ -152,7 +166,7 @@ runProgenyFast <- function(df,weight_matrix,k = 10000, z_scores = T, get_nulldis
     nullDist_list <- list()
   }
   
-    for(i in 2:length(df[1,]))
+  for(i in 2:length(df[1,]))
   {
     current_df <- df[,c(1,i)]
     current_df <- current_df[complete.cases(current_df),]
@@ -239,10 +253,11 @@ names(gene.names2) <- "Gene"
 progeny.cm <- cbind(gene.names2, model_matched)
 #3. Apply permutations:
 progeny.permutations <- t(runProgenyFast(progeny.df, progeny.cm, k = 10000, z_scores = T, get_nulldist = F))
+
 ##HEATMAP
 pheatmap(progeny.permutations, scale = "column")
 #Export heatmap as pdf
-pdf(file = "figs/Heatmap_progeny.pdf", width = 5, height = 5)
+pdf(file = "figs/Heatmap_progeny.pdf", width = 7, height = 5)
 pheatmap(progeny.permutations, scale = "column")
 dev.off()
 
@@ -257,7 +272,9 @@ result1 <- apply(t(progeny.permutations), 1, function(x) {
     select(-term)
 })
 result1 <- mutate(bind_rows(result1), Pathway=names(result1))
-results1 <- result1[,c(5,1:4)] 
+results1 <- as.data.frame(result1[,c(5,1:4)])
+write.table(results1, "output/Progeny_permutations.txt",
+           sep = "\t", dec = ".", quote = F, row.names = F)
 write_xlsx(results1, "output/Progeny_permutations.xlsx")
 
 #Plot pathways depending on significance and activation:
@@ -268,10 +285,10 @@ Progeny_plot <- ggplot(path.sig, aes(x=stat, y=Sig)) +
   geom_point( aes(size=abs(stat),color=Sig),
               show.legend = F) +
   scale_color_gradient(low = "blue", high = "red")+
-    geom_text_repel(data=subset(path.sig, Sig>6.6), 
-                   label=rownames(subset(path.sig, Sig>6.6)),
-                   size = 5,
-                   show.legend = F) +
+  geom_text_repel(data=subset(path.sig, Sig>6.6), 
+                  label=rownames(subset(path.sig, Sig>6.6)),
+                  size = 5,
+                  show.legend = F) +
   geom_vline(xintercept = 0) +
   geom_hline(yintercept = 6.6) +
   labs(title=paste("PROGENy pathways activity", pop[1],"vs",pop[2]),
@@ -301,7 +318,7 @@ progenyScores <- function(df, cm, dfIndex = 1, FCIndex = 3, cmIndex = 1) {
   names(cm)[cmIndex] <- "X1"
   df <- df[complete.cases(df[,FCIndex]),]
   merged <- merge(df[,c(dfIndex,FCIndex)],cm)
-    for (pathway in names(cm[,-cmIndex]))
+  for (pathway in names(cm[,-cmIndex]))
   {
     merged[,pathway] <- merged[,2]*merged[,pathway]
   }
@@ -309,27 +326,15 @@ progenyScores <- function(df, cm, dfIndex = 1, FCIndex = 3, cmIndex = 1) {
   names(progeny_scores) <- names(merged[,c(3:length(merged[1,]))])
   return(progeny_scores)
 }
-# # Import Deseq2 results
-# # if you want to generate the data here:
-# # Remove genes with very low counts:
+
+
+# If you want to perform DE analysis here (using raw counts)
+# unblock code from here:
 # dset1 <- dset[ rowSums (counts(dset)) > 10, ]
-# # Set control population for the DE comparison:
 # dset1$cell_type <- relevel(dset1$cell_type, pop[1])
-# # Apply DESeq to do differential expression:
 # dset1 <- DESeq(dset1)
-# # Clean up genes with low counts and high variability with Shrinkage
 # resLFC <- lfcShrink(dset1, coef=resultsNames(dset1)[2], type="apeglm")
-# # Order genes based on their pvalue
-# resOrdered <- as.data.frame(resLFC[order(resLFC$log2FoldChange, decreasing = T),])
-# 
-# write.table(resOrdered, paste0("data/DESeq2_",
-#                           strsplit(resultsNames(dset1)[2], "_")[[1]][3], "_vs_",
-#                           strsplit(resultsNames(dset1)[2], "_")[[1]][5], ".txt"),
-#                           quote = F, dec = ".", sep = "\t")
-# write_xlsx(resOrdered, paste0("data/DESeq2_",
-#                           strsplit(resultsNames(dset1)[2], "_")[[1]][3], "_vs_",
-#                           strsplit(resultsNames(dset1)[2], "_")[[1]][5], ".xlsx"))
- 
+# DESeq2 <- as.data.frame(resLFC[order(resLFC$log2FoldChange, decreasing = T),])
 
 gene.names <- as.data.frame(row.names(DESeq2))
 progeny.df <- cbind(gene.names, DESeq2$log2FoldChange)
@@ -338,7 +343,7 @@ progenyscores2 <- progenyScores(progeny.df, progeny.cm, dfIndex = 1, FCIndex = 2
 PS2 <- as.data.frame(progenyscores2)
 write_xlsx(PS2, "output/Progeny_scores_from_DESeq2.xlsx")
 progeny2graph <- ggplot(PS2, aes(x=rownames(PS2), y=progenyscores2)) + geom_col(fill="navyblue") +
-  xlab("Progeny pahtways") + ylab("Contrast score") +
+  xlab("Progeny pathways") + ylab("Contrast score") +
   ggtitle(paste("Progeny analysis based on DEseq analysis",pop[1],"vs",pop[2])) +
   theme(plot.title = element_text(hjust = 0.5, size = 16, face="bold")) +
   theme(axis.text.x = element_text(angle = 60, size = 10, hjust =1, face="bold"))+
@@ -348,63 +353,61 @@ progeny2graph <- ggplot(PS2, aes(x=rownames(PS2), y=progenyscores2)) + geom_col(
         panel.grid.major = element_line(size = 0.05, linetype = 'solid',
                                         colour = "grey"))
 
-pdf(file = "figs/Graphbar_progenyon_DESeq.pdf", width = 8, height = 8)
+pdf(file = "figs/Graphbar_progeny_on_DESeq.pdf", width = 8, height = 4)
 progeny2graph
 dev.off()
-  
+
 ###########################################################################
 #Scatter plots to check how genes within the pathways behave:
 #LOOP FOR ALL PATHWAYS
-Min0 = function(x) {
+min0 = function(x) {
   min(x[x!=0])
 }
+
 pdf(file=paste("figs/Progeny score","pathways",".pdf"))
 for (i in names(model)){
-#Scatter plots to check how genes within the pathways behave:
-#Retrieve genes that are involved in the pathway:
-genes <- rownames(model[which(model[,i] != 0),])
-#Filter the DESeq2 file to contain only these genes:
-DESeq_ <- na.omit(DESeq2[genes,"log2FoldChange", drop = FALSE])
-#Filter the progeny scoring matrix to contain only these proggenes too:
-progeny_ <- na.omit(model[genes,i, drop = FALSE])
-#Select common genes:
-genes_common <- intersect(rownames(DESeq_), rownames(progeny_))
-x = as.data.frame(DESeq_[genes_common,"log2FoldChange", drop = FALSE])
-y = progeny_[genes_common,i, drop = FALSE]
-stopifnot(rownames(x) == rownames(y))
-.plot <- merge(x = x, y = y, by = "row.names")
-row.names(.plot) <- .plot [,1]
-.plot <- .plot[,2:3]
-colnames(.plot) <- c("log2FC", "progeny")
-#We need to use these ` ` symbols around the progeny weights variable
-#because there is a space and this confuses R. Using these you mark it
-#as a one single variable
-# Change the point size depending on FC
-#And + geom_point(aes(size=abs(log2FC)), show.legend = F)
-#Add gene names to those that have a |FC|>2 and |progeny|>1, then change the size of the texts:
-#And we add colour depending on FC, a gradient:
-gplot <- ggplot(.plot, aes(x=log2FC, y=progeny)) + 
-  geom_point(aes(size=abs(log2FC), color=abs(log2FC)), show.legend = F) +
-  geom_label_repel(data=subset(.plot, abs(log2FC)>2 & abs(progeny)>1 ), 
-                   label=rownames(subset(.plot, abs(log2FC) > 2 & abs(progeny)>1)),
-                   size = 4, aes(fontface=2),
-                   show.legend = FALSE)+
-  scale_color_gradient(low = "blue", high = "red")+
-  geom_vline(xintercept = 0) +
-  geom_hline(yintercept = 0) +
-  labs(title=paste(i,"pathway",pop[1],"vs",pop[2]),
-       x ="log2FoldChange", y = "PROGENy score",
-       subtitle = paste0("Analysis p.value=",results[i,"p.value"], nsmall=3)) +
-  theme(plot.title = element_text(face = "bold", colour = "black", size = 18),
-        plot.subtitle = element_text(face = "bold", colour = "black", size = 14),
-        axis.title.x = element_text(color="navyblue", size=14, face="bold"),
-        axis.title.y = element_text(color="navyblue", size=14, face="bold"))+
-        coord_cartesian(xlim = c(floor(Min0(DESeq2$log2FoldChange)), ceiling(max(DESeq2$log2FoldChange))),
-                        ylim = c(floor(Min0(model)), ceiling(max(model))))
-# If we wanted to change the fontface: 
-#Allowed values : 1(normal), 2(bold), 3(italic), 4(bold.italic)
-print(gplot)
+  #Retrieve genes that are involved in the pathway:
+  genes <- rownames(model[which(model[,i] != 0),])
+  #Filter the DESeq2 file to contain only these genes:
+  DESeq_ <- na.omit(DESeq2[genes,"log2FoldChange", drop = FALSE])
+  #Filter the progeny scoring matrix to contain only these proggenes too:
+  progeny_ <- na.omit(model[genes,i, drop = FALSE])
+  #Select common genes:
+  genes_common <- intersect(rownames(DESeq_), rownames(progeny_))
+  x = as.data.frame(DESeq_[genes_common,"log2FoldChange", drop = FALSE])
+  y = progeny_[genes_common,i, drop = FALSE]
+  stopifnot(rownames(x) == rownames(y))
+  .plot <- merge(x = x, y = y, by = "row.names")
+  row.names(.plot) <- .plot [,1]
+  .plot <- .plot[,2:3]
+  colnames(.plot) <- c("log2FC", "progeny")
+  #We need to use these ` ` symbols around the progeny weights variable
+  #because there is a space and this confuses R. Using these you mark it
+  #as a one single variable
+  # Change the point size depending on FC
+  #And + geom_point(aes(size=abs(log2FC)), show.legend = F)
+  #Add gene names to those that have a |FC|>2 and |progeny|>1, then change the size of the texts:
+  #And we add colour depending on FC, a gradient:
+  gplot <- ggplot(.plot, aes(x=log2FC, y=progeny)) + 
+    geom_point(aes(size=abs(log2FC), color=abs(log2FC)), show.legend = F) +
+    geom_label_repel(data=subset(.plot, abs(log2FC)>2 & abs(progeny)>1 ), 
+                     label=rownames(subset(.plot, abs(log2FC) > 2 & abs(progeny)>1)),
+                     size = 4, aes(fontface=2),
+                     show.legend = FALSE)+
+    scale_color_gradient(low = "blue", high = "red")+
+    geom_vline(xintercept = 0) +
+    geom_hline(yintercept = 0) +
+    labs(title=paste(i,"pathway",pop[1],"vs",pop[2]),
+         x ="log2FoldChange", y = "PROGENy score",
+         subtitle = paste0("Analysis p.value=",results1[which(results1$Pathway == i),"p.value"], nsmall=3)) +
+    theme(plot.title = element_text(face = "bold", colour = "black", size = 18),
+          plot.subtitle = element_text(face = "bold", colour = "black", size = 14),
+          axis.title.x = element_text(color="navyblue", size=14, face="bold"),
+          axis.title.y = element_text(color="navyblue", size=14, face="bold"))+
+    coord_cartesian(xlim = c(floor(min0(DESeq2$log2FoldChange)), ceiling(max(DESeq2$log2FoldChange))),
+                    ylim = c(floor(min0(model)), ceiling(max(model))))
+  # If we wanted to change the fontface: 
+  #Allowed values : 1(normal), 2(bold), 3(italic), 4(bold.italic)
+  print(gplot)
 }
 dev.off()
-####################################################################
-
