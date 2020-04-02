@@ -258,6 +258,7 @@ write_xlsx(DesBM, paste0("output/DESeq2_",
 # HEATMAP:
 DEgenes <- DesBM[which(abs(DesBM$log2FoldChange)>2 & DesBM$padj<0.01), "Gene"]
 
+pdf(file = paste0("figs/Heatmap_", pop[2], "_vs_", pop[1], ".pdf"), width = 4, height = 6)
 pheatmap(rlog.norm.counts[DEgenes,], scale = "row",
          rev(brewer.pal(8, ("RdBu"))), show_rownames = F,
          # cluster_rows = F, cluster_cols = F, na_col = "white",
@@ -269,3 +270,4 @@ pheatmap(rlog.norm.counts[DEgenes,], scale = "row",
          # fontsize_col = 12, angle_col = 90,
          # width = 800, height = 4000)
 )
+dev.off()
