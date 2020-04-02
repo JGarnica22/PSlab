@@ -245,6 +245,7 @@ DesBM <- merge(x= as.data.frame(resOrdered), y= BM,
 DesBM <- DesBM[ , c(1, length(DesBM)-1, length(DesBM), 2:(length(DesBM)-2))]
 colnames(DesBM) <- c("Gene", colnames(DesBM[2:length(DesBM)]))
 DesBM <- DesBM[order(DesBM$log2FoldChange, decreasing = T),]
+DesBM <- DesBM[!duplicated(DesBM$Gene),]
 
 write.table(DesBM, paste0("output/DESeq2_", 
                           strsplit(resultsNames(dds)[2], "_")[[1]][3], "_vs_",
