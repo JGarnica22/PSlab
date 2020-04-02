@@ -18,4 +18,4 @@ To do the analysis follow these steps:
   4. Indicate the exact name of your DESeq2 analysis data file as "Desq2file"
   5. Indicate which species you are working with: "human" or "mouse"  
  
-Run all the script :smiling:
+Run all the script :smile:
