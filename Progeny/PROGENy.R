@@ -134,7 +134,7 @@ controls <- sample_info$cell_type == pop[1]
 result <- apply(t(progeny_scores_scaled), 1, function(x) {
   broom::tidy(lm(x ~ !controls)) %>%
     filter(term == "!controlsTRUE") %>%
-    select(-term)
+    dplyr::select(-term)
 })
 
 result <- mutate(Pathway=names(result), bind_rows(result))
@@ -269,7 +269,7 @@ controls <- sample_info$cell_type == pop[1]
 result1 <- apply(t(progeny.permutations), 1, function(x) {
   broom::tidy(lm(x ~ !controls)) %>%
     filter(term == "!controlsTRUE") %>%
-    select(-term)
+    dplyr::select(-term)
 })
 result1 <- mutate(bind_rows(result1), Pathway=names(result1))
 results1 <- as.data.frame(result1[,c(5,1:4)])
@@ -340,7 +340,8 @@ gene.names <- as.data.frame(row.names(DESeq2))
 progeny.df <- cbind(gene.names, DESeq2$log2FoldChange)
 names(progeny.df) <- c("Gene", "log2FC")
 progenyscores2 <- progenyScores(progeny.df, progeny.cm, dfIndex = 1, FCIndex = 2, cmIndex = 1)
-PS2 <- as.data.frame(progenyscores2)
+PS2 <- data.frame(Pathway = names(progenyscores2),
+                  Score = progenyscores2)
 write_xlsx(PS2, "output/Progeny_scores_from_DESeq2.xlsx")
 progeny2graph <- ggplot(PS2, aes(x=rownames(PS2), y=progenyscores2)) + geom_col(fill="navyblue") +
   xlab("Progeny pathways") + ylab("Contrast score") +
