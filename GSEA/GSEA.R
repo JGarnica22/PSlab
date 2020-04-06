@@ -76,7 +76,7 @@ names(ranks) <- row.names(DE.ord)
 
 #Gene names in the gmt file are human genes (capital letters)
 #If you are using mouse data (specified at the beginning of the script),
-# this next code will transform the gmt list to mouse genes:
+#this next code will transform the gmt list to mouse genes:
 
 #Create the BioMart
 if (species == "mouse"){
