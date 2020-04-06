@@ -159,13 +159,15 @@ plotEnrichment(gmt.mouse[[geneset]],
 dev.off()
 
 
-###FALTA###
-#Plot GSEA for all hallmarks in a single pdf
-for (i in gmt.mouse){
-  pdf(paste0(i,"figs/GSEA_all.pdf"),height=5,width=5) 
-  plt <- plotEnrichment(pathway = ranks[[i]], 
-                        gseaParam = 1, ticksSize = 0.5, stats= ranks) + 
-    labs(title=i) + theme(plot.title = element_text(hjust = 0.5, face="bold"))
+#Plot GSEA for all gene sets in a single pdf
+pdf(paste0("figs/GSEA_all_plots.pdf"), height=5, width=6)
+for (i in 1:length(gmt.file)){
+  plt <- plotEnrichment(gmt.mouse[[i]],
+                 stats= ranks,
+                 gseaParam = 1, 
+                 ticksSize = 0.5) + 
+    labs(title= names(gmt.mouse[i])) + 
+    theme(plot.title = element_text(hjust = 0.5, face="bold"))
   print(plt)
-  dev.off()
 }
+dev.off()
