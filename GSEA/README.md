@@ -14,4 +14,4 @@ To do the analysis follow these steps:
   3. Indicate the exact name of your differential expression data file in the read.table
   4. Indicate populations (conditions) in the comparison
   
-Run all the script ::smile::
+Run all the script :smile:
