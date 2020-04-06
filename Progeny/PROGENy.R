@@ -1,5 +1,5 @@
 #This script is to perform DE analysis with RNAseq data
-#It was created for R 3.6.2 version (2019-03-30)
+#It was created for R 3.6.3 version (2019-03-30)
 #Copyright (C) 2020  Patricia Sole Sanchez
 # Check if required packages are installed, if not install:
 cran.packages <- c("BiocManager","ggplot2", "ggrepel", "pheatmap", "RColorBrewer", "dplyr",
@@ -36,7 +36,7 @@ library(magrittr)
 library(dplyr)
 
 # Set your working directory (the project you are working in):
-setwd("/Users/patri/Desktop/R class/Prova_GitHub_DE_analysis")
+setwd("C:/Users/jgarn/OneDrive - Universitat de Barcelona/Documentos/Bioinformatics/Functionals/Progeny")
 
 ## Specify parameters to be used along the script:
 # Indicate name of txt file containing expression data (raw counts)
@@ -63,8 +63,7 @@ counts <- read.table(paste0("data/",expfile),
 DESeq2 <- read.table (file = paste0("data/",Desq2file),
                       sep = "\t", 
                       quote = "",
-                      dec = ".", 
-                      header = T, row.names = "Gene")
+                      dec = ".")
 
 ## Prepare weight matrix to be used
 row.names(model) <- model[,1]
@@ -274,7 +273,7 @@ result1 <- apply(t(progeny.permutations), 1, function(x) {
 result1 <- mutate(bind_rows(result1), Pathway=names(result1))
 results1 <- as.data.frame(result1[,c(5,1:4)])
 write.table(results1, "output/Progeny_permutations.txt",
-           sep = "\t", dec = ".", quote = F, row.names = F)
+            sep = "\t", dec = ".", quote = F, row.names = F)
 write_xlsx(results1, "output/Progeny_permutations.xlsx")
 
 #Plot pathways depending on significance and activation:
@@ -327,14 +326,13 @@ progenyScores <- function(df, cm, dfIndex = 1, FCIndex = 3, cmIndex = 1) {
   return(progeny_scores)
 }
 
-
-# If you want to perform DE analysis here (using raw counts)
-# unblock code from here:
-# dset1 <- dset[ rowSums (counts(dset)) > 10, ]
-# dset1$cell_type <- relevel(dset1$cell_type, pop[1])
-# dset1 <- DESeq(dset1)
-# resLFC <- lfcShrink(dset1, coef=resultsNames(dset1)[2], type="apeglm")
-# DESeq2 <- as.data.frame(resLFC[order(resLFC$log2FoldChange, decreasing = T),])
+if (exists("DESeq2")==F) {
+dset1 <- dset[ rowSums (counts(dset)) > 10, ]
+dset1$cell_type <- relevel(dset1$cell_type, pop[1])
+dset1 <- DESeq(dset1)
+resLFC <- lfcShrink(dset1, coef=resultsNames(dset1)[2], type="apeglm")
+DESeq2 <- as.data.frame(resLFC[order(resLFC$log2FoldChange, decreasing = T),])
+}
 
 gene.names <- as.data.frame(row.names(DESeq2))
 progeny.df <- cbind(gene.names, DESeq2$log2FoldChange)
