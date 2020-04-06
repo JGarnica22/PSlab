@@ -1,4 +1,4 @@
-#This script is to perform GSEA analysis with RNAseq data (can be used fro other kind of data)
+#This script is to perform GSEA analysis with RNAseq data (can be used for other kind of data)
 #It was created for R 3.6.2 version (2019-12-12)
 #Copyright (C) 2020  Patricia Solé Sánchez and Mireia Ortega Crespo
 
@@ -33,58 +33,69 @@ library(ggplot2)
 library(data.table)
 
 # Set your working directory (the project you are working in):
+setwd("/Users/patri/Desktop/R class/Prova_GitHub_DE_analysis")
 
-setwd("/Users/Mireia/Desktop/R_Home")
+## Specify parameters to be used along the script:
+# Indicate name of txt file containing DESeq2 analysis result previously performed
+Desq2file <- "DESeq2_TFH_vs_TH0.txt"
+# Indicate populations of interest, to be compared:
+# First indicate control population, then sample:
+pop <- c("Th0", "TFH")
+# Indicate species used in the analysis:
+species <- "mouse"
 
-#You need to work with differential expression data from your previous analysis.
-#First, we need to create a ranking of genes for GSEA. 
-#Then, we will order genes based on FC and also on significance (log10 of the padj):
+# Indicate gene set file for the analysis:
+gmt <- "h.all.v7.1.symbols.gmt"
 
-#1) Order genes depending on FC:
-DGE.LFC <- read.table("/Users/Mireia/Desktop/R_Home/Differential_expression_examen2.txt")
-DGE.FC.ord <- DGE.LFC[order(DGE.LFC$log2FoldChange, decreasing = TRUE),]
-DGE.FC.ord
+# Read the DESeq2 results:
+DESeq2 <- read.table (file = paste0("data/",Desq2file),
+                      sep = "\t", 
+                      quote = "",
+                      dec = ".", 
+                      header = T, row.names = "Gene")
 
-#2) Ranks object is a vector of FC with the names of the genes
-ranks <- DGE.FC.ord[, "log2FoldChange"]
-names(ranks) <- row.names(DGE.FC.ord)
-
-#Read hallmarks downloaded from MSigDB
+# Read gene sets (gmt.file):
 #The gmt.file is a list object that contains a set of vectors corresponding to the
 #gene sets. Each geneset (vector), will contain the genes within the geneset.
-
-gmt.file <- read.gmt("hallmarks.gmt")
+gmt.file <- read.gmt(paste0("data/", gmt))
 gmt.file
 
-#Read a Hallmak as an exaple: HALLMARK_G2M_CHECKPOINT 
-gmt.file["HALLMARK_G2M_CHECKPOINT"]
 
-#Gene names in the gmt file are in capital letters (human genes), while gene names in "ranks" 
-#are not (mouse genes). 
-#The CORRECT way is using Biomart to find orthologs for the gene names in the 
-#gene sets:
+##You need to work with differential expression data from your previous analysis.
+# First, we need to create a ranking of genes for GSEA. 
+#You can rank genes based on FC or on significance (log10 of the padj), we will use preferably FC
+
+#1) Order genes depending on FC:
+DE.ord <- DESeq2[order(DESeq2$log2FoldChange, decreasing = TRUE),]
+DE.ord
+
+#2) Ranks object is a vector of FC with the names of the genes
+ranks <- DE.ord[, "log2FoldChange"]
+names(ranks) <- row.names(DE.ord)
+
+
+#Gene names in the gmt file are human genes (capital letters)
+#If you are using mouse data (specified at the beginning of the script),
+# this next code will transform the gmt list to mouse genes:
+
 #Create the BioMart
+if (species == "mouse"){
 mouse = useMart(biomart="ENSEMBL_MART_ENSEMBL", dataset="mmusculus_gene_ensembl")
-
 BM1 <- getBM(attributes=c("ensembl_gene_id","gene_biotype",
                           "external_gene_name"), mart = mouse, verbose = T)
-BM2 <- getBM(attributes=c("ensembl_gene_id","hsapiens_homolog_associated_gene_name"), 
+BM2 <- getBM(attributes=c("ensembl_gene_id","hsapiens_homolog_associated_gene_name"),
              mart = mouse, verbose = T)
 #Merge two data frames in one by the common column ("ensembl_gene_id")
 BM <- merge(x = BM1, y = BM2, by = "ensembl_gene_id", all.x = T)
 BM <- unique(BM)
 BM <- BM[,c(3:4)]
 names(BM) <- c("mouse", "human")
-
-#Use the "for" function or loop to change the names of all the genes in all the gene sets (for within for):
-
+#Use for loop to change the names of all the genes in all the gene sets (for within for):
 # Create a empty list:
 gmt.mouse <- vector(mode = "list",length = length(gmt.file))
-
 # Set the names of the gene sets in the list:
-names(gmt.mouse) <- names(gmt.file) 
-
-#Change the gene names from human to mouse: 
+names(gmt.mouse) <- names(gmt.file)
+#Change the gene names from human to mouse:
 #For each Gene_set we create an empty vector, that will after contain the genes
 for(Gene_set in names(gmt.file)) {
   geneset_mouse <- vector()
@@ -98,9 +109,11 @@ for(Gene_set in names(gmt.file)) {
   #We replace each element of the list (that was empty, NULL) with the vector we created with the mouse gene names
   gmt.mouse[[Gene_set]] <- geneset_mouse
 }
+gmt.file <- gmt.mouse
+}
 
-#Run fGSEA:
-fgseaRes <- fgsea(pathways = gmt.mouse, 
+# Run fGSEA:
+fgseaRes <- fgsea(pathways = gmt.file, 
                   stats = ranks,
                   minSize=15,
                   maxSize=500,
@@ -108,34 +121,39 @@ fgseaRes <- fgsea(pathways = gmt.mouse,
 fgseaRes
 
 #Table plots for all hallmarks
-pdf(file = "figs/table_GSEA.pdf", width = 11, height = 5)
 topPathwaysUp <- fgseaRes[ES > 0][head(order(pval), n=10), pathway]
 topPathwaysDown <- fgseaRes[ES < 0][head(order(pval), n=10), pathway]
 topPathways <- c(topPathwaysUp, rev(topPathwaysDown))
+
+pdf(file = "figs/Table_GSEA.pdf", width = 11, height = 5)
 plotGseaTable(gmt.mouse[topPathways], ranks, fgseaRes, 
               gseaParam = 0.5)
 dev.off()
 
 #If from the plot above one can see that there are very similar pathways in the table (for example
-#Mitotic_Metaphase_and_Anaphase  and Mitotic_Anaphase). To select only independent pathways one 
+#Mitotic_Metaphase_and_Anaphase and Mitotic_Anaphase). To select only independent pathways one 
 #can use collapsePathways function:
-
-pdf(file = "figs/table_GSEA_collapsed.pdf", width = 11, height = 5)
 collapsedPathways <- collapsePathways(fgseaRes[order(pval)][padj < 0.01], 
                                       gmt.mouse, ranks)
 mainPathways <- fgseaRes[pathway %in% collapsedPathways$mainPathways][
   order(-NES), pathway]
+
+pdf(file = "figs/Table_GSEA_collapsed.pdf", width = 11, height = 5)
 plotGseaTable(gmt.mouse[mainPathways], ranks, fgseaRes, 
               gseaParam = 0.5)
 dev.off()
 
 #To save the results data:table::fwrite function can be used:
+fwrite(fgseaRes, 
+       file= paste0("output/fgseaRes_", pop[2], "_vs_", pop[1], ".txt"),
+       sep="\t", sep2=c("", " ", ""))
 
-fwrite(fgseaRes, file="output/fgseaRes.txt", sep="\t", sep2=c("", " ", ""))
+#Plot GSEA for an specific gene set:
+#Indicate gene set of interest
+geneset <- "HALLMARK_G2M_CHECKPOINT"
 
-#Plot GSEA for an specific hallmark
-pdf(file = "figs/GSEA.pdf", width = 5, height = 5)
-plotEnrichment(gmt.mouse[["HALLMARK_G2M_CHECKPOINT"]],
+pdf(file = paste0("figs/GSEA_", geneset, ".pdf"), width = 5, height = 5)
+plotEnrichment(gmt.mouse[[geneset]],
                ranks) + 
   labs(title="G2M_CHECKPOINT")
 dev.off()
@@ -151,4 +169,3 @@ for (i in gmt.mouse){
   print(plt)
   dev.off()
 }
-
