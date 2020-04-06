@@ -56,21 +56,26 @@ head(counts)
 
 #Set gene_name as rows labels
 row.names(counts) <- counts$gene_name
-#Eliminate unnecessary columns, we only want gene_name and counts for the different populations
-counts2 <- counts[, c(grep(pop[1], colnames(counts)), grep(pop[2], colnames(counts)))]
-
-#Change names of columns to shorter, easier ones:
-names (counts2) <- c(paste0(rep(pop[1], length(grep(pop[1],colnames(counts2)))),
-                            1:length(grep(pop[1],colnames(counts2)))), 
-                     paste0(rep(pop[2], length(grep(pop[2],colnames(counts2)))),
-                            1:length(grep(pop[2],colnames(counts2)))))
-head(counts2)
+#Eliminate unnecessary columns, we only want gene_name and counts for the different populations and
+#change names of columns into shorter and easier ones:
+  counts2 <- data.frame(matrix(ncol=0,nrow = nrow(counts)))
+  row.names(counts2) <- row.names(counts)
+  for (p in c(1:length(pop))){
+  counts1 <- counts[, c(grep(pop[p], colnames(counts)))]
+  names(counts1) <- c(paste0(rep(pop[p], length(grep(pop[p],colnames(counts1)))),
+                             1:length(grep(pop[p],colnames(counts)))))
+  counts2 <- cbind(counts2,counts1)
+  }
 #Create conditions:
-sample_info <- data.frame(cell_type = c(rep(pop[1], length(grep(pop[1], colnames(counts2)))), 
-                                        rep(pop[2], length(grep(pop[2], colnames(counts2))))),
-                          replicates = c(1:length(grep(pop[1],colnames(counts2))),
-                                         1:length(grep(pop[2],colnames(counts2)))),
-                          row.names = names (counts2))
+cell_type <- NULL
+replicates <- NULL
+ for (o in c(1:length(pop))) {
+   ct <- rep(pop[o], length(grep(pop[o], colnames(counts))))
+   cell_type <- append(cell_type, ct)
+   rpli <- 1:length(grep(pop[o],colnames(counts)))
+   replicates <- append(replicates,rpli)
+ }
+   sample_info <- data.frame(cell_type, replicates, row.names = names(counts2))
 #Transform the matrix by rounding the counts and transforming the values from "numeric" to "integer"
 counts2_r <- apply(counts2, c(1,2), round)
 counts2_i <- apply(counts2_r, c(1,2), as.integer)
