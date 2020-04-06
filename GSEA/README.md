@@ -7,9 +7,9 @@ Analysis is performed with differential expression data from previous analysis, 
 
 For this analysis you will need:
   1. Differential expression data file containing genes and log2FoldChange
-  2. Gene sets of interest, i.e. gmt file from MSigDB (https://www.gsea-msigdb.org/gsea/msigdb/index.jsp). We provide in this GitHub repository with the Hallmark gene sets (Classification of coherently expressed signatures derived by aggregating many MSigDB gene sets to represent well-defined biological states or processes). If you are interested in studying enrichment for other gene sets, go to website and dowloand your gmt
-**IMPORTANT! It needs to contain genes in sets labelled as Gene symbols, do not use Entrez IDs.** 
-**Gene sets from MSigDB are made with human genes, if using mouse data, transform gmt.file to mouse gene names.**
+  2. Gene sets of interest, i.e. gmt file from MSigDB (https://www.gsea-msigdb.org/gsea/msigdb/index.jsp). We provide in this GitHub repository with the Hallmark gene sets (Classification of coherently expressed signatures derived by aggregating many MSigDB gene sets to represent well-defined biological states or processes). If you are interested in studying enrichment for other gene sets, go to website and dowloand your gmt. <br />
+**IMPORTANT! It needs to contain genes in sets labelled as Gene symbols, do not use Entrez IDs.** <br />
+**Gene sets from MSigDB are made with human genes, if using mouse data, transform gmt.file to mouse gene names.**<br />
    
 To do the analysis follow these steps:
   1. Open R script
