@@ -47,6 +47,8 @@ species <- "mouse"
 # Indicate gene set file for the analysis:
 gmt <- "h.all.v7.1.symbols.gmt"
 
+
+##You need to work with differential expression data from your previous analysis.
 # Read the DESeq2 results:
 DESeq2 <- read.table (file = paste0("data/",Desq2file),
                       sep = "\t", 
@@ -60,8 +62,6 @@ DESeq2 <- read.table (file = paste0("data/",Desq2file),
 gmt.file <- read.gmt(paste0("data/", gmt))
 gmt.file
 
-
-##You need to work with differential expression data from your previous analysis.
 # First, we need to create a ranking of genes for GSEA. 
 #You can rank genes based on FC or on significance (log10 of the padj), we will use preferably FC
 
@@ -69,16 +69,16 @@ gmt.file
 DE.ord <- DESeq2[order(DESeq2$log2FoldChange, decreasing = TRUE),]
 DE.ord
 
-#2) Ranks object is a vector of FC with the names of the genes
+#2) Ranks object is a vector of FC with the names of the genes:
 ranks <- DE.ord[, "log2FoldChange"]
 names(ranks) <- row.names(DE.ord)
 
 
 #Gene names in the gmt file are human genes (capital letters)
 #If you are using mouse data (specified at the beginning of the script),
-#this next code will transform the gmt list to mouse genes:
+#this next code will transform the gmt list to mouse genes to avoid errors:
 
-#Create the BioMart
+#Create the BioMart:
 if (species == "mouse"){
 mouse = useMart(biomart="ENSEMBL_MART_ENSEMBL", dataset="mmusculus_gene_ensembl")
 BM1 <- getBM(attributes=c("ensembl_gene_id","gene_biotype",
@@ -120,7 +120,7 @@ fgseaRes <- fgsea(pathways = gmt.file,
                   nperm=10000)
 fgseaRes
 
-#Table plots for all hallmarks
+#Table plots for all hallmarks:
 topPathwaysUp <- fgseaRes[ES > 0][head(order(pval), n=10), pathway]
 topPathwaysDown <- fgseaRes[ES < 0][head(order(pval), n=10), pathway]
 topPathways <- c(topPathwaysUp, rev(topPathwaysDown))
@@ -159,7 +159,7 @@ plotEnrichment(gmt.mouse[[geneset]],
 dev.off()
 
 
-#Plot GSEA for all gene sets in a single pdf
+#Plot GSEA for all gene sets in a single pdf:
 pdf(paste0("figs/GSEA_all_plots.pdf"), height=5, width=6)
 for (i in 1:length(gmt.file)){
   plt <- plotEnrichment(gmt.mouse[[i]],
