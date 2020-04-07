@@ -47,6 +47,8 @@ species <- "mouse"
 # Indicate gene set file for the analysis:
 gmt <- "h.all.v7.1.symbols.gmt"
 
+
+##You need to work with differential expression data from your previous analysis.
 # Read the DESeq2 results:
 DESeq2 <- read.table (file = paste0("data/",Desq2file),
                       sep = "\t", 
@@ -60,8 +62,6 @@ DESeq2 <- read.table (file = paste0("data/",Desq2file),
 gmt.file <- read.gmt(paste0("data/", gmt))
 gmt.file
 
-
-##You need to work with differential expression data from your previous analysis.
 # First, we need to create a ranking of genes for GSEA. 
 #You can rank genes based on FC or on significance (log10 of the padj), we will use preferably FC
 
