@@ -1,8 +1,7 @@
 #This script is to perform DE analysis with RNAseq data
-#It was created for R 3.6.2 version (2019-12-12)
+#It was created for R 3.6.3 version (2019-12-12)
 #Copyright (C) 2020  Patricia Solé Sánchez
 ##########################################################
-
 # Check if required packages are installed, if not install:
 cran.packages <- c("ggplot2", "ggrepel", "writexl", "pheatmap")
 for (i in cran.packages) {
@@ -14,7 +13,6 @@ for (i in cran.packages) {
     print(paste(i,"was already installed"))
   }
 }
-
 bioc.packages <- c("DESeq2", "biomaRt")
 for (i in bioc.packages) {
   if (!require(i, character.only = TRUE)) {
@@ -24,7 +22,6 @@ for (i in bioc.packages) {
     print(paste(i,"was already installed"))
   }
 }
-
 # Load packages:
 library(ggplot2)
 library(ggrepel)
@@ -35,7 +32,7 @@ library(pheatmap)
 library(RColorBrewer)
 
 # Set your working directory (the project you are working in):
-setwd("/Users/patri/Desktop/R class/Prova_GitHub_DE_analysis")
+setwd("C:/Users/jgarn/OneDrive - Universitat de Barcelona/Documentos/Bioinformatics/Functionals/DE_analysis_RNAseq")
 
 # Specify parameters to be used along the script:
 ## Indicate name of txt file containing expression data (raw counts)
@@ -44,7 +41,9 @@ expfile <- "Partek_TFH_Raw_counts.txt"
 ## found in column names without numbers):
 # Ex: TFH1_25887 will be TFH
 #First indicate control population, then sample:
-pop <- c("Th0", "TFH")
+pop <- c("Th0", "TFH", "Tet")
+#Indicate species working with (typicall mouse or human)
+species <- "mouse"
 
 # Load data:
 counts <- read.table(paste0("data/", expfile),
@@ -58,24 +57,24 @@ head(counts)
 row.names(counts) <- counts$gene_name
 #Eliminate unnecessary columns, we only want gene_name and counts for the different populations and
 #change names of columns into shorter and easier ones:
-  counts2 <- data.frame(matrix(ncol=0,nrow = nrow(counts)))
-  row.names(counts2) <- row.names(counts)
-  for (p in c(1:length(pop))){
+counts2 <- data.frame(matrix(ncol=0,nrow = nrow(counts)))
+row.names(counts2) <- row.names(counts)
+for (p in c(1:length(pop))){
   counts1 <- counts[, c(grep(pop[p], colnames(counts)))]
   names(counts1) <- c(paste0(rep(pop[p], length(grep(pop[p],colnames(counts1)))),
                              1:length(grep(pop[p],colnames(counts)))))
   counts2 <- cbind(counts2,counts1)
-  }
+}
 #Create conditions:
 cell_type <- NULL
 replicates <- NULL
- for (o in c(1:length(pop))) {
-   ct <- rep(pop[o], length(grep(pop[o], colnames(counts))))
-   cell_type <- append(cell_type, ct)
-   rpli <- 1:length(grep(pop[o],colnames(counts)))
-   replicates <- append(replicates,rpli)
- }
-   sample_info <- data.frame(cell_type, replicates, row.names = names(counts2))
+for (o in c(1:length(pop))) {
+  ct <- rep(pop[o], length(grep(pop[o], colnames(counts))))
+  cell_type <- append(cell_type, ct)
+  rpli <- 1:length(grep(pop[o],colnames(counts)))
+  replicates <- append(replicates,rpli)
+}
+sample_info <- data.frame(cell_type, replicates, row.names = names(counts2))
 #Transform the matrix by rounding the counts and transforming the values from "numeric" to "integer"
 counts2_r <- apply(counts2, c(1,2), round)
 counts2_i <- apply(counts2_r, c(1,2), as.integer)
@@ -116,14 +115,14 @@ PC2_varexpl <- pc_sum$importance[2,"PC2"]
 plot <- as.data.frame(pc$x[,1:2])
 plot$sample_type <- as.character(sample_info$cell_type)
 
-pdf(file = paste0("figs/PCA_", pop[2], "_vs_", pop[1], ".pdf"), width = 5.5, height = 5)
+pdf(file = paste("figs/PCA", paste(pop, collapse=" "), ".pdf"), width = 5.5, height = 5)
 ggplot(plot, aes(x = PC1, y= PC2, 
                  color = sample_type,
                  fill= sample_type)) +
   geom_point(size= 5,
              pch = 21) +
-  scale_color_manual(values = c("royalblue3","green3")) + #border color, change colors if you like
-  scale_fill_manual(values = c("steelblue2","greenyellow")) + #fill color, change colors if you like
+  # scale_color_manual(values = c("royalblue3","green3")) + #border color, change colors if you like
+  # scale_fill_manual(values = c("steelblue2","greenyellow")) + #fill color, change colors if you like
   # theme_minimal() +
   #or
   theme_light() +
@@ -145,11 +144,11 @@ dds <- DESeq(dds)
 res <- results(dds)
 
 #Clean up genes with low counts and high variability with Shrinkage
-resLFC <- lfcShrink(dds, coef=resultsNames(dds)[2], type="apeglm")
+for (t in c(2:length(pop))){
+resLFC <- lfcShrink(dds, coef=resultsNames(dds)[t], type="apeglm")
 head(resLFC)
 #Order genes based on their pvalue
 resOrdered <- resLFC[order(resLFC$log2FoldChange, decreasing = T),]
-
 # VOLCANO PLOT:
 Vol <- data.frame(log2FC= resOrdered$log2FoldChange,
                   sig= -log10(resOrdered$padj), 
@@ -162,18 +161,15 @@ Vol[which(Vol$S==0), "S"] <- "NS"
 head(Vol)
 Vol$S <- as.factor(Vol$S)
 Vol[which(Vol$sig>=99.5), "sig"] <- 99.5
-
-pdf(file = paste0("figs/Volcano_", pop[2], "_vs_", pop[1], ".pdf"), width = 4, height = 5)
-ggplot(Vol, aes(x=log2FC, y=sig, color = S)) +
+pdf(file = paste0("figs/Volcano_", pop[t], "_vs_", pop[1], ".pdf"), width = 4, height = 5)
+print(ggplot(Vol, aes(x=log2FC, y=sig, color = S)) +
   geom_point (size = 0.25,
               show.legend = F) +
-  
-  geom_vline(xintercept = c(-2, 2), linetype = 1, size = 0.3, col = "grey20") +
+    geom_vline(xintercept = c(-2, 2), linetype = 1, size = 0.3, col = "grey20") +
   geom_hline(yintercept = 2, linetype = 1, size = 0.3, col = "grey20") +
-  
-  scale_color_manual(values = c("skyblue2", "grey60", "green3")) +
+    scale_color_manual(values = c("skyblue2", "grey60", "green3")) +
   theme_light() +
-  ggtitle(paste0(pop[2], " vs. ", pop[1])) +
+  ggtitle(paste0(pop[t], " vs. ", pop[1])) +
   xlab("Fold Change") + 
   ylab("-log10 (FDR)") +
   scale_y_continuous(breaks = c(1,20,40,60,80,100),
@@ -183,17 +179,14 @@ ggplot(Vol, aes(x=log2FC, y=sig, color = S)) +
                      guide = guide_axis(check.overlap = T)) +
   theme(axis.line = element_line(size = 0.3, colour = "grey20", linetype=1),
         panel.grid.minor.x = element_blank(),
-        panel.grid.minor.y = element_blank())
+        panel.grid.minor.y = element_blank()))
 dev.off()
-
 #If you need to add gene names, you may use these functions
-  #geom_label
-  #geom_text
+#geom_label
+#geom_text
 #http://www.sthda.com/english/wiki/ggplot2-texts-add-text-annotations-to-a-graph-in-r-software
-
 #If you want to show gene names for a particular set of genes:
 #Change txt file to the one containing a list of genes that you want to show in volcano
-
 # !! To unblock code, select all and press CTL+SHIFT+C
 # genestoshow <- "Table1.txt"
 # genes <- read.table(paste0("data/", genestoshow),
@@ -229,20 +222,19 @@ dev.off()
 #         panel.grid.minor.x = element_blank(),
 #         panel.grid.minor.y = element_blank())
 
-
 # BIOMART:
-#Select mart:
-ensembl <- useMart("ENSEMBL_MART_ENSEMBL")
-#Select a Dataset:
-ensembl <- useDataset("mmusculus_gene_ensembl", mart=ensembl)
-
-#If you need to look per specific attribute:
-#searchAttributes(mart = ensembl, pattern = "ensembl.*id")
-
-#Find in Biomart ensembleID, gene type and mouse gene name
+if (species == "mouse"){
+  #Select mart:
+  ensembl <- useMart("ENSEMBL_MART_ENSEMBL", dataset="mmusculus_gene_ensembl")
+  #If you need to look per specific attribute:
+  #searchAttributes(mart = ensembl, pattern = "ensembl.*id")
+} else {
+  #For human,select mart and dataset:
+  ensembl = useMart("ensembl", dataset="hsapiens_gene_ensembl")
+}
+#Find in Biomart ensembleID, gene type and gene name
 BM <- getBM(attributes=c("ensembl_gene_id","gene_biotype",
                          "external_gene_name"), mart = ensembl, verbose = T)
-
 #Now merge this data frame with DESeq2 results
 DesBM <- merge(x= as.data.frame(resOrdered), y= BM, 
                by.x= "row.names", by.y = "external_gene_name", 
@@ -252,19 +244,15 @@ colnames(DesBM) <- c("Gene", colnames(DesBM[2:length(DesBM)]))
 DesBM <- DesBM[order(DesBM$log2FoldChange, decreasing = T),]
 DesBM <- DesBM[!duplicated(DesBM$Gene),]
 
-write.table(DesBM, paste0("output/DESeq2_", 
-                          strsplit(resultsNames(dds)[2], "_")[[1]][3], "_vs_",
-                          strsplit(resultsNames(dds)[2], "_")[[1]][5], ".txt"), 
+write.table(DesBM, paste0("output/DESeq2_", pop[t], "_vs_", pop[1],".txt"), 
             quote = F,
             sep = "\t", dec = ".", row.names = F)
-write_xlsx(DesBM, paste0("output/DESeq2_", 
-                         strsplit(resultsNames(dds)[2], "_")[[1]][3], "_vs_",
-                         strsplit(resultsNames(dds)[2], "_")[[1]][5], ".xlsx"))
-
+write_xlsx(DesBM, paste0("output/DESeq2_",pop[t], "_vs_", pop[1], ".xlsx"))
+}
 # HEATMAP:
 DEgenes <- DesBM[which(abs(DesBM$log2FoldChange)>2 & DesBM$padj<0.01), "Gene"]
 
-pdf(file = paste0("figs/Heatmap_", pop[2], "_vs_", pop[1], ".pdf"), width = 4, height = 6)
+pdf(file = paste("figs/Heatmap comparison", paste(pop, collapse=" "), ".pdf"), width = 4, height = 6)
 pheatmap(rlog.norm.counts[DEgenes,], scale = "row",
          rev(brewer.pal(8, ("RdBu"))), show_rownames = F,
          # cluster_rows = F, cluster_cols = F, na_col = "white",
