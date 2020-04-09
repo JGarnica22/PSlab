@@ -33,14 +33,13 @@ library(RColorBrewer)
 
 # Set your working directory (the project you are working in):
 setwd("C:/Users/jgarn/OneDrive - Universitat de Barcelona/Documentos/Bioinformatics/Functionals/DE_analysis_RNAseq")
-
 # Specify parameters to be used along the script:
 ## Indicate name of txt file containing expression data (raw counts)
 expfile <- "Partek_TFH_Raw_counts.txt"
 ## Indicate populations of interest, to be compared (use same name
 ## found in column names without numbers):
 # Ex: TFH1_25887 will be TFH
-#First indicate control population, then sample:
+#First indicate control population, then sample(s):
 pop <- c("Th0", "TFH", "Tet")
 #Indicate species working with (typicall mouse or human)
 species <- "mouse"
@@ -89,7 +88,7 @@ counts(dds)
 dds <- dds[ rowSums (counts(dds)) > 10, ]
 counts(dds)
 
-#DESeq’s default method to normalize read counts to account for differences in 
+#DESeq's default method to normalize read counts to account for differences in 
 #sequencing depths is implemented in estimateSizeFactors:
 DESeq.ds_f <- estimateSizeFactors(dds)
 sizeFactors(DESeq.ds_f)
@@ -248,12 +247,14 @@ write.table(DesBM, paste0("output/DESeq2_", pop[t], "_vs_", pop[1],".txt"),
             quote = F,
             sep = "\t", dec = ".", row.names = F)
 write_xlsx(DesBM, paste0("output/DESeq2_",pop[t], "_vs_", pop[1], ".xlsx"))
-}
 # HEATMAP:
 DEgenes <- DesBM[which(abs(DesBM$log2FoldChange)>2 & DesBM$padj<0.01), "Gene"]
-
-pdf(file = paste("figs/Heatmap comparison", paste(pop, collapse=" "), ".pdf"), width = 4, height = 6)
-pheatmap(rlog.norm.counts[DEgenes,], scale = "row",
+pdf(file = paste0("figs/Heatmap comparison_", pop[t], "_vs_", pop[1], ".pdf"), width = 4, height = 6)
+pheatmap(rlog.norm.counts[DEgenes,c(paste0(rep(pop[1], length(grep(pop[1],colnames(counts)))),
+                                           1:length(grep(pop[1],colnames(counts)))),
+                                    paste0(rep(pop[p], length(grep(pop[p],colnames(counts)))),
+                                           1:length(grep(pop[p],colnames(counts)))))], 
+         scale = "row",
          rev(brewer.pal(8, ("RdBu"))), show_rownames = F,
          # cluster_rows = F, cluster_cols = F, na_col = "white",
          # border_color = "black",
@@ -265,3 +266,4 @@ pheatmap(rlog.norm.counts[DEgenes,], scale = "row",
          # width = 800, height = 4000)
 )
 dev.off()
+}
