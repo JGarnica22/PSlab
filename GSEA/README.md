@@ -21,5 +21,5 @@ To do the analysis follow these steps:
  
 Run all the script :smiley:
 
-You will generate the following outputs:
+You will generate the following outputs:<br/>
 1. 
