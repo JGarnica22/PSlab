@@ -14,7 +14,7 @@ For this script you will need: <br/>
 <br/>
 As you run the script you will need to indicate:<br/>
   1. The name of the required files. When indicating DE_matrix, you need to choose which comparison in case more than one sample or
-  condition is present.<br/>
-  2. Populations or conditions of your analysis<br/>
-  3. Confidence you want to use to do your analysis (only A, or only A,B,C, etc)<br/>
+  condition is present. <br/>
+  2. Populations or conditions of your analysis. <br/>
+  3. Confidence you want to use to do your analysis (only A, or only A,B,C, etc).<br/>
 <br/>
