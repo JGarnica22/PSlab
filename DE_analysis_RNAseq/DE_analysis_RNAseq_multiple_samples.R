@@ -255,8 +255,26 @@ for (t in c(2:length(pop))){
   # HEATMAP:
   DEgenes <- DesBM[which(abs(DesBM$log2FoldChange)>2 & DesBM$padj<0.01), "Gene"]
   
-  pdf(file = paste0("figs/Heatmap comparison_", pop[t], "_vs_", pop[1], ".pdf"), width = 4, height = 6)
+  pdf(file = paste0("figs/Heatmap_all_DEgenes_", pop[t], "_vs_", pop[1], ".pdf"), width = 4, height = 6)
   pheatmap(rlog.norm.counts[DEgenes,], 
+           scale = "row",
+           rev(brewer.pal(8, ("RdBu"))), show_rownames = F,
+           # cluster_rows = F, cluster_cols = F, na_col = "white",
+           # border_color = "black",
+           # cellwidth = 20, cellheight = 10,
+           # main = "Table 1", 
+           # fontsize = 10,
+           # fontsize_row = 9,
+           # fontsize_col = 12, angle_col = 90,
+           # width = 800, height = 4000)
+  )
+  dev.off()
+  
+  pdf(file = paste0("figs/Heatmap_", pop[t], "_vs_", pop[1], ".pdf"), width = 4, height = 6)
+  pheatmap(rlog.norm.counts[DEgenes,c(paste0(rep(pop[1], length(grep(pop[1],colnames(counts)))),
+                                             1:length(grep(pop[1],colnames(counts)))),
+                                      paste0(rep(pop[t], length(grep(pop[t],colnames(counts)))),
+                                             1:length(grep(pop[t],colnames(counts)))))], 
            scale = "row",
            rev(brewer.pal(8, ("RdBu"))), show_rownames = F,
            # cluster_rows = F, cluster_cols = F, na_col = "white",
