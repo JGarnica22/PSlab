@@ -87,7 +87,7 @@ counts(dds)
 dds <- dds[ rowSums (counts(dds)) > 10, ]
 counts(dds)
 
-#DESeq’s default method to normalize read counts to account for differences in 
+#DESeq's default method to normalize read counts to account for differences in 
 #sequencing depths is implemented in estimateSizeFactors:
 DESeq.ds_f <- estimateSizeFactors(dds)
 sizeFactors(DESeq.ds_f)
