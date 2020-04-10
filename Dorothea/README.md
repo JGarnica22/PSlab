@@ -1,5 +1,5 @@
 # Dorothea
-================================================
+
 This script infers trasncription factor (TF) activity based on target differential expression. This based on different sources of data <br/>
 including (i) manually curated repositories, (ii) interactions derived from ChIP-seq binding data, (iii) in silico prediction of <br/>
 TF binding on gene promoters and (iv) reverse-engineered regulons from large gene expression datasets. <br/>
