@@ -117,7 +117,7 @@ if (exists("rlog.norm.counts")==F){
 names(viper_regulon_mouse) <- sapply(strsplit(names(viper_regulon_mouse), split = ' - '), head, 1)
 # Compute single-sample TF activities from a normalized gene expression matrix
 # Estimate TF activities
-TFact_gexpr <- viper(eset = E, regulon = viper_regulon_mouse, nes = T, method = 'none', minsize = 4, eset.filter = F)
+TFact_gexpr <- viper(eset = rlog.norm.counts, regulon = viper_regulon_mouse, nes = T, method = 'none', minsize = 4, eset.filter = F)
 pheatmap(TFact_gexpr, scale = "row", show_rownames = FALSE, title = "Viper regulon mouse")
 # Save results
 write.csv(TFact_gexpr, file = 'output/TFactivities_rlog_geneexpression.csv')
@@ -312,7 +312,7 @@ ggplot(box, aes(x=Confidence, y=FDR)) + geom_point(color = "navyblue", position 
 dev.off()
 
 
-############  INCLUDE THIS CODE BELOW??  ###############
+##INCLUDE THIS CODE BELOW??
 
 
 #We get too many significant TFs, I will use only TFs with confidence A to do the analysis:
@@ -427,3 +427,4 @@ pval.comp
 #Also the exact same p-values.
 #The problem is really with FDR correction, that cannot be applied to this p-value distribution.
 #In order to select interesting TFs, we will just look at the top TFs, with high NES.
+
