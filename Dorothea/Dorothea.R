@@ -294,6 +294,7 @@ print(ggplot(Vol, aes(x=NES, y=FDR, color = Confidence)) +
               panel.grid.minor.y = element_blank()))
 dev.off()
 #boxplot NES vs FDR on TFact_DE_conf
+pdf(file = paste0("figs/Graphs_", "TFact_DE_conf", ".pdf"), width = 4, height = 5)
 box <- data.frame(FDR= -log10(TFact_DE_conf$FDR), Confidence=TFact_DE_conf$confidence,
                   row.names = rownames(TFact_DE_conf))
 ggplot(box, aes(x=Confidence, y=FDR)) + geom_point(color = "navyblue", position = position_jitter(w = 0.3, h = 0.0)) +
@@ -308,10 +309,10 @@ ggplot(box, aes(x=Confidence, y=FDR)) + geom_point(color = "navyblue", position 
         panel.grid.major = element_line(size = 0.05, linetype = 'solid',
                                         colour = "grey"))+
   geom_hline(yintercept = -log10(0.001), linetype = 1, size = 0.3, col = "grey20")
+dev.off()
 
 
-
-############################  INCLUDE THIS CODE BELOW???  ########################################
+############  INCLUDE THIS CODE BELOW??  ###############
 
 
 #We get too many significant TFs, I will use only TFs with confidence A to do the analysis:
