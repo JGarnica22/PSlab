@@ -45,7 +45,7 @@ expfile <- "Partek_TFH_Raw_counts.txt"
 Desq2file <- "DESeq2_TFH_vs_TH0.txt"
 # Indicate populations of interest, to be compared:
 # First indicate control population, then sample:
-pop <- c("Th0", "TFH")
+pop <- c("Th0", "TFH", "Tet")
 # Indicate "human" or "mouse" experiment
 species <- "mouse"
 
@@ -70,35 +70,41 @@ row.names(model) <- model[,1]
 model <- model[,-c(1)]
 
 ## Prepare the gene expression matrix for PROGENy from counts data
-# Set gene_name as rows labels
+#Set gene_name as rows labels
 row.names(counts) <- counts$gene_name
-# Eliminate unnecessary columns, we only want gene_name and counts for the different populations.
-counts2 <- counts[, c(grep(pop[1], colnames(counts)), grep(pop[2], colnames(counts)))]
-# Change names of columns to shorter, easier ones:
-names (counts2) <- c(paste0(rep(pop[1], length(grep(pop[1],colnames(counts2)))),
-                            1:length(grep(pop[1],colnames(counts2)))), 
-                     paste0(rep(pop[2], length(grep(pop[2],colnames(counts2)))),
-                            1:length(grep(pop[2],colnames(counts2)))))
-# Create conditions:
-sample_info <- data.frame(cell_type = c(rep(pop[1], length(grep(pop[1], colnames(counts2)))), 
-                                        rep(pop[2], length(grep(pop[2], colnames(counts2))))),
-                          replicates = c(1:length(grep(pop[1],colnames(counts2))),
-                                         1:length(grep(pop[2],colnames(counts2)))),
-                          row.names = names (counts2))
-# Transform the matrix by rounding the counts and transforming the values from "numeric" to "integer"
+#Eliminate unnecessary columns, we only want gene_name and counts for the different populations and
+#change names of columns into shorter and easier ones:
+counts2 <- data.frame(matrix(ncol=0,nrow = nrow(counts)))
+row.names(counts2) <- row.names(counts)
+for (p in c(1:length(pop))){
+  counts1 <- counts[, c(grep(pop[p], colnames(counts)))]
+  names(counts1) <- c(paste0(rep(pop[p], length(grep(pop[p],colnames(counts1)))),
+                             1:length(grep(pop[p],colnames(counts)))))
+  counts2 <- cbind(counts2,counts1)
+}
+#Create conditions:
+cell_type <- NULL
+replicates <- NULL
+for (o in c(1:length(pop))) {
+  ct <- rep(pop[o], length(grep(pop[o], colnames(counts))))
+  cell_type <- append(cell_type, ct)
+  rpli <- 1:length(grep(pop[o],colnames(counts)))
+  replicates <- append(replicates,rpli)
+}
+sample_info <- data.frame(cell_type, replicates, row.names = names(counts2))
+#Transform the matrix by rounding the counts and transforming the values from "numeric" to "integer"
 counts2_r <- apply(counts2, c(1,2), round)
 counts2_i <- apply(counts2_r, c(1,2), as.integer)
-# Generate the DESeq2 dataset:
-dset = DESeqDataSetFromMatrix(countData = counts2_i,
-                              colData= sample_info, 
-                              design= ~ cell_type)
-dset <- estimateSizeFactors(dset)
-dset <- estimateDispersions(dset)
-emat <- getVarianceStabilizedData(dset)
 
+#Generate the DESeq2 dataset:
+dds <- DESeqDataSetFromMatrix (countData = counts2_i,
+                               colData = sample_info,
+                               design = ~ cell_type)
+dds <- estimateSizeFactors(dds)
+dds <- estimateDispersions(dds)
+emat <- getVarianceStabilizedData(dds)
 
 ## We will calculate pathway activity by a matrix multiplication of the expression matrix and the weight matrix
-
 #Select gene names that appear both in the expression matrix and in the scoring matrix:
 common_genes <- intersect(rownames(emat), rownames(model))
 #Filter both matrixes to only contain the genes that are shared
@@ -128,7 +134,6 @@ pheatmap(progeny_scores_scaled, scale = "column")
 #We check if the control is different to the treated condition using a linear model:
 #Stablish control samples
 controls <- sample_info$cell_type == pop[1]
-
 #Perform linear regression to calculate enrichment of pathways:
 result <- apply(t(progeny_scores_scaled), 1, function(x) {
   broom::tidy(lm(x ~ !controls)) %>%
@@ -262,19 +267,21 @@ dev.off()
 
 #Checking for differences between the groups:
 #We check if the control is different to the treated condition using a linear model:
-#1. Stablish control samples:
+#1. Stablish control samples, and do a loop in case more than one condition, other than control, is present_
+for (n in c(2:length(pop))) {
 controls <- sample_info$cell_type == pop[1]
+study <- sample_info$cell_type == pop [n]
 #2. Perform linear regression to calculate enrichment of pathways:
-result1 <- apply(t(progeny.permutations), 1, function(x) {
-  broom::tidy(lm(x ~ !controls)) %>%
-    filter(term == "!controlsTRUE") %>%
+result1 <- apply(t(progeny.permutations), 1, function(study) {
+  broom::tidy(lm(study ~ controls)) %>%
+    filter(term == "controlsTRUE") %>%
     dplyr::select(-term)
-})
+  })
 result1 <- mutate(bind_rows(result1), Pathway=names(result1))
 results1 <- as.data.frame(result1[,c(5,1:4)])
 write.table(results1, "output/Progeny_permutations.txt",
             sep = "\t", dec = ".", quote = F, row.names = F)
-write_xlsx(results1, "output/Progeny_permutations.xlsx")
+write_xlsx(results1, paste0("output/Progeny_permutations", pop[n], "_v_", pop[1],".xlsx"))
 
 #Plot pathways depending on significance and activation:
 a <- as.data.frame(results1)
@@ -290,15 +297,16 @@ Progeny_plot <- ggplot(path.sig, aes(x=stat, y=Sig)) +
                   show.legend = F) +
   geom_vline(xintercept = 0) +
   geom_hline(yintercept = 6.6) +
-  labs(title=paste("PROGENy pathways activity", pop[1],"vs",pop[2]),
+  labs(title=paste("PROGENy pathways activity", pop[n], "_v_", pop[1]),
        x ="t value", y = "-log2(pvalue)") +
   theme(plot.title = element_text(face = "bold", colour = "black", size = 16),
         axis.title.x = element_text(color="navy", size=14, face="bold"),
         axis.title.y = element_text(color="navy", size=14, face="bold"))
 #Export progeny dotplot as pdf
-pdf(file = "figs/Dotplot_progeny.pdf", width = 5, height = 5)
-Progeny_plot
+pdf(file = paste0("figs/Dotplot_progeny", pop[n], "_v_", pop[1], ".pdf"), width = 5, height = 5)
+print(Progeny_plot)
 dev.off()
+}
 
 #########################################################################################################
 # @Aurelien's script: PROGENy can also be performed on a contrast (e.g. DESeq2 results, using log2FC)
@@ -327,11 +335,11 @@ progenyScores <- function(df, cm, dfIndex = 1, FCIndex = 3, cmIndex = 1) {
 }
 
 if (exists("DESeq2")==F) {
-dset1 <- dset[ rowSums (counts(dset)) > 10, ]
-dset1$cell_type <- relevel(dset1$cell_type, pop[1])
-dset1 <- DESeq(dset1)
-resLFC <- lfcShrink(dset1, coef=resultsNames(dset1)[2], type="apeglm")
-DESeq2 <- as.data.frame(resLFC[order(resLFC$log2FoldChange, decreasing = T),])
+  dds1 <- dds[ rowSums (counts(dds)) > 10, ]
+  dds1$cell_type <- relevel(dds1$cell_type, pop[1])
+  dds1 <- DESeq(dds1)
+  resLFC <- lfcShrink(dds1, coef=resultsNames(dds1)[2], type="apeglm")
+  DESeq2 <- as.data.frame(resLFC[order(resLFC$log2FoldChange, decreasing = T),])
 }
 
 gene.names <- as.data.frame(row.names(DESeq2))
