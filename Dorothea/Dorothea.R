@@ -101,7 +101,7 @@ if (exists("rlog.norm.counts")==F){
    rpli <- 1:length(grep(pop[o],colnames(counts)))
    replicates <- append(replicates,rpli)
  }
-   sampe_info <- data.frame(cell_type, replicates, row.names = names(counts2))
+  sample_info <- data.frame(cell_type, replicates, row.names = names(counts2))
   counts2_r <- apply(counts2, c(1,2), round)
   counts2_i <- apply(counts2_r, c(1,2), as.integer)
   dds <- DESeqDataSetFromMatrix (countData = counts2_i,
@@ -112,7 +112,7 @@ if (exists("rlog.norm.counts")==F){
   sizeFactors(DESeq.ds_f)
   DESeq.rlog <- rlog(DESeq.ds_f, blind = TRUE)
   rlog.norm.counts <- assay (DESeq.rlog)
-  }
+}
 # Clean TF names because some genes are present more than once as -1/2/...:
 names(viper_regulon_mouse) <- sapply(strsplit(names(viper_regulon_mouse), split = ' - '), head, 1)
 # Compute single-sample TF activities from a normalized gene expression matrix
@@ -121,9 +121,11 @@ TFact_gexpr <- viper(eset = rlog.norm.counts, regulon = viper_regulon_mouse, nes
 pheatmap(TFact_gexpr, scale = "row", show_rownames = FALSE, title = "Viper regulon mouse")
 # Save results
 write.csv(TFact_gexpr, file = 'output/TFactivities_rlog_geneexpression.csv')
+
 pdf(file = "figs/heatmap TF active gene expression.pdf", width = 7, height = 5)
-print(pheatmap(TFact_gexpr, scale = "row", show_rownames = FALSE))
+print(pheatmap(TFact_gexpr, scale = "row", show_rownames = FALSE, title = "Viper regulon mouse"))
 dev.off()
+# while (!is.null(dev.list()))  dev.off()
 
 #PROBABLY NOT CORRECT!! ASK
 #Perform linear regression to calculate enrichment of TFs:
@@ -144,6 +146,7 @@ ttest <- as.data.frame(ttest)
 ttest_sig <- subset(ttest, ttest$fdr<= 0.05)
 }
 
+#DELTE THIS PART?
 #Don't do now: requires objectes prepared later on !!
 TF.sig.emat <- ttest_sig[,"TF"]
 TF.sig.emat <- sort(TF.sig.emat)
@@ -164,7 +167,7 @@ rm <- subset(regulon_mouse, regulon_mouse$confidence == u)
 regulon_mouse_confi2 <- rbind(regulon_mouse_confi2,rm)
 }
 viper_regulon_mouse_confi <- df2regulon(regulon_mouse_confi2)
-TFact_gexpr_confi = viper(eset = E, regulon = viper_regulon_mouse_ABC, nes = T, method = 'none',
+TFact_gexpr_confi = viper(eset = rlog.norm.counts, regulon = viper_regulon_mouse_confi, nes = T, method = 'none',
                         minsize = 4, eset.filter = F)
 pheatmap(TFact_gexpr_confi, scale = "row", show_rownames = FALSE)
 
@@ -273,10 +276,10 @@ Vol <- data.frame(NES= TFact_DE_conf$NES,
 # Vol[which(Vol$S==0), "S"] <- "NS"
 # Vol$S <- as.factor(Vol$S)
 # Vol[which(Vol$FDR>=99.5), "FDR"] <- 99.5
-pdf(file = paste0("figs/Volcano_", "TFact_DE_conf", ".pdf"), width = 4, height = 5)
+pdf(file = paste0("figs/Volcano_", "TFact_", DEmatrix, ".pdf"), width = 8, height = 5)
 print(ggplot(Vol, aes(x=NES, y=FDR, color = Confidence)) +
-        geom_point (aes(color = factor(Confidence)), size=10, alpha = 1/3,
-                    show.legend = T) +
+        geom_point (aes(color = factor(Confidence)), size=6.5, alpha = 1/3,
+                    show.legend = T, position = position_jitter(w = 1, h = 3.0)) +
         geom_vline(xintercept = c(-2, 2), linetype = 1, size = 0.3, col = "grey20") +
         geom_hline(yintercept = 2, linetype = 1, size = 0.3, col = "grey20") +
         scale_color_manual(values = c("red", "orange", "yellow","green", "blue")) +
@@ -294,7 +297,7 @@ print(ggplot(Vol, aes(x=NES, y=FDR, color = Confidence)) +
               panel.grid.minor.y = element_blank()))
 dev.off()
 #boxplot NES vs FDR on TFact_DE_conf
-pdf(file = paste0("figs/Graphs_", "TFact_DE_conf", ".pdf"), width = 4, height = 5)
+pdf(file = paste0("figs/Graphs_", "TFact_",DEmatrix, ".pdf"), width = 4, height = 5)
 box <- data.frame(FDR= -log10(TFact_DE_conf$FDR), Confidence=TFact_DE_conf$confidence,
                   row.names = rownames(TFact_DE_conf))
 ggplot(box, aes(x=Confidence, y=FDR)) + geom_point(color = "navyblue", position = position_jitter(w = 0.3, h = 0.0)) +
@@ -427,4 +430,3 @@ pval.comp
 #Also the exact same p-values.
 #The problem is really with FDR correction, that cannot be applied to this p-value distribution.
 #In order to select interesting TFs, we will just look at the top TFs, with high NES.
-
