@@ -18,7 +18,6 @@ To do the analysis follow these steps:
   6. Indicate gmt.file (Gene sets) to use for the analysis
   7. Indicate the exact name of your differential expression data file in the read.table
   
- 
 Run all the script :smiley:
 
 You will generate the following outputs:<br/>
