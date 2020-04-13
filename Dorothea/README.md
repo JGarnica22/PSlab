@@ -1,8 +1,8 @@
 # DoRothEA :octocat:
 
-This script can be used to infer transcription factor (TF) activity based on target differential expression. It is run using the `DoRothEA` regulon and the Virtual Inference of Protein-activity by Enriched Regulon analysis (`VIPER`) tool. <br/>
+This script can be used to infer **transcription factor (TF) activity** based on target differential expression. It is run using the `DoRothEA` regulon and the Virtual Inference of Protein-activity by Enriched Regulon analysis (`VIPER`) tool. <br/>
 
-`DoRothEA`is a consensus regulon that links thousands of TFs to their targets based on different types of evidences: literature curated resources, (ii) interactions derived from ChIP-seq data, (iii) in silico prediction of 
+`DoRothEA` is a consensus regulon that links thousands of TFs to their targets based on different types of evidences: (i) literature curated resources, (ii) interactions derived from ChIP-seq data, (iii) in silico prediction of 
 TF binding on motifs and (iv) reverse-engineered regulons from large gene expression datasets. <br/> 
 
 Each interaction between TF and target gene is given a confidence from A to E. Interactions that are supported by all the four sources of evidence, manually curated by experts in specific reviews or supported both in at least two curated resource are considered to be highly reliable and were assigned an A score. Scores B-D are reserved for curated and/or ChIP-seq interactions with different levels of additional evidence. Finally, E score is used for interactions that are uniquely supported by computational predictions.<br/>
