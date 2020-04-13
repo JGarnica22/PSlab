@@ -1,5 +1,5 @@
 #This script is to perform DE analysis with RNAseq data
-#It was created for R 3.6.2 version (2019-12-12)
+#It was created for R 3.6.3 version (2019-12-12)
 #Copyright (C) 2020  Patricia Solé Sánchez
 ##########################################################
 
@@ -45,6 +45,8 @@ expfile <- "Partek_TFH_Raw_counts.txt"
 # Ex: TFH1_25887 will be TFH
 #First indicate control population, then sample:
 pop <- c("Th0", "TFH")
+#Indicate species working with (typicall mouse or human)
+species <- "mouse"
 
 # Load data:
 counts <- read.table(paste0("data/", expfile),
@@ -85,7 +87,7 @@ counts(dds)
 dds <- dds[ rowSums (counts(dds)) > 10, ]
 counts(dds)
 
-#DESeq’s default method to normalize read counts to account for differences in 
+#DESeq's default method to normalize read counts to account for differences in 
 #sequencing depths is implemented in estimateSizeFactors:
 DESeq.ds_f <- estimateSizeFactors(dds)
 sizeFactors(DESeq.ds_f)
@@ -226,11 +228,15 @@ dev.off()
 
 
 # BIOMART:
-#Select mart:
-ensembl <- useMart("ENSEMBL_MART_ENSEMBL")
-#Select a Dataset:
-ensembl <- useDataset("mmusculus_gene_ensembl", mart=ensembl)
-
+if (species == "mouse"){
+  #Select mart:
+  ensembl <- useMart("ENSEMBL_MART_ENSEMBL", dataset="mmusculus_gene_ensembl")
+  #If you need to look per specific attribute:
+  #searchAttributes(mart = ensembl, pattern = "ensembl.*id")
+} else {
+  #For human,select mart and dataset:
+  ensembl = useMart("ensembl", dataset="hsapiens_gene_ensembl")
+}
 #If you need to look per specific attribute:
 #searchAttributes(mart = ensembl, pattern = "ensembl.*id")
 
