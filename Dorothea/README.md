@@ -12,7 +12,7 @@ You can find more info in: https://saezlab.github.io/dorothea/ <br/>
 For the script you will need the following input files: <br/>
   1. rlog normalized counts and differential expression data file from RNAseq analysis, or at least the raw counts. <br/>
   2. Regulon for the species of the sample (human or mouse) as Rdata or csv. <br/>
-<br/>
+
 To do the analysis follow these steps: <br/>
   1. Open R script
   2. Change working directory
