@@ -10,7 +10,7 @@ Each interaction between TF and target gene is given a confidence from A to E. I
 You can find more info in: https://saezlab.github.io/dorothea/ <br/>
 
 For the script you will need the following input files: <br/>
-  1. rlog normalized counts and differential expression data file from RNAseq analysis, or at least the raw counts. <br/>
+  1. rlog normalized counts and differential expression data file from RNAseq analysis. <br/>
   2. Regulon for the species of the sample (human or mouse) as Rdata or csv. <br/>
 
 To do the analysis follow these steps: <br/>
