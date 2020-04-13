@@ -11,12 +11,12 @@ You can find more info in: https://saezlab.github.io/dorothea/ <br/>
 
 For the script you will need the following input files: <br/>
   1. rlog normalized counts and differential expression data file from RNAseq analysis. <br/>
-  2. Regulon for the species of the sample (human or mouse) as Rdata or csv. <br/>
+  2. Regulon for the species of the sample (human or mouse) as Rdata. You can download it from this repository in data folder. <br/>
 
 To do the analysis follow these steps: <br/>
   1. Open R script
   2. Change working directory
-  3. Indicate the exact name of your data files. When indicating DE_matrix, you need to choose which comparison in case more than one sample or condition is present <br/>
+  3. Indicate the exact name of your data files <br/>
   4. Indicate populations (conditions) in the comparison <br/>
   5. Indicate which species you are working with: "human" or "mouse"
   6. Indicate confidence you want to use to do your analysis (only A, or only A,B,C, etc).<br/>
