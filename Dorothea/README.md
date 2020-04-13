@@ -20,7 +20,6 @@ To do the analysis follow these steps: <br/>
   4. Indicate populations (conditions) in the comparison <br/>
   5. Indicate which species you are working with: "human" or "mouse"
   6. Indicate confidence you want to use to do your analysis (only A, or only A,B,C, etc).<br/>
-<br/>
   
 Run all the script :smiley:
 
