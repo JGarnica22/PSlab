@@ -1,4 +1,4 @@
-#This script is to infer TF activity in our test samples running msVIPER
+#This script is to infer TF activity in our test samples running msVIPER function
 #It was created for R 3.6.0 version (2019-04-26)
 #Copyright (C) 2020  Patricia Solé Sánchez and Mireia Ortega Crespo
 
@@ -37,25 +37,23 @@ library(dplyr)
 setwd("/Users/Mireia/Desktop/R_Home/VIPER2")
 
 ## Specify parameters to be used along the script:
-
 # Indicate name of txt file containing DESeq2 analysis result previously performed:
 Desq2file <- "DESeq2_TFH_vs_TH0.txt"
 
-# Indicate name of txt file containing rlog counts from teh DESeq2 script:
+# Indicate name of txt file containing rlog counts from the DESeq2 analysis:
 rlog.norm.counts <- "rlog.norm.counts.txt"
 
-# Indicate name of txt file containing normalized matrix for CD4 (tissue-specific data needs to be 
-#downloaded from GEO)
+# Indicate name of the txt file containing normalized matrix for CD4.
+# Remember that tissue-specific data needs to be downloaded from GEO
 norm.matrix.CD4 <- "norm.matrix.CD4.txt"
 
-# Indicate name of txt file containing ARACNe output .adj file (and the expression dataset used by ARACNe to reverse engineer the network):
+# Indicate name of txt file containing ARACNe output .adj file (the expression dataset used 
+#by ARACNe to reverse engineer the network):
 adjfile <- "network.txt"
-
 
 # Indicate populations of interest, to be compared:
 # First indicate control population, then sample:
 pop <- c("Th0", "TFH")
-
 
 # Read differential expression data from DESeq2:
 DESeq2 <- read.table (file = paste0("data/",Desq2file),
@@ -68,20 +66,16 @@ DESeq2 <- read.table (file = paste0("data/",Desq2file),
 DESeq2 = subset(DESeq2, Gene != "" )
 DESeq2 = subset(DESeq2, ! duplicated(Gene))
 
-
-
 # Read expression data used for ARACNe:
 exprdata <- read.table(file = paste0("data/",norm.matrix.CD4),
                        header = T, sep = "\t", dec = ".", quote = "",
                        row.names = NULL, stringsAsFactors = FALSE)
 
-
-
-# Read rlog.norm.counts:
+# Read rlog.norm.counts file from DESeq2:
 rlog.norm.counts2 <- read.table(paste0("data/",rlog.norm.counts), 
                                 header = T, sep = "\t", dec = ".", quote = "")
 
-# Convert Gene column to row.names:
+# Convert "Gene" column to row.names:
 rlog.norm.counts3 <- data.frame(rlog.norm.counts2, row.names = "Gene")
 
 
@@ -91,7 +85,7 @@ myPvalue = matrix(DESeq2$pvalue, dimnames = list(DESeq2$Gene, 'pvalue') )
 mySignature = (qnorm(myPvalue/2, lower.tail = FALSE) * sign(myStatistics))[, 1]
 mySignature = mySignature[order(mySignature, decreasing = T)]
 
-# Generate the regulon object from the ARACNe network:
+# Generate the regulon object from ARACNe network:
 rownames(exprdata) <- exprdata$gene
 exprdata <- exprdata[,colnames(exprdata)!="gene"]
 exprdata <- as.matrix(exprdata)
@@ -101,7 +95,7 @@ class(exprdata)
 dset <- ExpressionSet(assayData=exprdata)
 class(dset)
 
-# Generate regulon to use in VIPER:
+# Generate the regulon to be used in VIPER:
 regulon <- aracne2regulon(paste0("data/",adjfile), dset, gene = FALSE, verbose = TRUE)
 print(regulon)
 
@@ -110,7 +104,6 @@ pdf(file = "figs/Histogram.pdf", width = 11, height = 5)
 hist(unlist(lapply(regulon, function(TF) length(TF$tfmode))),
      main="Histogram", xlab="No.targets", breaks=25,las=1)
 dev.off()
-
 
 # Create a matrix from rlog.norm.counts to perform null distribution:
 MAT <- as.matrix(rlog.norm.counts3)
@@ -128,8 +121,7 @@ eset <-  ExpressionSet(assayData=MAT, phenoData=new("AnnotatedDataFrame",data=DF
 nullmodel <- ttestNull(eset, "group", pop[2], pop[1], per = 1000,
                        repos = TRUE, verbose = TRUE)
 
-
-# Estimate TF activities:
+# Estimate TF activities with msviper:
 mrs <- msviper(mySignature, regulon, nullmodel, verbose = TRUE)
 summary(mrs)
 
@@ -140,12 +132,12 @@ TFact = data.frame(Regulon = names(mrs$es$nes),
                    FDR = p.adjust(mrs$es$p.value, method = 'fdr'))
 TFact = TFact[ order(TFact$p.value), ]
 
-#Export results of TF activity:
+#Export results of TF activity as a txt file:
 write.table(TFact, "output/TFactivity_test.txt",
             sep = "\t", dec = ".",
             quote = F, row.names = F, col.names = T)
 
-# Plot a Volcano plot:
+# Plot a Volcano plot FALTARIA POSAR MÉS MACO:
 pdf(file = "figs/Volcano.pdf", width = 11, height = 5)
 vol <- TFact[, c("NES", "FDR")]
 vol[,2] <- -log10(vol[,2])
