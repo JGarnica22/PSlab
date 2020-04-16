@@ -48,7 +48,7 @@ rlog_norm <- "rlog_normalized_DESeq.txt"
 Desq2file <- "DESeq2_TFH_vs_TH0.txt"
 # First indicate control population, then sample:
 pop <- c("Th0", "TFH")
-# Indicate species used in the analysis:
+# Indicate species used in the analysis, human or mouse:
 species <- "mouse"
 #Indicate confidence to use:
 confi2 <- c("A","B","C")
@@ -64,19 +64,23 @@ DESeq2 <- read.table (file = paste0("data/",Desq2file),
                       header = T, row.names = "Gene")
 #Load your regulon as rdata
 load(paste0("data/viperRegulon_", species, ".rdata"))
-
+# Clean TF names because some genes are present more than once as -1/2/...:
+names(viper_regulon) <- sapply(strsplit(names(viper_regulon), split = ' - '), head, 1)
 
 # Compute single-sample TF activities from a normalized gene expression matrix
 # Estimate TF activities
 TFact_gexpr <- viper(eset = rlog.norm.counts, regulon = viper_regulon, nes = T, method = 'none', minsize = 4, eset.filter = F)
 pheatmap(TFact_gexpr, scale = "row", show_rownames = FALSE, title = "Viper regulon mouse")
 # Save results
-write.csv(TFact_gexpr, file = 'output/TFactivities_rlog_geneexpression.csv')
+TFact_gexprdf <- as.data.frame(TFact_gexpr)
+TFact_gexprdf$TF <- row.names(TFact_gexprdf)
+TFact_gexprdf <- TFact_gexprdf[,c(11,1:10)]
+write_xlsx(TFact_gexprdf, "output/TFactivities_rlog_gene_expression.xlsx")
 
 pdf(file = "figs/heatmap TF active gene expression.pdf", width = 7, height = 5)
-print(pheatmap(TFact_gexpr, scale = "row", show_rownames = FALSE, title = "Viper regulon mouse"))
+pheatmap(TFact_gexpr, scale = "row", show_rownames = FALSE, main = "Viper regulon mouse")
 dev.off()
-# while (!is.null(dev.list()))  dev.off()
+#while (!is.null(dev.list()))  dev.off()
 
 #PROBABLY NOT CORRECT!! ASK
 #Perform linear regression to calculate enrichment of TFs:
@@ -87,31 +91,13 @@ result <- apply(TFact_gexpr, 1, function(x) {
     select(-term)
 })
 ttest <- mutate(TF=names(result), bind_rows(result))
-write.table(ttest, "output/DoRothEA_ttest.txt", dec = ".", sep = "\t", quote = FALSE)
-
-#adjust pvalue if this presents a normal distribuition. Normal distribution visualization and saphirot test
-ggqqplot(ttest$p.value)
-if (shapiro.test(ttest$p.value)[2] > 0.05){
-  ttest$fdr <- p.adjust(ttest$p.value, method = "fdr")
-  ttest <- as.data.frame(ttest)
-  ttest_sig <- subset(ttest, ttest$fdr<= 0.05)
-}
-
-#DELETE THIS PART?
-#Don't do now: requires objectes prepared later on !!
-TF.sig.emat <- ttest_sig[,"TF"]
-TF.sig.emat <- sort(TF.sig.emat)
-TF.sig.DE <- as.vector(as.character(TF_sig[,"Regulon"]))
-TF.sig.DE <- sort(TF.sig.DE)
-length(TF.sig.emat)
-length(TF.sig.DE)
-table(TF.sig.DE %in% TF.sig.emat)
+write_xlsx(ttest, "output/DoRothEA_ttest.xlsx")
 
 #################################################################################################
-#In order to clean up and not use the whole TF elements in DoRothEA, I will try to use only
+#In order to clean up and not use the whole TF elements in DoRothEA, try to use only
 #TFs with high confidence, indicate confidence to use:
-#Set confidence to subset:
-regulon_confi2 <- data.frame(matrix(ncol= ncol(viper_regulon), nrow=0))
+##REGULON DO NOT INCLUDE CONFIDENCES
+regulon_confi2 <- data.frame(matrix(ncol= 4, nrow=0))
 names(regulon_confi2) <- names(viper_regulon)
 for (u in confi2) {
   rm <- subset(viper_regulon, viper_regulon$confidence == u)
@@ -203,6 +189,7 @@ print(ggplot(Vol, aes(x=NES, y=FDR, color = Confidence)) +
               panel.grid.minor.x = element_blank(),
               panel.grid.minor.y = element_blank()))
 dev.off()
+
 #boxplot NES vs FDR on TFact_DE_conf
 pdf(file = paste0("figs/Graphs_", "TFact_", pop[2], "_vs_", pop[1], ".pdf"), width = 4, height = 5)
 box <- data.frame(FDR= -log10(TFact_DE_conf$FDR), Confidence=TFact_DE_conf$confidence,
@@ -220,120 +207,3 @@ ggplot(box, aes(x=Confidence, y=FDR)) + geom_point(color = "navyblue", position 
                                         colour = "grey"))+
   geom_hline(yintercept = -log10(0.001), linetype = 1, size = 0.3, col = "grey20")
 dev.off()
-
-
-##INCLUDE THIS CODE BELOW??
-
-
-#We get too many significant TFs, I will use only TFs with confidence A to do the analysis:
-regulon_mouse_A <- regulon_mouse[which(regulon_mouse$confidence=="A"),]
-viper_regulon_mouse_A <- df2regulon(regulon_mouse_A)
-names(viper_regulon_mouse_A) = sapply(strsplit(names(viper_regulon_mouse_A), split = ' - '), head, 1)
-mrs_A = msviper(ges = mySignature, regulon = viper_regulon_mouse_A, minsize = 4, ges.filter = F)
-TFact_DE_A = data.frame(Regulon = names(mrs_A$es$nes),
-                        Size = mrs_A$es$size[ names(mrs_A$es$nes) ],
-                        NES = mrs_A$es$nes,
-                        p.value = mrs_A$es$p.value,
-                        FDR = p.adjust(mrs_A$es$p.value, method = 'fdr'))
-TFact_DE_A = TFact_DE_A[ order(TFact_DE_A$p.value), ]
-TFact_DE_A
-
-TFact_DE_A_sig <- TFact_DE_A[which(TFact_DE_A$FDR<=0.05),]
-TFact_DE_A_sig
-#From TFs with confidence A, I can only obtain 1 significant TF.
-
-#I will use TFs with confidence A, B or C to do the analysis:
-regulon_mouse_ABC <- regulon_mouse[which(regulon_mouse$confidence=="A" |
-                                           regulon_mouse$confidence=="B" |
-                                           regulon_mouse$confidence=="C"),]
-viper_regulon_mouse_ABC <- df2regulon(regulon_mouse_ABC)
-mrs_ABC = msviper(ges = mySignature, regulon = viper_regulon_mouse_ABC, minsize = 4, ges.filter = F)
-TFact_DE_ABC = data.frame(Regulon = names(mrs_ABC$es$nes),
-                          Size = mrs_ABC$es$size[ names(mrs_ABC$es$nes) ],
-                          NES = mrs_ABC$es$nes,
-                          p.value = mrs_ABC$es$p.value,
-                          FDR = p.adjust(mrs_ABC$es$p.value, method = 'fdr'))
-TFact_DE_ABC = TFact_DE_ABC[ order(TFact_DE_ABC$p.value), ]
-TFact_DE_ABC
-
-TFact_DE_ABC_conf <- merge(x = TFact_DE_ABC,
-                           y = regulon_mouse, 
-                           by.x = "row.names", by.y = "tf")
-TFact_DE_ABC_conf <- TFact_DE_ABC_conf[,c("Regulon", "NES", "p.value", "FDR", "confidence")]
-TFact_DE_ABC_conf <- unique(TFact_DE_ABC_conf)
-TFact_DE_ABC_conf = TFact_DE_ABC_conf[ order(TFact_DE_ABC_conf$p.value), ]
-
-write.csv(TFact_DE_ABC_conf, file = 'DoRothEA_TFactivities_DE_ABC.csv')
-
-TFact_DE_ABC_conf_sig <- TFact_DE_ABC_conf[which(TFact_DE_ABC_conf$FDR<=0.05),]
-TFact_DE_ABC_conf_sig
-
-#In this case we can again obtain only 1 significant TF with confidence A, and only 5 TFs with confidence
-#C. This is suspicious as we had before more significant TFs when using all TFs (all confidences) for the 
-#analysis. If we check for less comparisons (TFs) in pval adjustment (to FDR), correction by multiple 
-#testing should be less, so we would expect to find more significant results, not less.
-#We will try to do pval adjustment manually and compare with the correction that is done within
-#the viper function to see if the problem could be the p-values adjustment within viper. 
-#For that we use the `p.adjust` function.
-#We first need to create a vector with all the p-values:
-pval.A <- TFact_DE_A$p.value
-names(pval.A) <- row.names(TFact_DE_A)
-FDR.A <- p.adjust(pval.A, method = "fdr")
-#Results are the same than the obtained from viper, only 1 TF is significant looking at the FDR
-
-#We will try the same correction for the whole set of TFs:
-pval.all <- TFact_DE$p.value
-names(pval.all) <- row.names(TFact_DE)
-length(pval.all)
-FDR.all <- p.adjust(pval.all, method = "fdr")
-FDR.sig <- FDR.all<=0.05
-table(FDR.sig)
-#Manual correction gives no different results. The problem is with the FDR correction per se, not viper.
-
-#We will check distribution of p-values, because if the distribution is not the usual downwards
-#exponential curve, the FDR correction should not be applied.
-#p-values distribution of the analysis for all TFs (all confidences A-E)
-hist(TFact_DE$p.value, main = "pval distribution All-conf TFs", xlab = "pvalues")
-#p-values distribution of the analysis for TFs with confidence A-C:
-hist(TFact_DE_ABC$p.value, main = "pval distribution ABC-conf TFs", xlab = "pvalues")
-#p-values distribution of the analysis for TFs with confidence A:
-hist(TFact_DE_A$p.value, main = "pval distribution A-conf TFs", xlab = "pvalues")
-#The distribution of the pvalues for only TFs with confidence A is not normal. We should not
-#correct for FDR.
-#It is not normal even when you check how the pvalues for the set of A-conf TFs within the whole
-#analysis are distributed:
-hist(TFact_DE_conf[which(TFact_DE_conf$confidence=="A"),"p.value"], 
-     xlab = "pvalues",
-     main = "pval distribution A-conf TFs \n within All-conf list")
-
-#In order to check that it is only a matter of pvalue correction, we need to check also that the
-#NES and the pvalues obtained for A-TFs is the same when we do it for all TFs or only for the 
-#A set (in theory, viper does the analysis individually for each set):
-
-#1. Compare NES:
-NES.fil <- as.data.frame(TFact_DE_conf[which(TFact_DE_conf$confidence=="A"),"NES"])
-row.names(NES.fil) <- TFact_DE_conf[which(TFact_DE_conf$confidence=="A"), "Regulon"]
-names(NES.fil) <- "NES_all"
-
-NES.A <- as.data.frame(TFact_DE_A[,"NES"])
-row.names(NES.A) <- row.names(TFact_DE_A)
-names(NES.A) <- "NES_A"
-
-NES.comp <- merge(NES.A,NES.fil, by= 0)
-NES.comp
-#They are the exact same NES values.
-
-#2. Compare p-values:
-pval.fil <- as.data.frame(TFact_DE_conf[which(TFact_DE_conf$confidence=="A"),"p.value"])
-row.names(pval.fil) <- TFact_DE_conf[which(TFact_DE_conf$confidence=="A"), "Regulon"]
-names(pval.fil) <- "pval_all"
-
-pval.A <- as.data.frame(TFact_DE_A[,"p.value"])
-row.names(pval.A) <- row.names(TFact_DE_A)
-names(pval.A) <- "pval_A"
-
-pval.comp <- merge(pval.A,pval.fil, by= 0)
-pval.comp
-#Also the exact same p-values.
-#The problem is really with FDR correction, that cannot be applied to this p-value distribution.
-#In order to select interesting TFs, we will just look at the top TFs, with high NES.
