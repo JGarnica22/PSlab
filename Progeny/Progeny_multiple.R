@@ -124,6 +124,7 @@ pheatmap(progeny_scores_scaled, scale = "column")
 
 #Checking for differences between the groups:
 #We check if the control is different to the treated condition using a linear model:
+
 for (n in c(2:length(pop))) {
   #Stablish control and study samples:
   controls <- sample_info$cell_type == pop[1]
