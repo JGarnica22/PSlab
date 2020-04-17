@@ -43,7 +43,7 @@ setwd("C:/Users/jgarn/OneDrive - Universitat de Barcelona/Documentos/Bioinformat
 
 ## Specify parameters to be used along the script:
 # Indicate name of txt file with counts normalized for sequencing depth and transformed to log2 scale
-rlog_norm <- "rlog_normalized_DESeq.txt"
+rlog.norm.counts <- "rlog_normalized_DESeq.txt"
 # Indicate name of txt file containing DESeq2 analysis result previously performed
 Desq2file <- "DESeq2_TFH_vs_TH0.txt"
 # First indicate control population, then sample:
@@ -55,7 +55,7 @@ confi2 <- c("A","B","C")
 
 
 # Read rlog normalized counts:
-rlog.norm.counts <- read.table(paste0("data/",rlog_norm), header = T, sep = "\t", dec = ".", quote = "")
+rlog.norm.counts <- read.table(paste0("data/",rlog.norm.counts), header = T, sep = "\t", dec = ".", quote = "")
 # Read the DESeq2 results:
 DESeq2 <- read.table (file = paste0("data/",Desq2file),
                       sep = "\t", 
