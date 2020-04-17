@@ -24,4 +24,13 @@ To do the analysis follow these steps: <br/>
 Run all the script :smiley:
 
 You will generate the following outputs:<br/>
-1. 
+1. TF activity inferences based on normalized gene expression of all confidences <br/>
+2. TF activity inferences based on normalized gene expression of selected confidences <br/>
+3. TF activity inferences based on gene expression signature (GES) of all confidences <br/>
+4. TF activity inferences based on gene expression signature (GES) of all confidences with high significacances <br/>
+
+and the following figures: <br/>
+1. Heatmap of TF activity inferences based on normalized gene expression of all confidences <br/>
+2. Heatmap of TF activity inferences based on normalized gene expression of selected confidences <br/>
+3. Volcano plot of TF activities differentially infered <br/>
+4. Graphs plot with significantly differentially expressed TF in each confidence group <br/>
