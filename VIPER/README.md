@@ -8,8 +8,8 @@ VIPER is run on a previous network defining interactions. In our case, we will i
 For the script you will need the following input files:
   1. Differential expression data file containing genes and log2FoldChange, for example, from `DESeq2` data.
   2. rlog.norm.counts data file from DESeq2 script.
-  3. Normalized counts matrix used to build your network (tissue-specific gene expression data that was used to run `ARACNe`). Here we provide a normalized counts matrix for CD4 T cell samples (data was downloaded from GEO).
-  4. Cellular network defining interactins (ARACNe output). Here we provide a mouse CD4 T cell network defining targets for a list of TFs.
+  3. Normalized counts matrix used to build your network (tissue-specific gene expression data that was used to run `ARACNe`). Here we provide a normalized counts matrix for CD4 T cell samples (data was downloaded from GEO). Find _norm.matrix.CD4.txt_ in data folder.
+  4. Cellular network defining interactins (ARACNe output). Here we provide a mouse CD4 T cell network defining targets for a list of TFs. Find _CD4_T_cell_network_ARACNe.txt_ in data folder.
    
 To do the analysis follow these steps:
   1. Open R script
