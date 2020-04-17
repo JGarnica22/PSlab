@@ -20,4 +20,12 @@ To do the analysis follow these steps:
 Run all the script :smile:
 
 You will generate the following outputs:<br/>
-1. 
+1. Linear regression of progeny permutations between samples or conditions<br/>
+2. Progeny scores based on DESeq2 results<br/>
+
+and the following figures:<br/>
+1. Heatmap with the progeny permutations between samples or conditions<br/>
+2. Dotplot graph of differences in score between samples for each pathway<br/>
+3. Graphbars with contrast score for each progeny pathway based on DESeq2 results<br/>
+4. Dotplot with genes most differentialy expressed within each pathway<br/>
+
