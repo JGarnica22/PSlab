@@ -8,6 +8,7 @@ TF binding on motifs and (iv) reverse-engineered regulons from large gene expres
 Each interaction between TF and target gene is given a confidence from A to E. Interactions that are supported by all the four sources of evidence, manually curated by experts in specific reviews or supported both in at least two curated resource are considered to be highly reliable and were assigned an A score. Scores B-D are reserved for curated and/or ChIP-seq interactions with different levels of additional evidence. Finally, E score is used for interactions that are uniquely supported by computational predictions.<br/>
 
 You can find more info in: https://saezlab.github.io/dorothea/ <br/>
+<br />
 
 For the script you will need the following input files: <br/>
   1. rlog normalized counts and differential expression data file from RNAseq analysis. <br/>
