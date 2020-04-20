@@ -12,6 +12,7 @@ You can find more info in: https://saezlab.github.io/dorothea/ <br/>
 For the script you will need the following input files: <br/>
   1. rlog normalized counts and differential expression data file from RNAseq analysis. <br/>
   2. Regulon for the species of the sample (human or mouse) as _.rdata_. You can download it from this repository in data folder. <br/>
+  <br />
 
 To do the analysis follow these steps: <br/>
   1. Open R script
@@ -20,8 +21,8 @@ To do the analysis follow these steps: <br/>
   4. Indicate populations (conditions) in the comparison <br/>
   5. Indicate which species you are working with: "human" or "mouse"
   6. Indicate confidence you want to use to do your analysis (only A, or only A,B,C, etc).<br/>
-  
-Run all the script :smiley:
+  7. Run all the script :smiley:<br />
+  <br />
 
 You will generate the following outputs:<br/>
 1. TF activity inferences based on normalized gene expression of all confidences <br/>
