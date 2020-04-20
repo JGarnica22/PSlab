@@ -18,8 +18,7 @@ To do the analysis follow these steps:
   2. Change working directory
   3. Indicate the exact name of your differential expression data file in the read.table
   4. Indicate populations (conditions) in the comparison
-   
-Run all the script :smiley: <br/>
+  5. Run all the script :smiley: <br/>
  <br/>
 
 You will generate the following outputs:<br/>
