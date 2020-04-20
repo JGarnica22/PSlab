@@ -27,7 +27,7 @@ You will generate the following outputs:<br/>
 1. TF activity inferences based on normalized gene expression of all confidences <br/>
 2. TF activity inferences based on normalized gene expression of selected confidences <br/>
 3. TF activity inferences based on gene expression signature (GES) of all confidences <br/>
-4. TF activity inferences based on gene expression signature (GES) of all confidences with high significacances <br/>
+4. TF activity inferences based on gene expression signature (GES) of all confidences with high significances <br/>
 
 and the following figures: <br/>
 1. Heatmap of TF activity inferences based on normalized gene expression of all confidences <br/>
