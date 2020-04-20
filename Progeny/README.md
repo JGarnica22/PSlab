@@ -3,12 +3,14 @@ This script can be used to perform **Pathway RespOnsive GENes (PROGENy) analysis
 
 For more information go to: https://saezlab.github.io/progeny/ 
 
-Analysis can be performed both on raw counts data to assess pathway activity in single sample (followed by a linear regression model to study difference between conditions) or on differential expression data (e.g. from `DESeq2`).
+Analysis can be performed both on raw counts data to assess pathway activity in single sample (followed by a linear regression model to study difference between conditions) or on differential expression data (e.g. from `DESeq2`).<br/>
+<br/>
 
 For the script you will need the following input file(s):
   1. Raw counts data file.
   2. Progeny matrix for the species you are working with (human or mouse), available to download in this repository, version 2020.
-  3. DESeq2 analysis data file (it is possible to do it inline here too).
+  3. DESeq2 analysis data file (it is possible to do it inline here too).<br/>
+  <br/>
   
 To do the analysis follow these steps:
   1. Open R script
@@ -16,8 +18,8 @@ To do the analysis follow these steps:
   3. Indicate the exact name of your raw counts file as "expfile"
   4. Indicate the exact name of your DE analysis data file as "Desq2file"
   5. Indicate which species you are working with: "human" or "mouse"  
- 
-Run all the script :smile:
+  6. Run all the script :smile:<br/>
+  <br/>
 
 You will generate the following outputs:<br/>
 1. Linear regression of progeny permutations between samples or conditions<br/>
