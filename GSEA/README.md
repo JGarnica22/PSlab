@@ -23,8 +23,8 @@ To do the analysis follow these steps:
   <br/>
 
 You will generate the following outputs:<br/>
-1. GSEA plot for an specific pathway
-2. GSEA plots for all pathways
+1. GSEA plot for a specific gene set
+2. GSEA plots for all gene sets in the same file
 3. Table plots
 4. Table plots collapsed (optional)
 5. Txt file with results
