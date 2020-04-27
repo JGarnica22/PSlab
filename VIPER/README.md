@@ -3,7 +3,7 @@ This script can be used to run **Virtual Inference of Protein-activity by Enrich
 
 VIPER is run on a previous network defining interactions. In our case, we will infer TF activity from a TF-target network that was generated with **ARACNe (Algorithm for the Reconstruction of Accurate Cellular Networks)**. 
 
-**IMPORTANT!! In this script we are providing a specific cellular network created on mouse CD4 T cell data.** If you want to use `VIPER`on a different cellular network you should either downloaded from an available source or create your own with `ARACNe`.<br/>
+**IMPORTANT!! In this script we are providing a specific cellular network created on mouse CD4 T cell data.** If you want to use `VIPER` on a different cellular network you should either download it from an available source or create your own with `ARACNe`.<br/>
 <br/>
 
 For the script you will need the following input files:
