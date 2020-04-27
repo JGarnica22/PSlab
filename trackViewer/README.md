@@ -1,5 +1,9 @@
 # TrackViewer
 
+
+## Prepare your input files:
+
+
 #Install:
 
 deeptools (bamCoverage - transform .bam to .bw)
@@ -27,3 +31,6 @@ or
 deeptools --help
 * Help on how to use bamCoverage:
 bamCoverage --help
+
+
+Use trackViewer: script.R
