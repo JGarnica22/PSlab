@@ -4,10 +4,12 @@ If you working in Mac, you will already have installed the _Terminal.app_. Termi
 
 Currently, after macOS Catalina, Mac uses _zsh_ as the default login and interactive shell ("language").<br/>
 
+#
 In order to use the Terminal, you need to first learn the basic commands. You can find a summary of **regular expressions** (Appendix 2) and **basic shell commands** (Appendix 3) in the following Cheat Sheet:  
 http://practicalcomputing.org/files/PCfB_Appendices.pdf  
 <br/>
 
+#
 It is optional, but in order to easily manipulate your Terminal configuration you can install **Oh My Zsh** (https://ohmyz.sh).
 
 To modify your zsh profile (_.zshrc_) you should open it from your default directory (/Users/$USER)
