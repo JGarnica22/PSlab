@@ -1,6 +1,6 @@
 # How to Set up your Terminal in Mac
 
-If you are running your analyses in Mac, you will already have installed the _Terminal.app_. Terminal provides a command line interface to control the UNIX-based operating system that controls Mac operating system (macOS).<br/>
+If you working in Mac, you will already have installed the _Terminal.app_. Terminal provides a command line interface to control the UNIX-based operating system that controls Mac operating system (macOS).<br/>
 
 Currently, after macOS Catalina, Mac uses _zsh_ as the default login and interactive shell ("language").<br/>
 
