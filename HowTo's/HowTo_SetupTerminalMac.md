@@ -4,7 +4,7 @@ If you are running your analyses in Mac, you will already have installed the _Te
 
 Currently, after macOS Catalina, Mac uses _zsh_ as the default login and interactive shell ("language").<br/>
 
-In order to use the Terminal, you need to first learn the basic commands. You can find a summary of **regular expressions** (Appendix 2) and **basic shell commands** (Appendix 3) in the following Cheat Sheet:<br/>
+In order to use the Terminal, you need to first learn the basic commands. You can find a summary of **regular expressions** (Appendix 2) and **basic shell commands** (Appendix 3) in the following Cheat Sheet:  
 http://practicalcomputing.org/files/PCfB_Appendices.pdf
 
 It is optional, but in order to easily manipulate your Terminal configuration you can install **Oh My Zsh** (https://ohmyz.sh).
@@ -13,7 +13,7 @@ To modify your zsh profile (_.zshrc_) you should call from your default director
 ````
 nano .zshrc
 ````
-This will open the nano editor within Terminal and will allow you to modify your Terminal aesthetics. I suggest you change the zsh theme to "bureau" (ZSH_THEME="bureau") in order to see in each of your command lines:
-$USER@computer directory                    [time]
+This will open the nano editor within Terminal and will allow you to modify your Terminal aesthetics. I suggest you change the zsh theme to "bureau" (ZSH_THEME="bureau") in order to see in each of your command lines:<br/>
+$USER@computer directory                [time]  
 
 
