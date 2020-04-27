@@ -15,7 +15,7 @@ To modify your zsh profile (_.zshrc_) you should open it from your default direc
 open .zshrc
 ````
 This will open an external text editor (TextEdit) will allow you to modify your Terminal aesthetics. I suggest you change the zsh theme to "_bureau_" (ZSH_THEME="bureau") in order to see in each of your command lines:<br/>
-$USER@computer directory                [time]  
+`$USER @ computer   directory                      [time]`  
 
 Save and close.
 <br/>
