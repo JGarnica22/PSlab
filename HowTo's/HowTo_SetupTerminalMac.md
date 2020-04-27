@@ -5,7 +5,8 @@ If you are running your analyses in Mac, you will already have installed the _Te
 Currently, after macOS Catalina, Mac uses _zsh_ as the default login and interactive shell ("language").<br/>
 
 In order to use the Terminal, you need to first learn the basic commands. You can find a summary of **regular expressions** (Appendix 2) and **basic shell commands** (Appendix 3) in the following Cheat Sheet:  
-http://practicalcomputing.org/files/PCfB_Appendices.pdf
+http://practicalcomputing.org/files/PCfB_Appendices.pdf  
+<br/>
 
 It is optional, but in order to easily manipulate your Terminal configuration you can install **Oh My Zsh** (https://ohmyz.sh).
 
@@ -19,12 +20,12 @@ $USER@computer directory                [time]
 <Ctrl + X> to exit nano and accept Save.
 <br/>
 
-Analysis of NGS data requires many tools, which usually can be installed through **Conda** (https://docs.conda.io/en/latest/). For Mac, _miniconda_ is preferably used. To install _miniconda_ go to https://conda.io/projects/conda/en/latest/user-guide/install/macos.html  
+Analysis of NGS data requires many tools, which usually can be installed through **Conda** (https://docs.conda.io/en/latest/). For Mac, _miniconda_ is preferably used. To install _miniconda_ go to https://conda.io/projects/conda/en/latest/user-guide/install/macos.html and followin instructions.  
+
+**IMPORTANT! In the process of installation, you will be asked where to install Miniconda. By default, it will be installed into your default location (/Users/$USER). If you want to change that, specify another location**.
 <br/>
 
-After installing _miniconda_ it will initialize by default every time you open Terminal. You can know Conda is active if you see _(base)_ at the beginning of your command line.
-
-To avoid activation by default run the following line in Terminal:
+After installing _miniconda_ it will initialize by default every time you open Terminal. You can know Conda is active if you see _(base)_ at the beginning of your command line. To avoid activation by default run the following line in Terminal:
 
 ````
 conda config --set auto_activate_base false
@@ -35,5 +36,4 @@ To initialize Conda, use:
 ````
 conda activate
 ````
-
 
