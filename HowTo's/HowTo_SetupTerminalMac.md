@@ -17,10 +17,10 @@ This will open the nano editor within Terminal and will allow you to modify your
 $USER@computer directory                [time]  
 
 <Ctrl + X> to exit nano and accept Save.
- 
+<br/>
 
 Analysis of NGS data requires many tools, which usually can be installed through **Conda** (https://docs.conda.io/en/latest/). For Mac, _miniconda_ is preferably used. To install _miniconda_ go to https://conda.io/projects/conda/en/latest/user-guide/install/macos.html  
-  
+<br/>
 
 After installing _miniconda_ it will initialize by default every time you open Terminal. You can know Conda is active if you see _(base)_ at the beginning of your command line.
 
