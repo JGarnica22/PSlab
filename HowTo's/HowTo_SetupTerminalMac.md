@@ -1,8 +1,8 @@
 # How to Set up your Terminal in Mac
 
-<p>If you are running your analyses in Mac, you will already have installed the _Terminal.app_. Terminal provides a command line interface to control the UNIX-based operating system that lurks below macOS (or Mac OS X). <p>
+If you are running your analyses in Mac, you will already have installed the _Terminal.app_. Terminal provides a command line interface to control the UNIX-based operating system that lurks below macOS (or Mac OS X).<br/>
 
-<p>Currently, after macOS Catalina, mac uses _zsh_ as the default login and interactive shell ("language").<p>
+Currently, after macOS Catalina, mac uses _zsh_ as the default login and interactive shell ("language").<br/>
 
 In order to use the Terminal, you need to know the basic commands in _zsh_ (extremely similar to _bash_ language). <br/>
 You can find a summary of **regular expressions** (Appendix 2) and **basic shell commands** (Appendix 3) in the following Cheat Sheet:<br/>
