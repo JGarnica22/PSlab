@@ -10,8 +10,8 @@ In order to use the Terminal, you need to first learn the basic commands. You ca
 http://practicalcomputing.org/files/PCfB_Appendices.pdf  
 <br/>
 
-### 2. (Optional) Install Oh My Zsh
-It is optional, but in order to easily manipulate your Terminal configuration you can install **Oh My Zsh** (https://ohmyz.sh).
+### 2. (Optional) Install _Oh My Zsh_
+It is optional, but in order to easily manipulate your Terminal configuration you can install _Oh My Zsh_ (https://ohmyz.sh).
 
 To modify your zsh profile (_.zshrc_) you should open it from your default directory (/Users/$USER)
 ````
@@ -21,7 +21,7 @@ This will open an external text editor (TextEdit) will allow you to modify your 
 `$USER@computer   directory                      [time]`  
 <br/>
 
-# 3. Install Miniconda
+### 3. Install Miniconda
 Analysis of NGS data requires many different tools. Many of them can be installed and run through **Conda** (https://docs.conda.io/en/latest/). For Mac, _miniconda_ is preferably used. 
 
 To install _miniconda_ go to https://conda.io/projects/conda/en/latest/user-guide/install/macos.html and follow instructions.  
