@@ -16,4 +16,4 @@ nano .zshrc
 This will open the nano editor within Terminal and will allow you to modify your Terminal aesthetics. I suggest you change the zsh theme to "bureau" (ZSH_THEME="bureau") in order to see in each of your command lines:<br/>
 $USER@computer directory                [time]  
 
-
+`Ctrl + X` to exit nano and accept Save.
