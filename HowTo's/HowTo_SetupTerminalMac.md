@@ -10,14 +10,14 @@ http://practicalcomputing.org/files/PCfB_Appendices.pdf
 
 It is optional, but in order to easily manipulate your Terminal configuration you can install **Oh My Zsh** (https://ohmyz.sh).
 
-To modify your zsh profile (_.zshrc_) you should call from your default directory (/Users/$USER)
+To modify your zsh profile (_.zshrc_) you should open it from your default directory (/Users/$USER)
 ````
-nano .zshrc
+open .zshrc
 ````
-This will open the nano editor within Terminal and will allow you to modify your Terminal aesthetics. I suggest you change the zsh theme to "bureau" (ZSH_THEME="bureau") in order to see in each of your command lines:<br/>
+This will open an external text editor (TextEdit) will allow you to modify your Terminal aesthetics. I suggest you change the zsh theme to "_bureau_" (ZSH_THEME="bureau") in order to see in each of your command lines:<br/>
 $USER@computer directory                [time]  
 
-<Ctrl + X> to exit nano and accept Save.
+Save and close.
 <br/>
 
 Analysis of NGS data requires many tools, which usually can be installed through **Conda** (https://docs.conda.io/en/latest/). For Mac, _miniconda_ is preferably used. To install _miniconda_ go to https://conda.io/projects/conda/en/latest/user-guide/install/macos.html and followin instructions.  
