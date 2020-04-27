@@ -40,243 +40,160 @@ library(ggpubr)
 
 # Set your working directory (the project you are working in):
 setwd("C:/Users/jgarn/OneDrive - Universitat de Barcelona/Documentos/Bioinformatics/Functionals/Dorothea")
+
 ## Specify parameters to be used along the script:
-# Indicate name of txt file containing expression data (raw counts)
-expfile <- "Partek_TFH_Raw_counts.txt"
-#Indicate name of txt file with counts normalized for sequencing depth and transformed to log2 scale
-rlog_norm <- "rlog_normalized.txt"
-#Indicate differential expressionl data:
-DEmatrix <- "DE_Tetvs.Th0"
-# Indicate populations of interest, to be compared. First indicate control population, then sample(s):
-pop <- c("Th0", "TFH", "Tet")
-#Indicate confidence to use:
-confi2 <- c("A","B","C")
-#Load or indicate your regulon as rdata or as csv
-load('data/TOP10score_viperRegulon.rdata')
-regucsv <- "dorothea_regulon_mouse_v1.csv"
-#if regulon is not available in viper format, transform from csv
-if (exists("viper_regulon_mouse")==F) {
-  regulon_mouse <- read.csv(paste0("data/",regucsv), header = T, sep = ",", quote = "")
-    # This function converts a regulon in data frame format to the viper format:
-  df2regulon = function(df) {
-    regulon = df %>%
-      split(.$tf) %>%
-      map(function(dat) {
-        tf = dat %>% distinct(tf) %>% pull()
-        targets = setNames(dat$mor, dat$target)
-        likelihood = dat$likelihood
-        list(tfmode =targets, likelihood = likelihood)
-      })
-    return(regulon)
-  }
-  viper_regulon_mouse <- df2regulon(regulon_mouse)
-  }  
-# Indicate "human" or "mouse" experiment
+# Indicate name of txt file with counts normalized for sequencing depth and transformed to log2 scale
+rlog.norm.counts <- "rlog_normalized_DESeq.txt"
+# Indicate name of txt file containing DESeq2 analysis result previously performed
+Desq2file <- "DESeq2_TFH_vs_TH0.txt"
+# First indicate control population, then sample:
+pop <- c("Th0", "TFH")
+# Indicate species used in the analysis, human or mouse:
 species <- "mouse"
-# Read raw counts:
-counts <- read.table(paste0("data/",expfile),
-                     header = T,
-                     sep = "\t",
-                     quote = "",
-                     dec = ".")
-#Read rlog normalized counts
-rlog.norm.counts <- read.table(paste0("data/",rlog_norm), header = T, sep = "\t", dec = ".", quote = "")
-#if not available, make from raw counts:
-if (exists("rlog.norm.counts")==F){
-  row.names(counts) <- counts$gene_name
-  # Eliminate unnecessary columns, we only want gene_name and counts for the different populations.
-  counts2 <- data.frame(matrix(ncol=0,nrow = nrow(counts)))
-  row.names(counts2) <- row.names(counts)
-  for (p in c(1:length(pop))){
-  counts1 <- counts[, c(grep(pop[p], colnames(counts)))]
-  names(counts1) <- c(paste0(rep(pop[p], length(grep(pop[p],colnames(counts1)))),
-                             1:length(grep(pop[p],colnames(counts)))))
-  counts2 <- cbind(counts2,counts1)
-  }
- cell_type <- NULL
- replicates <- NULL
- for (o in c(1:length(pop))) {
-   ct <- rep(pop[o], length(grep(pop[o], colnames(counts))))
-   cell_type <- append(cell_type, ct)
-   rpli <- 1:length(grep(pop[o],colnames(counts)))
-   replicates <- append(replicates,rpli)
- }
-  sample_info <- data.frame(cell_type, replicates, row.names = names(counts2))
-  counts2_r <- apply(counts2, c(1,2), round)
-  counts2_i <- apply(counts2_r, c(1,2), as.integer)
-  dds <- DESeqDataSetFromMatrix (countData = counts2_i,
-                                 colData = sample_info,
-                                 design = ~ cell_type)
-  dds <- dds[ rowSums (counts(dds)) > 10, ]
-  DESeq.ds_f <- estimateSizeFactors(dds)
-  sizeFactors(DESeq.ds_f)
-  DESeq.rlog <- rlog(DESeq.ds_f, blind = TRUE)
-  rlog.norm.counts <- assay (DESeq.rlog)
-}
-# Clean TF names because some genes are present more than once as -1/2/...:
-names(viper_regulon_mouse) <- sapply(strsplit(names(viper_regulon_mouse), split = ' - '), head, 1)
-# Compute single-sample TF activities from a normalized gene expression matrix
-# Estimate TF activities
-TFact_gexpr <- viper(eset = rlog.norm.counts, regulon = viper_regulon_mouse, nes = T, method = 'none', minsize = 4, eset.filter = F)
-pheatmap(TFact_gexpr, scale = "row", show_rownames = FALSE, title = "Viper regulon mouse")
-# Save results
-write.csv(TFact_gexpr, file = 'output/TFactivities_rlog_geneexpression.csv')
+# Indicate confidence levels to use:
+confi2 <- c("A","B","C")
 
-pdf(file = "figs/heatmap TF active gene expression.pdf", width = 7, height = 5)
-print(pheatmap(TFact_gexpr, scale = "row", show_rownames = FALSE, title = "Viper regulon mouse"))
-dev.off()
-# while (!is.null(dev.list()))  dev.off()
 
-#PROBABLY NOT CORRECT!! ASK
-#Perform linear regression to calculate enrichment of TFs:
-controls <- sample_info$cell_type == pop[1] 
-result <- apply(TFact_gexpr, 1, function(x) {
-  broom::tidy(lm(x ~ !controls)) %>%
-    filter(term == "!controlsTRUE") %>%
-    select(-term)
-})
-ttest <- mutate(TF=names(result), bind_rows(result))
-write.table(ttest, "output/DoRothEA_ttest.txt", dec = ".", sep = "\t", quote = FALSE)
+# Read rlog normalized counts:
+rlog.norm.counts <- read.table(paste0("data/",rlog.norm.counts), header = T, sep = "\t", dec = ".", quote = "")
+# Read the DESeq2 results:
+DESeq2 <- read.table (file = paste0("data/",Desq2file),
+                      sep = "\t", 
+                      quote = "",
+                      dec = ".", 
+                      header = T, row.names = "Gene")
+# Load your regulon (table) as rda:
+load(paste0("data/dorothea_", species, ".rda"))
 
-#adjust pvalue if this presents a normal distribuition. Normal distribution visualization and saphirot test
-ggqqplot(ttest$p.value)
-if (shapiro.test(ttest$p.value)[2] > 0.05){
-ttest$fdr <- p.adjust(ttest$p.value, method = "fdr")
-ttest <- as.data.frame(ttest)
-ttest_sig <- subset(ttest, ttest$fdr<= 0.05)
-}
 
-#DELTE THIS PART?
-#Don't do now: requires objectes prepared later on !!
-TF.sig.emat <- ttest_sig[,"TF"]
-TF.sig.emat <- sort(TF.sig.emat)
-TF.sig.DE <- as.vector(as.character(TF_sig[,"Regulon"]))
-TF.sig.DE <- sort(TF.sig.DE)
-length(TF.sig.emat)
-length(TF.sig.DE)
-table(TF.sig.DE %in% TF.sig.emat)
+# Prepare your normalized data to work with after:
+rownames(rlog.norm.counts) <- rlog.norm.counts$Gene
+rlog.norm.counts$Gene <- NULL
 
-#################################################################################################
-#In order to clean up and not use the whole TF elements in DoRothEA, I will try to use only
-#TFs with high confidence, indicate confidence to use:
-#Set confidence to subset:
-regulon_mouse_confi2 <- data.frame(matrix(ncol= ncol(regulon_mouse), nrow=0))
-names(regulon_mouse_confi2) <- names(regulon_mouse)
-for (u in confi2) {
-rm <- subset(regulon_mouse, regulon_mouse$confidence == u)
-regulon_mouse_confi2 <- rbind(regulon_mouse_confi2,rm)
-}
-viper_regulon_mouse_confi <- df2regulon(regulon_mouse_confi2)
-TFact_gexpr_confi = viper(eset = rlog.norm.counts, regulon = viper_regulon_mouse_confi, nes = T, method = 'none',
-                        minsize = 4, eset.filter = F)
-pheatmap(TFact_gexpr_confi, scale = "row", show_rownames = FALSE)
-
-#Introduce level of confidence to each TF:
-TFact_gexpr_hiconf <- merge(x = TFact_gexpr_confi,
-                 y = regulon_mouse_confi2, 
-                 by.x = "row.names", by.y = "tf")
-TFact_gexpr_hiconf <- unique(TFact_gexpr_hiconf)
-TFact_gexpr_hiconf <- TFact_gexpr_ABC_conf[order(TFact_gexpr_ABC_conf$confidence), ]
-write.table(TFact_gexpr_hiconf, file = paste0("output/DoRothEA_TFactivities_gexpr_", paste0(confi2, collapse = ""),".txt"), dec = ".", sep = "\t",
-            quote = FALSE)
-write_xlsx(TFact_gexpr_hiconf, paste0("output/DoRothEA_TFactivities_gexpr_", paste0(confi2, collapse = ""),".xlsx"))
-
-# 2B.Compute TF activity changes from a differential gene expression signature
-################################################################################
-# Load differential expression signature
-DEsignature <- read.table(paste0("data/", DEmatrix ,".txt"), header = T, sep = "\t",
-                          dec = ".", quote = "", row.names = NULL)
-if (exists("DEsignature")==F){
-  counts <- read.table(paste0("data/", expfile),
-                       header = T,
-                       sep = "\t",
-                       quote = "", 
-                       dec = ".")
-    row.names(counts) <- counts$gene_name
-  counts2 <- data.frame(matrix(ncol=0,nrow = nrow(counts)))
-  row.names(counts2) <- row.names(counts)
-  for (p in c(1:length(pop))){
-    counts1 <- counts[, c(grep(pop[p], colnames(counts)))]
-    names(counts1) <- c(paste0(rep(pop[p], length(grep(pop[p],colnames(counts1)))),
-                               1:length(grep(pop[p],colnames(counts)))))
-    counts2 <- cbind(counts2,counts1)
-  }
-  cell_type <- NULL
-  replicates <- NULL
-  for (o in c(1:length(pop))) {
-    ct <- rep(pop[o], length(grep(pop[o], colnames(counts))))
-    cell_type <- append(cell_type, ct)
-    rpli <- 1:length(grep(pop[o],colnames(counts)))
-    replicates <- append(replicates,rpli)
-  }
-  sample_info <- data.frame(cell_type, replicates, row.names = names(counts2))
-  counts2_r <- apply(counts2, c(1,2), round)
-  counts2_i <- apply(counts2_r, c(1,2), as.integer)
-    dds <- DESeqDataSetFromMatrix (countData = counts2_i,
-                                 colData = sample_info,
-                                 design = ~ cell_type)
-    dds <- dds[ rowSums (counts(dds)) > 10, ]
-  dds$cell_type <- relevel(dds$cell_type, ref = pop[1])
-  dds <- DESeq(dds)
-  for (t in c(2:length(pop))){
-    resLFC <- lfcShrink(dds, coef=resultsNames(dds)[t], type="apeglm")
-    resOrdered <- resLFC[order(resLFC$log2FoldChange, decreasing = T),]
-    write.table(resOrdered, file = paste0("data/DE_",strsplit(resultsNames(dds)[t], "_")[[1]][3], "vs.",
-                                          strsplit(resultsNames(dds)[t], "_")[[1]][5],".txt"),
-                                          quote = FALSE, sep = "\t", dec = ".")
-  }
-}
-DEsignature <- read.table(paste0("data/", DEmatrix ,".txt"), header = T, sep = "\t",
-                          dec = ".", quote = "", row.names = NULL)
-DEsignature$Gene <- DEsignature[,1]
-DEsignature <- DEsignature[,c(7,2:6)]
-
+# Prepare differential expression signature
+DESeq2$Gene <- rownames(DESeq2)
+DESeq2 <- DESeq2[, c("Gene", "log2FoldChange", "padj")]
 # Exclude probes with unknown or duplicated gene symbol
-DEsignature = subset(DEsignature, Gene != "" )
-DEsignature = subset(DEsignature, ! duplicated(Gene))
+DESeq2 = subset(DESeq2, Gene != "" )
+DESeq2 = subset(DESeq2, ! duplicated(Gene))
+
+# Convert your network (table) to the viper regulon format:
+dorothea_network$likelihood <- rep(1, nrow(dorothea_network))
+df2regulon = function(df) {
+  regulon = df %>%
+    split(.$tf) %>%
+    map(function(dat) {
+      tf = dat %>% distinct(tf) %>% pull()
+      targets = setNames(dat$mor, dat$target)
+      likelihood = dat$likelihood
+      list(tfmode =targets, likelihood = likelihood)
+    })
+  return(regulon)
+}
+viper_regulon <- df2regulon(dorothea_network)
+# Clean TF names because some genes are present more than once as -1/2/...:
+names(viper_regulon) <- sapply(strsplit(names(viper_regulon), split = ' - '), head, 1)
+
+
+## A. Compute single-sample TF activities from a normalized gene expression matrix
+#######################################################################################
+# Estimate TF activities:
+TFact_gexpr <- viper(eset = rlog.norm.counts, regulon = viper_regulon, nes = T, method = 'none', minsize = 4, eset.filter = F)
+pheatmap(TFact_gexpr, scale = "row", show_rownames = FALSE, 
+         main = paste("Viper regulon", pop[2], "vs.", pop[1], species))
+
+TFact_gexprdf <- as.data.frame(TFact_gexpr)
+TFact_gexprdf$TF <- row.names(TFact_gexprdf)
+TFact_gexprdf <- TFact_gexprdf[,c(length(TFact_gexprdf), 1:(length(TFact_gexprdf)-1))]
+# Introduce level of confidence to each TF:
+TFact_gexprdf2 <- merge(x = TFact_gexprdf,
+                        y = dorothea_network[,c("tf","confidence")], 
+                        by.x = "TF", by.y = "tf")
+TFact_gexprdf2 <- unique(TFact_gexprdf2)
+write_xlsx(TFact_gexprdf2, paste0("output/DoRothEA_TFactivities_gexpr_", pop[2], "_", pop[1], "_allconf.xlsx"))
+
+pdf(file = "figs/Heatmap_TF_activity_gexpr_allconf.pdf", width = 5, height = 7)
+pheatmap(TFact_gexpr, scale = "row", show_rownames = FALSE, 
+         main = paste("Viper regulon", pop[2], "vs.", pop[1], species))
+dev.off()
+#while (!is.null(dev.list()))  dev.off()
+
+
+# In order to clean up and not use the whole TF elements in DoRothEA, use only selected confidences
+regulon_confi2 <- data.frame(matrix(ncol= 5, nrow=0))
+names(regulon_confi2) <- names(dorothea_network)
+for (u in confi2) {
+  rm <- subset(dorothea_network, dorothea_network$confidence == u)
+  regulon_confi2 <- rbind(regulon_confi2,rm)
+}
+viper_regulon_confi <- df2regulon(regulon_confi2)
+TFact_gexpr_confi = viper(eset = rlog.norm.counts, regulon = viper_regulon_confi, nes = T, method = 'none',
+                          minsize = 4, eset.filter = F)
+pheatmap(TFact_gexpr_confi, scale = "row", show_rownames = FALSE,
+         main = paste0("Viper regulon ", pop[2], " vs. ", pop[1], " ", species,
+                       "\nConfidence ", paste0(confi2, collapse = "")))
+
+pdf(file = paste0("figs/Heatmap_TF_activity_gexpr_Confidence_", paste0(confi2, collapse = ""), ".pdf"),
+    width = 5, height = 7)
+pheatmap(TFact_gexpr_confi, scale = "row", show_rownames = FALSE,
+         main = paste0("Viper regulon ", pop[2], " vs. ", pop[1], " ", species,
+                       "\nConfidence ", paste0(confi2, collapse = "")))
+dev.off()
+
+# Introduce level of confidence to each TF:
+TFact_gexpr_confidf <- as.data.frame(TFact_gexpr_confi)
+TFact_gexpr_confidf$TF <- row.names(TFact_gexpr_confidf)
+TFact_gexpr_confidf <- TFact_gexpr_confidf[,c(length(TFact_gexpr_confidf), 1:(length(TFact_gexpr_confidf)-1))]
+TFact_gexpr_hiconf <- merge(x = TFact_gexpr_confidf,
+                            y = regulon_confi2[,c("tf","confidence")], 
+                            by.x = "TF", by.y = "tf")
+TFact_gexpr_hiconf <- unique(TFact_gexpr_hiconf)
+TFact_gexpr_hiconf <- TFact_gexpr_hiconf[order(TFact_gexpr_hiconf$confidence), ]
+write.table(TFact_gexpr_hiconf, file = paste0("output/DoRothEA_TFactivities_gexpr_", 
+                                              pop[2], "_", pop[1], "_",
+                                              paste0(confi2, collapse = ""),".txt"), 
+            dec = ".", sep = "\t", quote = FALSE)
+write_xlsx(TFact_gexpr_hiconf, paste0("output/DoRothEA_TFactivities_gexpr_",
+                                      pop[2], "_", pop[1], "_",
+                                      paste0(confi2, collapse = ""),".xlsx"))
+
+
+# B.Compute TF activity changes from a differential gene expression signature (GES)
+#####################################################################################
 # Estimate z-score values for the GES. Check VIPER manual for details
-myStatistics = matrix(DEsignature$log2FoldChange, dimnames = list(DEsignature$Gene, 'logFC') )
-myPvalue = matrix(DEsignature$pvalue, dimnames = list(DEsignature$Gene, 'pvalue') )
+myStatistics = matrix(DESeq2$log2FoldChange, dimnames = list(DESeq2$Gene, 'logFC') )
+myPvalue = matrix(DESeq2$padj, dimnames = list(DESeq2$Gene, 'padj') )
 mySignature = (qnorm(myPvalue/2, lower.tail = FALSE) * sign(myStatistics))[, 1]
 mySignature = mySignature[order(mySignature, decreasing = T)]
 # Estimate TF activities
-mrs = msviper(ges = mySignature, regulon = viper_regulon_mouse, minsize = 4, ges.filter = F)
+mrs = msviper(ges = mySignature, regulon = viper_regulon, minsize = 4, ges.filter = F)
 TFact_DE = data.frame(Regulon = names(mrs$es$nes),
-                           Size = mrs$es$size[ names(mrs$es$nes) ], 
-                           NES = mrs$es$nes, 
-                           p.value = mrs$es$p.value, 
-                           FDR = p.adjust(mrs$es$p.value, method = 'fdr'))
+                      Size = mrs$es$size[ names(mrs$es$nes) ], 
+                      NES = mrs$es$nes, 
+                      p.value = mrs$es$p.value, 
+                      FDR = p.adjust(mrs$es$p.value, method = 'fdr'))
 TFact_DE = TFact_DE[ order(TFact_DE$p.value), ]
 
 TFact_DE_conf <- merge(x = TFact_DE,
-                     y = regulon_mouse, 
-                     by.x = "row.names", by.y = "tf")
+                       y = dorothea_network, 
+                       by.x = "row.names", by.y = "tf")
 TFact_DE_conf <- TFact_DE_conf[,c("Regulon", "NES", "p.value", "FDR", "confidence")]
 TFact_DE_conf <- unique(TFact_DE_conf)
 TFact_DE_conf <- TFact_DE_conf[order(TFact_DE_conf$FDR), ]
 
 TFact_DE_conf_sig <- TFact_DE_conf[which(TFact_DE_conf$FDR<=0.05),]
 TFact_DE_conf_sig <- TFact_DE_conf_sig[order(TFact_DE_conf_sig$FDR), ]
-table(TFact_DE_conf_sig$confidence=="A")
-table(TFact_DE_conf_sig$confidence=="B")
-table(TFact_DE_conf_sig$confidence=="C")
 
 # Save results
-write.csv(TFact_DE_conf, file = paste0("output/DoRothEA_TFactivities_",DEmatrix,"_allconf.csv"))
-write.csv(TFact_DE_conf_sig, file = paste0("output/DoRothEA_TFactivities_",DEmatrix,"_allconf005SIG.csv"))
+write_xlsx(TFact_DE_conf, paste0("output/DoRothEA_TFactivities_GES_", pop[2], "_vs_", pop[1],"_allconf.xlsx"))
+write_xlsx(TFact_DE_conf_sig, paste0("output/DoRothEA_TFactivities_GES_", pop[2], "_vs_", pop[1],"_allconf_FDR005.xlsx"))
 
-#Volcano NES vs FDR on TFact_DE_conf
+# Volcano NES vs FDR on TFact_DE_conf
 Vol <- data.frame(NES= TFact_DE_conf$NES,
                   FDR= -log10(TFact_DE_conf$FDR), Confidence=TFact_DE_conf$confidence,
                   row.names = rownames(TFact_DE_conf))
-# Vol$S <- 0
-# Vol[which(Vol$FDR<2), "S"] <- "NS"
-# Vol[which(Vol$NES>2 & Vol$S!="NS"), "S"] <- "UP"
-# Vol[which(Vol$NES<(-2) & Vol$S!="NS"), "S"] <- "DOWN"
-# Vol[which(Vol$S==0), "S"] <- "NS"
-# Vol$S <- as.factor(Vol$S)
-# Vol[which(Vol$FDR>=99.5), "FDR"] <- 99.5
-pdf(file = paste0("figs/Volcano_", "TFact_", DEmatrix, ".pdf"), width = 8, height = 5)
+
+pdf(file = paste0("figs/Volcano_", "TFact_", pop[2], "_vs_", pop[1], ".pdf"), width = 6, height = 5)
 print(ggplot(Vol, aes(x=NES, y=FDR, color = Confidence)) +
         geom_point (aes(color = factor(Confidence)), size=6.5, alpha = 1/3,
                     show.legend = T, position = position_jitter(w = 1, h = 3.0)) +
@@ -284,7 +201,7 @@ print(ggplot(Vol, aes(x=NES, y=FDR, color = Confidence)) +
         geom_hline(yintercept = 2, linetype = 1, size = 0.3, col = "grey20") +
         scale_color_manual(values = c("red", "orange", "yellow","green", "blue")) +
         theme_light() +
-        ggtitle(paste0(DEmatrix)) +
+        ggtitle(paste(pop[2], "vs", pop[1])) +
         xlab("Normalized enrichment score") + 
         ylab("-log10 (FDR)") +
         # scale_y_continuous(breaks = c(1,20,40,60,80,100),
@@ -296,13 +213,14 @@ print(ggplot(Vol, aes(x=NES, y=FDR, color = Confidence)) +
               panel.grid.minor.x = element_blank(),
               panel.grid.minor.y = element_blank()))
 dev.off()
-#boxplot NES vs FDR on TFact_DE_conf
-pdf(file = paste0("figs/Graphs_", "TFact_",DEmatrix, ".pdf"), width = 4, height = 5)
+
+# Boxplot NES vs FDR on TFact_DE_conf
+pdf(file = paste0("figs/Graphs_", "TFact_", pop[2], "_vs_", pop[1], ".pdf"), width = 4, height = 5)
 box <- data.frame(FDR= -log10(TFact_DE_conf$FDR), Confidence=TFact_DE_conf$confidence,
                   row.names = rownames(TFact_DE_conf))
 ggplot(box, aes(x=Confidence, y=FDR)) + geom_point(color = "navyblue", position = position_jitter(w = 0.3, h = 0.0)) +
   xlab("Confidence") + ylab("-log10FDR") + labs(subtitle="Line set at FDR=0.001")+
-  ggtitle(paste0(DEmatrix)) + 
+  ggtitle(paste0(pop[2], "_vs_", pop[1])) + 
   theme(plot.title = element_text(hjust = 0.5, size = 16, face="bold"), axis.title.x = element_text(size=14, face= "bold"),
         axis.title.y = element_text(size=14, face= "bold"), plot.subtitle = ) +
   theme(axis.text.x = element_text(angle = 0, size = 14, hjust =1, face="bold"))+
@@ -313,120 +231,3 @@ ggplot(box, aes(x=Confidence, y=FDR)) + geom_point(color = "navyblue", position 
                                         colour = "grey"))+
   geom_hline(yintercept = -log10(0.001), linetype = 1, size = 0.3, col = "grey20")
 dev.off()
-
-
-##INCLUDE THIS CODE BELOW??
-
-
-#We get too many significant TFs, I will use only TFs with confidence A to do the analysis:
-regulon_mouse_A <- regulon_mouse[which(regulon_mouse$confidence=="A"),]
-viper_regulon_mouse_A <- df2regulon(regulon_mouse_A)
-names(viper_regulon_mouse_A) = sapply(strsplit(names(viper_regulon_mouse_A), split = ' - '), head, 1)
-mrs_A = msviper(ges = mySignature, regulon = viper_regulon_mouse_A, minsize = 4, ges.filter = F)
-TFact_DE_A = data.frame(Regulon = names(mrs_A$es$nes),
-                             Size = mrs_A$es$size[ names(mrs_A$es$nes) ],
-                             NES = mrs_A$es$nes,
-                             p.value = mrs_A$es$p.value,
-                             FDR = p.adjust(mrs_A$es$p.value, method = 'fdr'))
-TFact_DE_A = TFact_DE_A[ order(TFact_DE_A$p.value), ]
-TFact_DE_A
-
-TFact_DE_A_sig <- TFact_DE_A[which(TFact_DE_A$FDR<=0.05),]
-TFact_DE_A_sig
-#From TFs with confidence A, I can only obtain 1 significant TF.
-
-#I will use TFs with confidence A, B or C to do the analysis:
-regulon_mouse_ABC <- regulon_mouse[which(regulon_mouse$confidence=="A" |
-                                           regulon_mouse$confidence=="B" |
-                                           regulon_mouse$confidence=="C"),]
-viper_regulon_mouse_ABC <- df2regulon(regulon_mouse_ABC)
-mrs_ABC = msviper(ges = mySignature, regulon = viper_regulon_mouse_ABC, minsize = 4, ges.filter = F)
-TFact_DE_ABC = data.frame(Regulon = names(mrs_ABC$es$nes),
-                             Size = mrs_ABC$es$size[ names(mrs_ABC$es$nes) ],
-                             NES = mrs_ABC$es$nes,
-                             p.value = mrs_ABC$es$p.value,
-                             FDR = p.adjust(mrs_ABC$es$p.value, method = 'fdr'))
-TFact_DE_ABC = TFact_DE_ABC[ order(TFact_DE_ABC$p.value), ]
-TFact_DE_ABC
-
-TFact_DE_ABC_conf <- merge(x = TFact_DE_ABC,
-                       y = regulon_mouse, 
-                       by.x = "row.names", by.y = "tf")
-TFact_DE_ABC_conf <- TFact_DE_ABC_conf[,c("Regulon", "NES", "p.value", "FDR", "confidence")]
-TFact_DE_ABC_conf <- unique(TFact_DE_ABC_conf)
-TFact_DE_ABC_conf = TFact_DE_ABC_conf[ order(TFact_DE_ABC_conf$p.value), ]
-
-write.csv(TFact_DE_ABC_conf, file = 'DoRothEA_TFactivities_DE_ABC.csv')
-
-TFact_DE_ABC_conf_sig <- TFact_DE_ABC_conf[which(TFact_DE_ABC_conf$FDR<=0.05),]
-TFact_DE_ABC_conf_sig
-
-#In this case we can again obtain only 1 significant TF with confidence A, and only 5 TFs with confidence
-#C. This is suspicious as we had before more significant TFs when using all TFs (all confidences) for the 
-#analysis. If we check for less comparisons (TFs) in pval adjustment (to FDR), correction by multiple 
-#testing should be less, so we would expect to find more significant results, not less.
-#We will try to do pval adjustment manually and compare with the correction that is done within
-#the viper function to see if the problem could be the p-values adjustment within viper. 
-#For that we use the `p.adjust` function.
-#We first need to create a vector with all the p-values:
-pval.A <- TFact_DE_A$p.value
-names(pval.A) <- row.names(TFact_DE_A)
-FDR.A <- p.adjust(pval.A, method = "fdr")
-#Results are the same than the obtained from viper, only 1 TF is significant looking at the FDR
-
-#We will try the same correction for the whole set of TFs:
-pval.all <- TFact_DE$p.value
-names(pval.all) <- row.names(TFact_DE)
-length(pval.all)
-FDR.all <- p.adjust(pval.all, method = "fdr")
-FDR.sig <- FDR.all<=0.05
-table(FDR.sig)
-#Manual correction gives no different results. The problem is with the FDR correction per se, not viper.
-
-#We will check distribution of p-values, because if the distribution is not the usual downwards
-#exponential curve, the FDR correction should not be applied.
-#p-values distribution of the analysis for all TFs (all confidences A-E)
-hist(TFact_DE$p.value, main = "pval distribution All-conf TFs", xlab = "pvalues")
-#p-values distribution of the analysis for TFs with confidence A-C:
-hist(TFact_DE_ABC$p.value, main = "pval distribution ABC-conf TFs", xlab = "pvalues")
-#p-values distribution of the analysis for TFs with confidence A:
-hist(TFact_DE_A$p.value, main = "pval distribution A-conf TFs", xlab = "pvalues")
-#The distribution of the pvalues for only TFs with confidence A is not normal. We should not
-#correct for FDR.
-#It is not normal even when you check how the pvalues for the set of A-conf TFs within the whole
-#analysis are distributed:
-hist(TFact_DE_conf[which(TFact_DE_conf$confidence=="A"),"p.value"], 
-     xlab = "pvalues",
-     main = "pval distribution A-conf TFs \n within All-conf list")
-
-#In order to check that it is only a matter of pvalue correction, we need to check also that the
-#NES and the pvalues obtained for A-TFs is the same when we do it for all TFs or only for the 
-#A set (in theory, viper does the analysis individually for each set):
-
-#1. Compare NES:
-NES.fil <- as.data.frame(TFact_DE_conf[which(TFact_DE_conf$confidence=="A"),"NES"])
-row.names(NES.fil) <- TFact_DE_conf[which(TFact_DE_conf$confidence=="A"), "Regulon"]
-names(NES.fil) <- "NES_all"
-
-NES.A <- as.data.frame(TFact_DE_A[,"NES"])
-row.names(NES.A) <- row.names(TFact_DE_A)
-names(NES.A) <- "NES_A"
-
-NES.comp <- merge(NES.A,NES.fil, by= 0)
-NES.comp
-#They are the exact same NES values.
-
-#2. Compare p-values:
-pval.fil <- as.data.frame(TFact_DE_conf[which(TFact_DE_conf$confidence=="A"),"p.value"])
-row.names(pval.fil) <- TFact_DE_conf[which(TFact_DE_conf$confidence=="A"), "Regulon"]
-names(pval.fil) <- "pval_all"
-
-pval.A <- as.data.frame(TFact_DE_A[,"p.value"])
-row.names(pval.A) <- row.names(TFact_DE_A)
-names(pval.A) <- "pval_A"
-
-pval.comp <- merge(pval.A,pval.fil, by= 0)
-pval.comp
-#Also the exact same p-values.
-#The problem is really with FDR correction, that cannot be applied to this p-value distribution.
-#In order to select interesting TFs, we will just look at the top TFs, with high NES.

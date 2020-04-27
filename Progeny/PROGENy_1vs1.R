@@ -1,5 +1,5 @@
-#This script is to perform DE analysis with RNAseq data
-#It was created for R 3.6.3 version (2019-03-30)
+#This script is to perform Progeny analysis of 2 conditions only
+#It was created for R 3.6.3 version (2020-04-10)
 #Copyright (C) 2020  Patricia Sole Sanchez
 # Check if required packages are installed, if not install:
 cran.packages <- c("BiocManager","ggplot2", "ggrepel", "pheatmap", "RColorBrewer", "dplyr",
@@ -43,9 +43,8 @@ setwd("C:/Users/jgarn/OneDrive - Universitat de Barcelona/Documentos/Bioinformat
 expfile <- "Partek_TFH_Raw_counts.txt"
 # Indicate name of txt file containing DESeq2 analysis result previously performed
 Desq2file <- "DESeq2_TFH_vs_TH0.txt"
-# Indicate populations of interest, to be compared:
-# First indicate control population, then sample:
-pop <- c("Th0", "TFH", "Tet")
+# Indicate populations of interest, to be compared. First indicate control population, then sample:
+pop <- c("Th0", "TFH")
 # Indicate "human" or "mouse" experiment
 species <- "mouse"
 
@@ -261,52 +260,49 @@ progeny.permutations <- t(runProgenyFast(progeny.df, progeny.cm, k = 10000, z_sc
 ##HEATMAP
 pheatmap(progeny.permutations, scale = "column")
 #Export heatmap as pdf
-pdf(file = "figs/Heatmap_progeny.pdf", width = 7, height = 5)
+pdf(paste0("figs/Heatmap_Progeny_permutations_", pop[2], "_v_", pop[1], ".pdf"), width = 7, height = 5)
 pheatmap(progeny.permutations, scale = "column")
 dev.off()
 
 #Checking for differences between the groups:
 #We check if the control is different to the treated condition using a linear model:
 #1. Stablish control samples, and do a loop in case more than one condition, other than control, is present_
-for (n in c(2:length(pop))) {
-controls <- sample_info$cell_type == pop[1]
-study <- sample_info$cell_type == pop [n]
-#2. Perform linear regression to calculate enrichment of pathways:
-result1 <- apply(t(progeny.permutations), 1, function(study) {
-  broom::tidy(lm(study ~ controls)) %>%
-    filter(term == "controlsTRUE") %>%
-    dplyr::select(-term)
+  controls <- sample_info$cell_type == pop[1]
+    #2. Perform linear regression to calculate enrichment of pathways:
+  result1 <- apply(t(progeny.permutations), 1, function(x) {
+    broom::tidy(lm(x ~ controls)) %>%
+      filter(term == "controlsTRUE") %>%
+      dplyr::select(-term)
   })
-result1 <- mutate(bind_rows(result1), Pathway=names(result1))
-results1 <- as.data.frame(result1[,c(5,1:4)])
-write.table(results1, "output/Progeny_permutations.txt",
-            sep = "\t", dec = ".", quote = F, row.names = F)
-write_xlsx(results1, paste0("output/Progeny_permutations", pop[n], "_v_", pop[1],".xlsx"))
-
-#Plot pathways depending on significance and activation:
-a <- as.data.frame(results1)
-path.sig <- data.frame(stat = a$statistic, Sig = -log2(a$p.value))
-row.names(path.sig) <- a$Pathway
-Progeny_plot <- ggplot(path.sig, aes(x=stat, y=Sig)) +
-  geom_point( aes(size=abs(stat),color=Sig),
-              show.legend = F) +
-  scale_color_gradient(low = "blue", high = "red")+
-  geom_text_repel(data=subset(path.sig, Sig>6.6), 
-                  label=rownames(subset(path.sig, Sig>6.6)),
-                  size = 5,
-                  show.legend = F) +
-  geom_vline(xintercept = 0) +
-  geom_hline(yintercept = 6.6) +
-  labs(title=paste("PROGENy pathways activity", pop[n], "_v_", pop[1]),
-       x ="t value", y = "-log2(pvalue)") +
-  theme(plot.title = element_text(face = "bold", colour = "black", size = 16),
-        axis.title.x = element_text(color="navy", size=14, face="bold"),
-        axis.title.y = element_text(color="navy", size=14, face="bold"))
-#Export progeny dotplot as pdf
-pdf(file = paste0("figs/Dotplot_progeny", pop[n], "_v_", pop[1], ".pdf"), width = 5, height = 5)
-print(Progeny_plot)
-dev.off()
-}
+  result1 <- mutate(bind_rows(result1), Pathway=names(result1))
+  results1 <- as.data.frame(result1[,c(5,1:4)])
+  write.table(results1, paste0("output/Progeny_permutations_linear_regression_", pop[2], "_v_", pop[1],".txt"),
+              sep = "\t", dec = ".", quote = F, row.names = F)
+  write_xlsx(results1, paste0("output/Progeny_permutations_linear regression", pop[2], "_v_", pop[1],".xlsx"))
+  
+  #Plot pathways depending on significance and activation:
+  a <- as.data.frame(results1)
+  path.sig <- data.frame(stat = a$statistic, Sig = -log2(a$p.value))
+  row.names(path.sig) <- a$Pathway
+  Progeny_plot <- ggplot(path.sig, aes(x=stat, y=Sig)) +
+    geom_point( aes(size=abs(stat),color=Sig),
+                show.legend = F) +
+    scale_color_gradient(low = "blue", high = "red")+
+    geom_text_repel(data=subset(path.sig, Sig>6.6), 
+                    label=rownames(subset(path.sig, Sig>6.6)),
+                    size = 5,
+                    show.legend = F) +
+    geom_vline(xintercept = 0) +
+    geom_hline(yintercept = 6.6) +
+    labs(title=paste("PROGENy pathways activity", pop[2], "_v_", pop[1]),
+         x ="t value", y = "-log2(pvalue)") +
+    theme(plot.title = element_text(face = "bold", colour = "black", size = 16),
+          axis.title.x = element_text(color="navy", size=14, face="bold"),
+          axis.title.y = element_text(color="navy", size=14, face="bold"))
+  #Export progeny dotplot as pdf
+  pdf(file = paste0("figs/Dotplot_progeny", pop[2], "_v_", pop[1], ".pdf"), width = 5, height = 5)
+  print(Progeny_plot)
+  dev.off()
 
 #########################################################################################################
 # @Aurelien's script: PROGENy can also be performed on a contrast (e.g. DESeq2 results, using log2FC)
@@ -360,7 +356,7 @@ progeny2graph <- ggplot(PS2, aes(x=rownames(PS2), y=progenyscores2)) + geom_col(
         panel.grid.major = element_line(size = 0.05, linetype = 'solid',
                                         colour = "grey"))
 
-pdf(file = "figs/Graphbar_progeny_on_DESeq.pdf", width = 8, height = 4)
+pdf(file = paste0("figs/Graphbar_progeny_on_DESeq_", pop[2], "_v_", pop[1],".pdf"), width = 8, height = 4)
 progeny2graph
 dev.off()
 
@@ -371,7 +367,7 @@ min0 = function(x) {
   min(x[x!=0])
 }
 
-pdf(file=paste("figs/Progeny score","pathways",".pdf"))
+pdf(file=paste("figs/Progeny_score_each_pathway_",pop[2], "_v_", pop[1] ,".pdf"))
 for (i in names(model)){
   #Retrieve genes that are involved in the pathway:
   genes <- rownames(model[which(model[,i] != 0),])
