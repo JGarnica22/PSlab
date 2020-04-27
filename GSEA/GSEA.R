@@ -4,7 +4,7 @@
 
 # Check if required packages are installed, if not install:
 
-bioc.packages <- c("fgsea", "qusage", "biomaRt")
+bioc.packages <- c("fgsea", "qusage", "biomaRt", "stats")
 for (i in bioc.packages) {
   if (!require(i, character.only = TRUE)) {
     BiocManager::install(i)
@@ -31,9 +31,10 @@ library(qusage)
 library(biomaRt)
 library(ggplot2)
 library(data.table)
+library(stats)
 
 # Set your working directory (the project you are working in):
-setwd("/Users/patri/Desktop/R class/Prova_GitHub_DE_analysis")
+setwd("C:/Users/jgarn/OneDrive - Universitat de Barcelona/Documentos/Bioinformatics/Functionals/GSEA")
 
 ## Specify parameters to be used along the script:
 # Indicate name of txt file containing DESeq2 analysis result previously performed
@@ -66,12 +67,12 @@ gmt.file
 #You can rank genes based on FC or on significance (log10 of the padj), we will use preferably FC
 
 #1) Order genes depending on FC:
-DE.ord <- DESeq2[order(DESeq2$log2FoldChange, decreasing = TRUE),]
-DE.ord
+resOrdered <- DESeq2[order(DESeq2$log2FoldChange, decreasing = TRUE),]
+resOrdered
 
 #2) Ranks object is a vector of FC with the names of the genes:
-ranks <- DE.ord[, "log2FoldChange"]
-names(ranks) <- row.names(DE.ord)
+ranks <- resOrdered[, "log2FoldChange"]
+names(ranks) <- row.names(resOrdered)
 
 
 #Gene names in the gmt file are human genes (capital letters)
@@ -80,36 +81,36 @@ names(ranks) <- row.names(DE.ord)
 
 #Create the BioMart:
 if (species == "mouse"){
-mouse = useMart(biomart="ENSEMBL_MART_ENSEMBL", dataset="mmusculus_gene_ensembl")
-BM1 <- getBM(attributes=c("ensembl_gene_id","gene_biotype",
-                          "external_gene_name"), mart = mouse, verbose = T)
-BM2 <- getBM(attributes=c("ensembl_gene_id","hsapiens_homolog_associated_gene_name"),
-             mart = mouse, verbose = T)
-#Merge two data frames in one by the common column ("ensembl_gene_id")
-BM <- merge(x = BM1, y = BM2, by = "ensembl_gene_id", all.x = T)
-BM <- unique(BM)
-BM <- BM[,c(3:4)]
-names(BM) <- c("mouse", "human")
-#Use for loop to change the names of all the genes in all the gene sets (for within for):
-# Create a empty list:
-gmt.mouse <- vector(mode = "list",length = length(gmt.file))
-# Set the names of the gene sets in the list:
-names(gmt.mouse) <- names(gmt.file)
-#Change the gene names from human to mouse:
-#For each Gene_set we create an empty vector, that will after contain the genes
-for(Gene_set in names(gmt.file)) {
-  geneset_mouse <- vector()
-  #Then for each gene in each gene set, we create a vector with the mouse gene names and we move this data to the
-  #vector we created on top for each gene set (named geneset_mouse)
-  for (h_gene in gmt.file[[Gene_set]]){
-    m_gene <- BM[which(BM$human==h_gene),"mouse"]
-    geneset_mouse <- c(geneset_mouse, m_gene)
+  mouse = useMart(biomart="ENSEMBL_MART_ENSEMBL", dataset="mmusculus_gene_ensembl")
+  BM1 <- getBM(attributes=c("ensembl_gene_id","gene_biotype",
+                            "external_gene_name"), mart = mouse, verbose = T)
+  BM2 <- getBM(attributes=c("ensembl_gene_id","hsapiens_homolog_associated_gene_name"),
+               mart = mouse, verbose = T)
+  #Merge two data frames in one by the common column ("ensembl_gene_id")
+  BM <- merge(x = BM1, y = BM2, by = "ensembl_gene_id", all.x = T)
+  BM <- unique(BM)
+  BM <- BM[,c(3:4)]
+  names(BM) <- c("mouse", "human")
+  #Use for loop to change the names of all the genes in all the gene sets (for within for):
+  # Create a empty list:
+  gmt.mouse <- vector(mode = "list",length = length(gmt.file))
+  # Set the names of the gene sets in the list:
+  names(gmt.mouse) <- names(gmt.file)
+  #Change the gene names from human to mouse:
+  #For each Gene_set we create an empty vector, that will after contain the genes
+  for(Gene_set in names(gmt.file)) {
+    geneset_mouse <- vector()
+    #Then for each gene in each gene set, we create a vector with the mouse gene names and we move this data to the
+    #vector we created on top for each gene set (named geneset_mouse)
+    for (h_gene in gmt.file[[Gene_set]]){
+      m_gene <- BM[which(BM$human==h_gene),"mouse"]
+      geneset_mouse <- c(geneset_mouse, m_gene)
+    }
+    #And finally we need to copy the information in each vector to the empty list - with names- list we created before (gmt.mouse)
+    #We replace each element of the list (that was empty, NULL) with the vector we created with the mouse gene names
+    gmt.mouse[[Gene_set]] <- geneset_mouse
   }
-  #And finally we need to copy the information in each vector to the empty list - with names- list we created before (gmt.mouse)
-  #We replace each element of the list (that was empty, NULL) with the vector we created with the mouse gene names
-  gmt.mouse[[Gene_set]] <- geneset_mouse
-}
-gmt.file <- gmt.mouse
+  gmt.file <- gmt.mouse
 }
 
 # Run fGSEA:
@@ -163,9 +164,9 @@ dev.off()
 pdf(paste0("figs/GSEA_all_plots.pdf"), height=5, width=6)
 for (i in 1:length(gmt.file)){
   plt <- plotEnrichment(gmt.mouse[[i]],
-                 stats= ranks,
-                 gseaParam = 1, 
-                 ticksSize = 0.5) + 
+                        stats= ranks,
+                        gseaParam = 1, 
+                        ticksSize = 0.5) + 
     labs(title= names(gmt.mouse[i])) + 
     theme(plot.title = element_text(hjust = 0.5, face="bold"))
   print(plt)
