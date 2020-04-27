@@ -12,7 +12,7 @@ Create bigwig from bam:
 #1. Create index file (.bai) with samtools
 ````
 samtools -b -o
-
+````
 
 * Remember to activate conda - you will see (base) in your terminal when conda is inititated
 * If you need help on how to use samtools:
