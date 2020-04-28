@@ -27,8 +27,8 @@ Analysis of NGS data requires many different tools. Many of them can be installe
 To install _miniconda_ go to https://conda.io/projects/conda/en/latest/user-guide/install/macos.html and follow instructions.  
 
 **IMPORTANT! In the process of installation, you will be asked where to install Miniconda. By default, it will be installed into your default location (/Users/$USER). If you want to change that, specify another location**. 
-For example: /Users/$USER/Applications/miniconda3 
-(note that the path you specify must exist: all folders might be already present, but the last miniconda3 folder that will be created by the installtion)
+For example: /Users/$USER/Applications/miniconda3  
+(note that the path you specify must exist: all folders might be already present, but the last miniconda3 folder that will be created by the installtion) 
 <br/>
 
 After installing _miniconda_ it will initialize by default every time you open Terminal. You can know Conda is active if you see _(base)_ at the beginning of your command line. To avoid activation by default run the following line in Terminal:
@@ -47,6 +47,7 @@ To deactivate Conda, run:
 ````
 conda deactivate
 ````
+<br/>
 
 ### 4. Install tools from miniconda
 With miniconda you will be able to install many different tools required for NGS data analysis (e.g. deeptools, samtools, bedtools).
