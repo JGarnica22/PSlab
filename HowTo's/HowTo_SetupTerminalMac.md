@@ -98,18 +98,21 @@ make STARforMacStatic CXX=/path/to/gcc #e.g. /usr/local/Cellar/gcc/9.2.0_2/bin/g
 
 **IMPORTANT! This needs to be done every time you install a tool**  
 
-##### #How to know what is in your $PATH:
+How to know what is in your $PATH:
 ````
 echo $PATH
 ````
 
-##### #You must add the /path/to/yourtool into your $PATH. You can do that in your _.zshrc_ profile.
+You must add the /path/to/yourtool into your $PATH. You can do that in your _.zshrc_ profile.
 ````
-open .zshrc`
+open .zshrc
 ````
-#Add /path/to/yourtool into your $PATH and save. For example:
+
+Add /path/to/yourtool into your $PATH and save. For example:
 PATH=$PATH:/Users/patri/Applications/STAR-2.7.3a/bin/MacOSX_x86_64
-#Close and open Terminal to update changes
+
+Close and open Terminal to update changes  
+
 
 5. Run STAR:  
 ````
