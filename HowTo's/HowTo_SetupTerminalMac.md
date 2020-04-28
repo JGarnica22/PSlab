@@ -73,12 +73,13 @@ conda list
 ### 5. Install other tools outside from Conda
 Tools that cannot be installed from Conda will have their on installation protocol. Following the installation manual is recommended.
 
-#### EXAMPLE: How to install STAR (v. 2.7.3a)
+#### EXAMPLE: How to install `STAR` (v. 2.7.3a)
 
 1. Change directory to your _Applications_ folder
 ````
 cd /Users/$USER/Applications
 ````
+<br/>
 
 2. Download package from source (GitHub) and unzip:
 ````
@@ -87,12 +88,14 @@ tar -xzf 2.7.3a.tar.gz
 rm *.tar.gz
 cd STAR-2.7.3a
 ````
+<br/>
 
 3. Compile tool:
 ````
 cd source
 make STARforMacStatic CXX=/path/to/gcc #e.g. /usr/local/Cellar/gcc/9.2.0_2/bin/g++-9  
 ````
+<br/>
 
 4. In order to be able to run the tool from any directory without having to locate the executable file, you need to add the directory to your $PATH:  
 
@@ -108,11 +111,11 @@ You must add the /path/to/yourtool into your $PATH. You can do that in your _.zs
 open .zshrc
 ````
 
-Add /path/to/yourtool into your $PATH and save. For example:
-PATH=$PATH:/Users/patri/Applications/STAR-2.7.3a/bin/MacOSX_x86_64
+Add /path/to/yourtool into your $PATH and save. <br/>
+For example: PATH=$PATH:/Users/patri/Applications/STAR-2.7.3a/bin/MacOSX_x86_64
 
 Close and open Terminal to update changes  
-
+<br/>
 
 5. Run STAR:  
 ````
