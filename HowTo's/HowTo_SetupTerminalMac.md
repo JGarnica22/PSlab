@@ -96,14 +96,14 @@ make STARforMacStatic CXX=/path/to/gcc #e.g. /usr/local/Cellar/gcc/9.2.0_2/bin/g
 
 4. In order to be able to run the tool from any directory without having to locate the executable file, you need to add the directory to your $PATH:  
 
-**IMPORTANT! These needs to be done every time you install a tool**  
+**IMPORTANT! This needs to be done every time you install a tool**  
 
-##### How to know what is in your $PATH:
+##### #How to know what is in your $PATH:
 ````
 echo $PATH
 ````
 
-##### You must add the /path/to/yourtool into your $PATH. You can do that in your _.zshrc_ profile.
+##### #You must add the /path/to/yourtool into your $PATH. You can do that in your _.zshrc_ profile.
 ````
 open .zshrc`
 ````
