@@ -4,7 +4,7 @@ R is a powerful open source program for statistics and graphics. It can run on p
 
 RStudio is an integrated development environment (IDE) for R. It’s basically a nice front-end for R, giving you a console, a scripting window, a graphics window, and an R workspace, among other options.<br/>
 
-**Install R and RStudio**
+**Install R and RStudio**<br/>
 Installing R on Windows or Mac is very straightforward. The easiest way is to install it through CRAN.<br/>
 
 To download and install R and RStudio follow these steps:
