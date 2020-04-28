@@ -91,10 +91,30 @@ cd STAR-2.7.3a
 3. Compile tool:
 ````
 cd source
-make STARforMacStatic CXX=/path/to/gcc
+make STARforMacStatic CXX=/path/to/gcc #e.g. /usr/local/Cellar/gcc/9.2.0_2/bin/g++-9  
 ````
 
-4. In order to be able to run the tool from any directory without having to locate the executable file, you need to add the directory to your $PATH
+4. In order to be able to run the tool from any directory without having to locate the executable file, you need to add the directory to your $PATH:  
 
-**IMPORTANT! These needs to be done every time you install a tool**
+**IMPORTANT! These needs to be done every time you install a tool**  
+
+##### How to know what is in your $PATH:
+````
+echo $PATH
+````
+
+##### You must add the /path/to/yourtool into your $PATH. You can do that in your _.zshrc_ profile.
+````
+open .zshrc`
+````
+#Add /path/to/yourtool into your $PATH and save. For example:
+PATH=$PATH:/Users/patri/Applications/STAR-2.7.3a/bin/MacOSX_x86_64
+#Close and open Terminal to update changes
+
+5. Run STAR:  
+````
+STAR  [options]... --genomeDir /path/to/genome/index/   --readFilesIn R1.fq R2.fq
+````
+
+
 
