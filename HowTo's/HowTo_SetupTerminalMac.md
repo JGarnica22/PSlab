@@ -27,6 +27,7 @@ Analysis of NGS data requires many different tools. Many of them can be installe
 To install _miniconda_ go to https://conda.io/projects/conda/en/latest/user-guide/install/macos.html and follow instructions.  
 
 **IMPORTANT! In the process of installation, you will be asked where to install Miniconda. By default, it will be installed into your default location (/Users/$USER). If you want to change that, specify another location**.  
+
 For example: /Users/$USER/Applications/miniconda3  
 (\*note that the path you specify must exist: all folders might be already present, but the last miniconda3 folder that will be created by the installtion) 
 <br/>
