@@ -18,7 +18,7 @@ To modify your zsh profile (_.zshrc_) you should open it from your default direc
 open .zshrc
 ````
 This will open an external text editor (TextEdit) will allow you to modify your Terminal aesthetics. I suggest you change the zsh theme to "_bureau_" (ZSH_THEME="bureau") in order to see in each of your command lines:<br/>
-**$USER@computer.....directory...............................[time]**  
+**$USER@computer.....directory...............................[time]:**  
 <br/>
 
 ### 3. Install Miniconda
@@ -29,7 +29,7 @@ To install _miniconda_ go to https://conda.io/projects/conda/en/latest/user-guid
 **IMPORTANT! In the process of installation, you will be asked where to install Miniconda. By default, it will be installed into your default location (/Users/$USER). If you want to change that, specify another location**.  
 
 For example: /Users/$USER/Applications/miniconda3  
-_(\*note that the path you specify must exist: all folders might be already present, but the last miniconda3 folder that will be created by the installtion. I recommend you create an _Applications_ folder in you user where you install all your command-line tools)_  
+_(\*note that the path you specify must exist: all folders might be already present, but the last miniconda3 folder that will be created by the installtion. I recommend you create an_ Applications _folder in you user where you install all your command-line tools)_  
 <br/>
 
 After installing _miniconda_ it will initialize by default every time you open Terminal. You can know Conda is active if you see _(base)_ at the beginning of your command line. To avoid activation by default run the following line in Terminal:
