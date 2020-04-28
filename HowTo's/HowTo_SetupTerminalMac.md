@@ -29,7 +29,7 @@ To install _miniconda_ go to https://conda.io/projects/conda/en/latest/user-guid
 **IMPORTANT! In the process of installation, you will be asked where to install Miniconda. By default, it will be installed into your default location (/Users/$USER). If you want to change that, specify another location**.  
 
 For example: /Users/$USER/Applications/miniconda3  
-(\*note that the path you specify must exist: all folders might be already present, but the last miniconda3 folder that will be created by the installtion. I recommend you create an _Applications_ folder in you user where you install all your command-line tools) 
+_(\*note that the path you specify must exist: all folders might be already present, but the last miniconda3 folder that will be created by the installtion. I recommend you create an _Applications_ folder in you user where you install all your command-line tools)_  
 <br/>
 
 After installing _miniconda_ it will initialize by default every time you open Terminal. You can know Conda is active if you see _(base)_ at the beginning of your command line. To avoid activation by default run the following line in Terminal:
@@ -72,6 +72,7 @@ conda list
 
 ### 5. Install other tools outside from Conda
 Tools that cannot be installed from Conda will have their on installation protocol. Following the installation manual is recommended.
+<br/>
 
 #### EXAMPLE: How to install `STAR` (v. 2.7.3a)
 
@@ -97,9 +98,7 @@ make STARforMacStatic CXX=/path/to/gcc #e.g. /usr/local/Cellar/gcc/9.2.0_2/bin/g
 ````
 <br/>
 
-4. In order to be able to run the tool from any directory without having to locate the executable file, you need to add the directory to your $PATH:  
-
-**IMPORTANT! This needs to be done every time you install a tool**  
+4. In order to be able to run the tool from any directory without having to locate the executable file, you need to add the directory to your $PATH. **IMPORTANT! This needs to be done every time you install a tool**  
 
 How to know what is in your $PATH:
 ````
@@ -111,7 +110,8 @@ You must add the /path/to/yourtool into your $PATH. You can do that in your _.zs
 open .zshrc
 ````
 
-Add /path/to/yourtool into your $PATH and save. <br/>
+Add /path/to/yourtool into your $PATH and save.  
+<br/>
 For example: PATH=$PATH:/Users/patri/Applications/STAR-2.7.3a/bin/MacOSX_x86_64
 
 Close and open Terminal to update changes  
