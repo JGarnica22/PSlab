@@ -18,13 +18,14 @@ To modify your zsh profile (_.zshrc_) you should open it from your default direc
 open .zshrc
 ````
 This will open an external text editor (TextEdit) will allow you to modify your Terminal aesthetics. I suggest you change the zsh theme to "_bureau_" (ZSH_THEME="bureau") in order to see in each of your command lines:<br/>
-**$USER@computer.....directory...............................[time]:**  
+**$USER@computer**.....**directory**...............................**[time]:**  
 <br/>
 
 ### 3. Install Miniconda
 Analysis of NGS data requires many different tools. Many of them can be installed and run through **Conda** (https://docs.conda.io/en/latest/). For Mac, _miniconda_ is preferably used. 
 
 To install _miniconda_ go to https://conda.io/projects/conda/en/latest/user-guide/install/macos.html and follow instructions.  
+<br/>
 
 **IMPORTANT! In the process of installation, you will be asked where to install Miniconda. By default, it will be installed into your default location (/Users/$USER). If you want to change that, specify another location**.  
 
