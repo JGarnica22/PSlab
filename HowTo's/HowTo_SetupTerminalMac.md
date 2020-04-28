@@ -51,23 +51,25 @@ conda deactivate
 <br/>
 
 ### 4. Install tools from miniconda
-With miniconda you will be able to install many different tools required for NGS data analysis (e.g. deeptools, samtools, bedtools).
+With miniconda you will be able to install many different tools required for NGS data analysis (e.g. `deeptools`, `samtools`, `bedtools`).
 
-In order to install, search the tool in https://anaconda.org and you will find which channel ("source") it can be installed from (e.g. bioconda) and the code to do so. If you want to install, for example, samtools, the following command should be used:
+In order to install, search the tool in https://anaconda.org and you will find which channel ("source") it can be installed from (e.g. bioconda) and the code to do so. If you want to install, for example, `samtools`, the following command should be used:
 ````
 conda install -c bioconda samtools
-````
+````  
 
 After you install the tool, you can run it directly when conda is activated:
 ````
 samtools <command> [options]
-````
+````  
 
 In order to check which tools you have install within conda, you can use:
 ````
 conda list
 ````
+<br/>
 
+### 5. Install other tools
 
 #
 NOTE:
