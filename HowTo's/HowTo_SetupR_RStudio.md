@@ -36,8 +36,8 @@ A repository is a place where packages are located so you can install them from 
 Install from CRAN:
 
 1. Run the following command? with the name of the package to be installed:
-''''
+````
 install.packages("package")
-''''
+````
 
 
