@@ -218,8 +218,9 @@ Confirm that tools is properly installed by running help command
 ````
 samtools --help
 ````
-In case you do not want to activate tool environtment each time include this tool in your `PATH` by
+In case you do not want to activate tool environtment each time include this tool in your `PATH` by adding this command at the final of your .zshrc file
 ````
+nano ~.zshrc
 export PATH=/home/USER/anaconda3/envs/samtools/bin:$PATH 
 ````
 
@@ -258,8 +259,7 @@ sudo apt-get install build-essential
 sudo apt install zlib1g-dev
 ````
 
-4. In order to be able to run the tool from any directory without having to locate the executable file as done previously with conda, you need to add the directory to your $PATH. **IMPORTANT! This would need to be done every time you install a tool**  
-
+4. In order to be able to run the tool from any directory without having to locate the executable file as done previously with conda, you need to add the directory to your $PATH on your .zshrc file. **IMPORTANT! This would need to be done every time you install a tool**  
 ````
 export PATH=/home/USER/STAR-2.7.3a/bin/Linux_x86_64:$PATH 
 ````
