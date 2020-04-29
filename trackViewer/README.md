@@ -19,9 +19,6 @@ Download bam files or move them into bam_files+index directory
 
 ### 2. Create an index file (.bai) for each bam file in the direcotry using samtools
 ````
-(conda activate samtools)
-````
-````
 cd bam_files+index
 ````
 ````
@@ -34,9 +31,6 @@ done
 ````
 
 ### 3. Convert bam files into bigwig (bw) files using `bamCoverage`
-````
-(conda activate deeptools)
-````
 ````
 for i in *.bam
 do
