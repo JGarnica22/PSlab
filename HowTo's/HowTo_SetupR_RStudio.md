@@ -33,7 +33,7 @@ A repository is a place where packages are located so you can install them from 
 2. Bioconductor: this is a topic specific repository, intended for open source software for bioinformatics. As CRAN, it has its own submission and review processes.
 3. Github: this is not R specific, Github is probably the most popular repository for open source projects. Its popularity comes from the unlimited space for open source, the integration with git, a version control software, and its ease to share and collaborate with others. But be aware that there is no review process associated with it.
 
-Install from CRAN:
+**Install from CRAN:**<br/>
 
 1. Run the following function with the name of the package to be installed:
 ````
@@ -44,7 +44,7 @@ To install more than a package at a time, just write them as a character vector 
 install.packages(c("package_1", "package_2"))
 ````
 
-Install from Bioconductor:
+**Install from Bioconductor:**<br/>
 
 1. Executing the following script:
 ````
