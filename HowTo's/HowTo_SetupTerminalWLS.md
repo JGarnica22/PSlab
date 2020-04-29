@@ -252,13 +252,13 @@ cd STAR/source
 make STAR  
 ````
 
-**NOTE: if application do not find make command, you may still need to install all the basic packages to build code and zlib library, then repeat the previous command.****
+**NOTE: if application do not find make command, you may still need to install all the basic packages to build code and zlib library, then repeat the previous command.**
 ````
 sudo apt-get install build-essential
 sudo apt install zlib1g-dev
 ````
 
-4. In order to be able to run the tool from any directory without having to locate the executable file as done previously with conda, you need to add the directory to your $PATH. **IMPORTANT! This needs to be done every time you install a tool**  
+4. In order to be able to run the tool from any directory without having to locate the executable file as done previously with conda, you need to add the directory to your $PATH. **IMPORTANT! This would need to be done every time you install a tool**  
 
 ````
 export PATH=/home/USER/STAR-2.7.3a/bin/Linux_x86_64:$PATH 
