@@ -148,7 +148,7 @@ Anaconda3-2019.03-Linux-x86_64.sh
 After following the onscreen instructions to install Anaconda, simply remove the installation file:
 
 ````
-rm Anaconda3-2019.03-Linux-x86_64.sh`
+rm Anaconda3-2019.03-Linux-x86_64.sh
 ````
 
 ### 3.3. Updating Anaconda
@@ -162,7 +162,7 @@ source ~anaconda3/bin/activate
 
 Once activated, initiate a full update:
 ````
-conda update --all`
+conda update --all
 ````
 
 ### 3.4. (Optional) Turn off Anaconda as your defect environtment
