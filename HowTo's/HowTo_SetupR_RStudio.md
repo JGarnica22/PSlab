@@ -35,9 +35,51 @@ A repository is a place where packages are located so you can install them from 
 
 Install from CRAN:
 
-1. Run the following command? with the name of the package to be installed:
+1. Run the following function with the name of the package to be installed:
 ````
 install.packages("package")
 ````
+To install more than a package at a time, just write them as a character vector in the first argument of the function:
+````
+install.packages(c("package_1", "package_2"))
+````
+
+Install from Bioconductor:
+
+1. Executing the following script:
+````
+source("https://bioconductor.org/biocLite.R")
+````
+2. Run the following function with the name of the package to be installed:
+````
+biocLite("package")
+````
+To install more than a package at a time, just write them as a character vector in the first argument of the function:
+````
+biocLite(c(package_1", "package_2))
+````
+
+**Check and remove packages in RStudio**<br/>
+
+To check what packages are installed on your computer, you can use:
+````
+installed.packages()
+````
+
+Uninstalling a package is straightforward with the following function:
+````
+remove.packages("package")
+````
+
+You can check what packages need an update with a call to the function:
+````
+old.packages()
+````
+
+You can also update all packages by using:
+````
+update.packages()
+````
 
 
+Need to how load a package????
