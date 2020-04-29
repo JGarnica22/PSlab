@@ -23,3 +23,21 @@ To download and install R and RStudio follow these steps (bear in mind that RStu
 
 **Install R packages in RStudio**<br/>
 
+R packages are collections of functions and data sets developed by the community. A package will include code, documentation for the package and the functions inside, some tests to check everything works as it should, and data sets. You could also find out what the package does, who the author is, what version the documentation belongs to, the date, the type of license its use, and the package dependencies.<br/>
+
+What Are Repositories?<br/>
+
+A repository is a place where packages are located so you can install them from it. Three of the most popular repositories for R packages are:
+
+1. CRAN: the official repository, it is a network of ftp and web servers maintained by the R community around the world. The R foundation coordinates it, and for a package to be published here, it needs to pass several tests that ensure the package is following CRAN policies.
+2. Bioconductor: this is a topic specific repository, intended for open source software for bioinformatics. As CRAN, it has its own submission and review processes.
+3. Github: this is not R specific, Github is probably the most popular repository for open source projects. Its popularity comes from the unlimited space for open source, the integration with git, a version control software, and its ease to share and collaborate with others. But be aware that there is no review process associated with it.
+
+Install from CRAN:
+
+1. Run the following command? with the name of the package to be installed:
+''''
+install.packages("package")
+''''
+
+
