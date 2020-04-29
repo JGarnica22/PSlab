@@ -1,4 +1,4 @@
-# How to Set up your Terminal in Windows Subsystem for Linux (WLS)
+# How to Set up your Terminal in Windows Subsystem for Linux (WLS) :penguin:
 
 If you need to work with Terminal language and tools and your computer is running on windows system you need to enable 
 Linux subsystem (WLS) in order to get access to tools only available for Linux and macOS. Moreover, scripts include in this reservoir (***PS***) will only be written in UNIX language (Linux and macOS).<br/>
@@ -24,7 +24,7 @@ In this How-to we will do:<br/>
 - Install tools from outside Anaconda  
 
 
-## 1. Setting up WSL
+## 1. Setting up WSL :wrench:
 First off we have to do some preliminary setup to get WSL working:<br/>
 ### 1.1. Turning on Developer mode
 First head to the developer settings in your Windows 10 settings menu:<br/>
@@ -54,18 +54,18 @@ Next make sure the feature “Windows Subsystem for Linux” is ticked:<br/>
 
 ### 1.3. Restart your computer
 
-### 1.4. Install Ubuntu
+### 1.4. Install Ubuntu :minidisc:
 Head to the Microsoft Store and search for **“Ubuntu”**, select the App you prefer and install it. This app will enable to run Linux commands in  your Windows system.
 
 ![](https://miro.medium.com/max/1070/1*KspvSBty03M8zl6nl9bisQ.png)
 
-### UNIX language
+### UNIX language :u6307:
 Now you have a fully functional Linux Subsystem with full admin rights, in case you are not experienced, to use the Terminal, you need to first learn the basic commands. You can find a summary of **regular expressions** (Appendix 2) and **basic shell commands** (Appendix 3) in the following Cheat Sheet:  
 http://practicalcomputing.org/files/PCfB_Appendices.pdf  
 <br/>
 **IMPORTANT! As you will be using a subsystem inside windows `Ubuntu` will create a hidden folder only found by search on windows explorer in case you want to see how look like via explorer. It is highly recommended to explore Linux directories and files on `Ubuntu` app. Very importantly, you must not edit directories or files from the Linux subsystem using Windows explorer. Conversely, you can edit windows files from `Ubuntu` app. In case, you need to, for instance, move file from windows system to Linux subsystem you can explore Window directories in Terminal via `/mnt/UNIT/USERS/`.**
 
-## 2. (Optional) Install _Oh My Zsh_
+## 2. (Optional) Install _Oh My Zsh_ :necktie:
 It is optional, but in order to easily manipulate your Terminal configuration you can install `Oh-My-Zsh` following these instructions:<br/>
 
 ### 2.1. Install zsh
@@ -124,7 +124,7 @@ Save it and restart your Ubuntu shell again to see the changes.
 
 
 
-## 3. Install and set up Anaconda
+## 3. Install and set up Anaconda :snake:
 
 Analysis of NGS data requires many different tools. [Anaconda](https://docs.conda.io/en/latest/) is one of the most widely used solutions for package management for R and Python, it comes with 1.500+ popular packages out of the box which is more than enough for 99% of all Data Science related tasks.
 
@@ -183,7 +183,7 @@ conda deactivate
 ````
 <br/>
 
-### 4. Install tools from Conda
+### 4. Install tools from Conda :cd:
 With Anaconda you will be able to install many different tools required for NGS data analysis (e.g. `deeptools`, `samtools`, `bedtools`).
 
 In order to install, search the tool in https://anaconda.org and you will find which channel ("source") it can be installed from (e.g. bioconda) and the code to do so (*Remember that may the code be different for Linux and macOS installation, you must use **Linux***). For WLS you need to previously create an **environtment** for the tools and then include them in the `PATH` if you do not want needing to activate them every time.
@@ -224,55 +224,47 @@ export PATH=/home/USER/anaconda3/envs/samtools/bin:$PATH
 ````
 
 
-
-## 5. Install other tools outside from Anaconda
-Tools that cannot be installed from Conda will have their on installation protocol. Following the installation manual is recommended.
+## 5. Install other tools outside from Anaconda :floppy_disk:
+Tools that cannot be installed from Conda will have their on **installation protocol**. Following the installation manual is recommended.
 <br/>
 
-#### EXAMPLE: How to install `STAR` (v. 2.7.3a)
+### EXAMPLE: How to install `STAR` (v. 2.7.3a)
 
-1. Change directory to your _Applications_ folder
+1. Change directory to the folder you are using to store applications
 ````
-cd /Users/$USER/Applications
+cd /Users/$USER/*
 ````
 <br/>
 
-2. Download package from source (GitHub) and unzip:
+2. **Download** package from source (*GitHub*) and **unzip**:
 ````
 wget https://github.com/alexdobin/STAR/archive/2.7.3a.tar.gz
 tar -xzf 2.7.3a.tar.gz
-rm *.tar.gz
+rm  2.7.3a.tar.gz
+
 cd STAR-2.7.3a
 ````
 <br/>
 
-3. Compile tool:
+3. **Compile** tool under Linux:
 ````
-cd source
-make STARforMacStatic CXX=/path/to/gcc #e.g. /usr/local/Cellar/gcc/9.2.0_2/bin/g++-9  
-````
-<br/>
-
-4. In order to be able to run the tool from any directory without having to locate the executable file, you need to add the directory to your $PATH. **IMPORTANT! This needs to be done every time you install a tool**  
-
-How to know what is in your $PATH:
-````
-echo $PATH
+cd STAR/source
+make STAR  
 ````
 
-You must add the /path/to/yourtool into your $PATH. You can do that in your _.zshrc_ profile.
+**NOTE: if application do not find make command, you may still need to install all the basic packages to build code and zlib library, then repeat the previous command.****
 ````
-open .zshrc
+sudo apt-get install build-essential
+sudo apt install zlib1g-dev
 ````
 
-Add /path/to/yourtool into your $PATH and save.  
-<br/>
-For example: PATH=$PATH:/Users/patri/Applications/STAR-2.7.3a/bin/MacOSX_x86_64
+4. In order to be able to run the tool from any directory without having to locate the executable file as done previously with conda, you need to add the directory to your $PATH. **IMPORTANT! This needs to be done every time you install a tool**  
 
-Close and open Terminal to update changes  
-<br/>
+````
+export PATH=/home/USER/STAR-2.7.3a/bin/Linux_x86_64:$PATH 
+````
 
-5. Run STAR:  
+5. Run `STAR`:  
 ````
 STAR  [options]... --genomeDir /path/to/genome/index/   --readFilesIn R1.fq R2.fq
 ````
