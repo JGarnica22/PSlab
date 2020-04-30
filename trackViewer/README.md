@@ -17,37 +17,23 @@ mkdir bam_files+index bw_files
 
 Download bam files or move them into bam_files+index directory
 
-### 2. Create an index file (.bai) for each bam file in the direcotry using samtools
+### 2. Create an index file (.bai) for each bam file in the direcotry using `samtools` and then convert bam files into bigwigs with`bamCoverage` and store them in bw_files folder.
+
 ````
-cd bam_files+index
-````
-````
-for f in *.bam
+for f in $(find . -name "*.bam" -exec basename {} \;)
 do
 echo "Indexing:"$f
-samtools index $f
+echo samtools index $f
 echo $f".bai index file created"
+echo Converting $f to bw
+echo bamCoverage -b $f -o bw_files/Coverage_$f.bw -v
+echo Coverage_$f.bw file created
 done
 ````
 
-### 3. Convert bam files into bigwig (bw) files using `bamCoverage`
+In a WLS, you may want to move it to a windows folder for R analysis:
 ````
-for i in *.bam
-do
-echo "Converting "$i" to bw"
-bamCoverage -b $i -o Coverage_$i.bw -v
-echo "Coverage_"$i".bw file created"
-done
-````
-
-Move files to bw_files folder
-````
-mv *.bw ~/projects/bam_to_bw/bw_files
-````
-
-In a WLS, you may want to move it to windows folder`
-````
-mv *bw /mnt/...
+mv *.bw /mnt/...
 ````
 
 
