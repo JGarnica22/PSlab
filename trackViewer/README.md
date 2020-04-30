@@ -12,15 +12,15 @@ You can obtain bw files from bam files with `bamCoverage`(deeptools) in Terminal
 You will need `samtools` and `deeptools`, both included in conda (to install them see [HowTo_setupTerminalWLS](https://github.com/patriciasolesanchez/PSlab/blob/master/HowTo's/HowTo_SetupTerminalWLS.md) or [HowTo_SetupTerminalMac](https://github.com/patriciasolesanchez/PSlab/blob/master/HowTo's/HowTo_SetupTerminalMac.md) if you are working on Windows or Mac, respectively).  
 <br/>
 
-### 1. Create your project folder ("trackViewer") with the corresponding subfolders (data, doc, figs, etc.) in your computer:
+### 1. Create your folder to work:
 
-Create a new subfolder to work:
 ````
-cd /path/to/your/project/folder #e.g. /Users/$USER/projects/trackViewer
-mkdir bam_to_bw && cd "$_"
+cd /path/to/your/working/directory
+mkdir bam_to_bw & cd "$_"
+mkdir bam_files+index bw_files
 ````
 
-Download bam files or move them into this directory  
+Download bam files or move them into bam_files+index directory  
 <br/>
 
 ### 2. Create an index file (.bai) for each bam file in the direcotry using `samtools` and then convert bam files into bigwigs with`bamCoverage` and store them in bw_files folder.
@@ -37,9 +37,14 @@ echo Coverage_$f.bw file created
 done
 ````
 
-In a WLS, you may want to move it to a windows folder for R analysis:
+Move bw files to the trackViewer _data_ folder in your computer:
 ````
-mv *.bw /mnt/...
+mv bw_files/*.bw /path/to/your/project/data/folder #e.g. /Users/$USER/projects/trackViewer/data
+````
+
+\* In a WLS, you have to move it to **a Windows folder** for R analysis:
+````
+mv bw_files/*.bw /mnt/path/to/your/project/data/folder #e.g. /Users/$USER/projects/trackViewer/data /mnt/...
 ````
 
 
