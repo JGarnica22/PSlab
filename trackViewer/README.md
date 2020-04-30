@@ -23,10 +23,10 @@ Download bam files or move them into bam_files+index directory
 for f in $(find . -name "*.bam" -exec basename {} \;)
 do
 echo "Indexing:"$f
-echo samtools index $f
+samtools index $f
 echo $f".bai index file created"
 echo Converting $f to bw
-echo bamCoverage -b $f -o bw_files/Coverage_$f.bw -v
+bamCoverage -b $f -o bw_files/Coverage_$f.bw -v
 echo Coverage_$f.bw file created
 done
 ````
