@@ -1,16 +1,16 @@
 # TrackViewer :eyeglasses:
-This is a package with web interface for drawing elegant interactive tracks or lollipop plots to facilitate integrated analysis of multi-omics data. You can visualize mapped reads along with annotation as track layers for different NGS datasets such as ChIP-seq, RNA-seq, miRNA-seq, DNA-seq, SNPs and methylation data.
+This is a package with web interface for drawing elegant interactive tracks or lollipop plots to facilitate integrated analysis of multi-omics data. You can visualize mapped reads along with annotation as track layers for different NGS datasets such as ChIP-seq, RNA-seq, miRNA-seq, DNA-seq, SNPs and methylation data.  
 <br/>
 
 ## Prepare your input files:
 Input files for trackViewer can be **bigWig (.bw)** or **BED (.bed)** files.
 
-You can obtain bw files from bam files with `bamCoverage`(deeptools) in Terminal. For that follow these instructions:
+You can obtain bw files from bam files with `bamCoverage`(deeptools) in Terminal. For that follow these instructions:  
 <br/>
 
 ### 0. Install tools:
-You will need `samtools` and `deeptools`, both included in conda (to install them see [HowTo_setupTerminalWLS](https://github.com/patriciasolesanchez/PSlab/blob/master/HowTo's/HowTo_SetupTerminalWLS.md) or [HowTo_SetupTerminalMac](https://github.com/patriciasolesanchez/PSlab/blob/master/HowTo's/HowTo_SetupTerminalMac.md) if you are working on Windows or Mac, respectively).
-
+You will need `samtools` and `deeptools`, both included in conda (to install them see [HowTo_setupTerminalWLS](https://github.com/patriciasolesanchez/PSlab/blob/master/HowTo's/HowTo_SetupTerminalWLS.md) or [HowTo_SetupTerminalMac](https://github.com/patriciasolesanchez/PSlab/blob/master/HowTo's/HowTo_SetupTerminalMac.md) if you are working on Windows or Mac, respectively).  
+<br/>
 
 ### 1. Create your project folder ("trackViewer") with the corresponding subfolders (data, doc, figs, etc.) in your computer:
 
