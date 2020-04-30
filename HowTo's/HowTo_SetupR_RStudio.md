@@ -19,7 +19,6 @@ To download and install R and RStudio follow these steps (bear in mind that <ins
 2. In the subdirectory "base" chose "Install R for the first time".
 3. You will obtain an executable file.
 4. Run the executable file. Leave all default settings in the installation options, so click the button 'Next' until the process is complete.  
-<br/>
 
 ### Install RStudio <br/>
 
