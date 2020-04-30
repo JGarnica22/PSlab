@@ -212,7 +212,7 @@ conda install -c anaconda samtools
 Now you can run the tool when conda is activated after activating its environtment:
 
 ````
-activate samtools
+conda activate samtools
 ````
 Confirm that tools is properly installed by running help command
 ````
