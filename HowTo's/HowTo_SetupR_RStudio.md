@@ -38,9 +38,9 @@ R packages are collections of functions and data sets developed by the community
 
 A repository is a place where packages are located so you can install them from there. Three of the most popular repositories for R packages are:
 
-**1. CRAN:** the official repository, it is a network of ftp and web servers maintained by the R community around the world. The R foundation coordinates it, and for a package to be published here, it needs to pass several tests that ensure the package is following CRAN policies.
-**2. Bioconductor:** this is a topic-specific repository, intended for open source software for bioinformatics. As CRAN, it has its own submission and review processes.
-**3. Github:** this is not R specific, Github is probably the most popular repository for open source projects. Its popularity comes from the unlimited space for open source, the integration with git, a version control software, and its ease to share and collaborate with others. But be aware that <ins>there is no review process associated with it</ins>!
+**1. CRAN:** the official repository, it is a network of ftp and web servers maintained by the R community around the world. The R foundation coordinates it, and for a package to be published here, it needs to pass several tests that ensure the package is following CRAN policies.<br/>
+**2. Bioconductor:** this is a topic-specific repository, intended for open source software for bioinformatics. As CRAN, it has its own submission and review processes.<br/>
+**3. Github:** this is not R specific, Github is probably the most popular repository for open source projects. Its popularity comes from the unlimited space for open source, the integration with git, a version control software, and its ease to share and collaborate with others. But be aware that <ins>there is no review process associated with it</ins>!<br/>
 
 ### Install from CRAN:<br/>
 
