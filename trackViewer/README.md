@@ -20,7 +20,7 @@ mkdir bam_to_bw & cd "$_"
 mkdir bam_files+index bw_files
 ````
 
-Download bam files or move them into bam_files+index directory  
+Download bam files or move them into _bam_files+index_ directory  
 <br/>
 
 ### 2. Create an index file (.bai) for each bam file in the direcotry using `samtools` and then convert bam files into bigwigs with`bamCoverage` and store them in bw_files folder.
@@ -36,6 +36,7 @@ bamCoverage -b $f -o bw_files/Coverage_$f.bw -v
 echo Coverage_$f.bw file created
 done
 ````
+<br/>
 
 Move bw files to the trackViewer _data_ folder in your computer:
 ````
@@ -47,5 +48,6 @@ mv bw_files/*.bw /path/to/your/project/data/folder #e.g. /Users/$USER/projects/t
 mv bw_files/*.bw /mnt/path/to/your/project/data/folder #e.g. /Users/$USER/projects/trackViewer/data /mnt/...
 ````
 
+<br/>
 
 Use trackViewer: script.R
