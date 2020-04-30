@@ -55,7 +55,7 @@ install.packages(c("package_1", "package_2"))
 ````
 <br/>
 
-## Install from Bioconductor: <br/>
+### Install from Bioconductor: <br/>
 
 1. Executing the following script:
 ````
