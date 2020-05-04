@@ -8,12 +8,13 @@ Steps:
 
 1. Select a file that has to be downloaded and do right click.
 2. Click **Share** and a dialog box will appear.
-3. Click Advance in the right bottom corner.
-4. Click on the Change.. under who has access.
+3. Click **Advance** in the right bottom corner.
+4. Click on the **Change..** under who has access.
 5. Make it Public or accessible with the link.
-6. Click Save button.
+6. Click **Save** button.
 7. Copy the link for sharing, e.g. https://drive.google.com/file/d/1-uiB7SntziHO7ItAxZ2PuQGcsadG8ZJ1/view?usp=sharing
-8. Extract FILEID, in this case: **1-uiB7SntziHO7ItAxZ2PuQGcsadG8ZJ1**
+8. Extract FILEID, in this case: **1-uiB7SntziHO7ItAxZ2PuQGcsadG8ZJ1**  
+<br/>
 
 For small files, run the following command on your terminal:
 ````
