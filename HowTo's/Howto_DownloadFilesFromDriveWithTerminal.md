@@ -1,4 +1,4 @@
-# How to download files from Google drive using `wget` :arrow_down:
+# How to Download files from Google Drive using `wget` :arrow_down:
 
 Files can be downloaded from google drive using `wget`. Before that you need to know if your files are small or large sized in Google Drive (Files less than 100MB are regarded as small files, whereas files greater than 100MB are regarded as large files).
 
