@@ -5,7 +5,7 @@ This is a package with web interface for drawing elegant interactive tracks or l
 ## Prepare your input files:
 Input files for trackViewer can be **bigWig (.bw)** or **BED (.bed)** files.
 
-You can obtain bw files from bam files with `bamCoverage`(deeptools) in Terminal. For that follow these instructions:  
+You can obtain bw files from bam files with `bamCoverage`(deeptools) in Terminal. For that, follow these instructions:  
 <br/>
 
 ### 0. Install tools:
@@ -21,16 +21,16 @@ wd=/path/to/your/project/.../trackViewer
 wd=/mnt/unit/$USER/.../trackviewer
 ````
 
-Create new directories to work:
+Create new directory to work:
 ````
 cd $wd
 mkdir bam_to_bw && cd "$_"
 ````
 
-Download bam files or move them into bam_to_bw directory
+Download bam files or move them into bam_to_bw directory.  
 <br/>
 
-### 2. Create an index file (.bai) for each bam file in the direcotry using `samtools` and then convert bam files into bigwigs with`bamCoverage` and store them in data folder to be used by `RStudio`.
+### 2. Create an index file (.bai) for each bam file in the direcotry using `samtools` and then convert bam files into bigwigs with `bamCoverage` and store them in data folder to be used by `RStudio`.
 
 ````
 for f in $(find . -name "*.bam" -exec basename {} \;)
