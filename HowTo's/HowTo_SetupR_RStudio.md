@@ -12,7 +12,6 @@ Installing R on Windows or Mac is very straightforward. The easiest way is to in
 
 To download and install R and RStudio follow these steps (bear in mind that <ins>RStudio requires that R is installed beforehand</ins>).  
 
-
 ### Install R <br/>
 
 1. Download R from http://cran.us.r-project.org/ (click on “Download R for Windows” or "Download R for Mac OS X).
