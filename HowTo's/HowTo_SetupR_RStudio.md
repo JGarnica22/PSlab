@@ -64,18 +64,20 @@ source("https://bioconductor.org/biocLite.R")
 ````
 biocLite("package")
 ````
-To install more than a package at a time, just write them as a character vector in the first argument of the function:
+To install more than one package at a time, just write them as a character vector in the first argument of the function:
 ````
 biocLite(c(package_1", "package_2))
-````
+````  
+<br/>
 
 **Load packages in RStudio**<br/>
 
-After a package is installed, you are not able to work with its functionalities unless you call it before using a command to use the package:
+Everytime you open R and need to use packages that are not from base R, you will need to load them. For that you can use the commands _library_ or _require_:
 ````
 library("package")
 ````
-Another good reminder is that using the command without arguments, it will provide you the list of packages installed in different libraries on your computer :
+
+\* Note that that using the _library_ command without arguments provides you with the list of packages installed in the different libraries on your computer:
 ````
 library()
 ````
