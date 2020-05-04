@@ -1,6 +1,6 @@
 # How to Set up your Terminal in Windows Subsystem for Linux (WLS) :penguin:
 
-If you need to work with Terminal language and tools and your computer is running on windows system you need to enable 
+If you need to work with command-line tools and your computer is running on Windows system, you need to enable 
 Linux subsystem (WLS) in order to get access to tools only available for Linux and macOS. Moreover, scripts include in this reservoir (***PS***) will only be written in UNIX language (Linux and macOS).<br/>
 
 On top of that, The Windows Subsystem for Linux lets developers run a GNU/Linux environment -- including most command-line tools, utilities, and applications -- directly on Windows, unmodified, without the overhead of a virtual machine.
@@ -17,12 +17,12 @@ With WLS you can:
 5. Invoke Windows applications using a Unix-like command-line shell.
 6. Invoke GNU/Linux applications on Windows.
 
-In this How-to we will do:<br/>
+In this How-to we will:<br/>
 - Set up **WSL** (with optional **ZSH** and **Oh-my-zsh**) for Windows 10
 - Install and set up **Anaconda**
 - Install some tools from Anaconda
 - Install tools from outside Anaconda  
-
+<br/>
 
 ## 1. Setting up WSL :wrench:
 First off we have to do some preliminary setup to get WSL working:<br/>
@@ -48,14 +48,14 @@ Or by searching *“windows features”* and selecting *“Turn Windows features
 
 ![](https://miro.medium.com/max/700/1*KgnlItWjj4d525gmay_g_A.png)
 
-Next make sure the feature “Windows Subsystem for Linux” is ticked:<br/>
+\!! Make sure the feature “Windows Subsystem for Linux” is ticked:<br/>
 
 ![](https://miro.medium.com/max/413/1*f7vMExOir3iPyfbNGcJ8Tw.png)
 
 ### 1.3. Restart your computer
 
 ### 1.4. Install Ubuntu :minidisc:
-Head to the Microsoft Store and search for **“Ubuntu”**, select the App you prefer and install it. This app will enable to run Linux commands in  your Windows system.
+Head to the Microsoft Store and search for **“Ubuntu”**, select the App you prefer and install it. This app will enable to run Linux commands in your Windows system.
 
 ![](https://miro.medium.com/max/1070/1*KspvSBty03M8zl6nl9bisQ.png)
 
@@ -63,10 +63,10 @@ Head to the Microsoft Store and search for **“Ubuntu”**, select the App you 
 Now you have a fully functional Linux Subsystem with full admin rights, in case you are not experienced, to use the Terminal, you need to first learn the basic commands. You can find a summary of **regular expressions** (Appendix 2) and **basic shell commands** (Appendix 3) in the following Cheat Sheet:  
 http://practicalcomputing.org/files/PCfB_Appendices.pdf  
 <br/>
-**IMPORTANT! As you will be using a subsystem inside windows `Ubuntu` will create a hidden folder only found by search on windows explorer in case you want to see how look like via explorer. It is highly recommended to explore Linux directories and files on `Ubuntu` app. Very importantly, you must not edit directories or files from the Linux subsystem using Windows explorer. Conversely, you can edit windows files from `Ubuntu` app. In case, you need to, for instance, move file from windows system to Linux subsystem you can explore Window directories in Terminal via `/mnt/UNIT/USERS/`.**
+**IMPORTANT! As you will be using a subsystem inside Windows, `Ubuntu` will create a hidden folder only found by searching on Windows Explorer in case you want to see how it looks like via explorer. It is highly recommended to explore Linux directories and files on `Ubuntu` app. Very importantly, you must not edit directories or files from the Linux subsystem using Windows explorer. Conversely, you can edit Windows files from `Ubuntu` app. In case you need to, for instance, move files from Windows system to Linux subsystem, you can explore Window directories in Terminal via `/mnt/UNIT/$USER/`.**
 
 ## 2. (Optional) Install _Oh My Zsh_ :necktie:
-It is optional, but in order to easily manipulate your Terminal configuration you can install `Oh-My-Zsh` following these instructions:<br/>
+It is optional but, in order to easily manipulate your Terminal configuration, you can install `Oh-My-Zsh` following these instructions:<br/>
 
 ### 2.1. Install zsh
 
@@ -79,7 +79,7 @@ sudo apt-get install zsh
 After installing it, type `zsh`, zsh will ask you to choose some configuration. We will do this later on while installing `oh-my-zsh`, so choose option `0` to create the config file and prevent this message to show again.
 
 ### 2.2. Installing oh-my-zsh
-Before all we need to have git installed:
+First of all we need to have git installed:
 ````
 sudo apt-get install git
 ````
@@ -95,7 +95,7 @@ This will clone the repo and replace the existing `~/.zshrc` with a template fro
 ![](https://blog.joaograssi.com/content/images/2018/04/1---Install-oh-my-zsh.PNG)
 
 ### 2.3. Configuring zsh/oh-my-zsh
-First, we need to make sure `zsh` is executed by default for **Bash** on Ubuntu. This is not mandatory, but if not done you need to type zsh every time. For this, edit the `.bashrc` file with nano: `nano ~/.bashrc` and paste this right after the first comments:
+First, we need to make sure `zsh` is executed by default for **Bash** on Ubuntu. This is not mandatory, but if not done you need to type _zsh_ every time. For this, edit the `.bashrc` file with nano: `nano ~/.bashrc` and paste this right after the first comments:
 
 ````
 if test -t 1; then
@@ -158,7 +158,7 @@ Now you should be able to start up your Anaconda **environment**:
 source ~anaconda3/bin/activate
 ````
 
-*“~anaconda3/bin/activate”* is default place that Anaconda will install itself but if you chose elsewhere simply point to that directory.
+*“~anaconda3/bin/activate”* is default place where Anaconda will be installed, but if you chose elsewhere simply point to that directory.
 
 Once activated, initiate a full update:
 ````
@@ -186,16 +186,16 @@ conda deactivate
 ### 4. Install tools from Conda :cd:
 With Anaconda you will be able to install many different tools required for NGS data analysis (e.g. `deeptools`, `samtools`, `bedtools`).
 
-In order to install, search the tool in https://anaconda.org and you will find which channel ("source") it can be installed from (e.g. bioconda) and the code to do so (*Remember that may the code be different for Linux and macOS installation, you must use **Linux***). For WLS you need to previously create an **environtment** for the tools and then include them in the `PATH` if you do not want needing to activate them every time.
+In order to install, search the tool in https://anaconda.org and you will find which channel ("source") it can be installed from (e.g. bioconda) and the code to do so (*Remember that may the code be different for Linux and macOS installation, you must use **Linux***). For WLS you need to previously create an **environment** for the tools and then include them in the `PATH` if you do not want to activate them every time.
 
 If you want to install, for example, `samtools`, the following command should be used:
-
-Create environtment
-
-This need to be done for tools giving this problem when installing:
 ````
-Solving environment: failed with initial frozen solve. Retrying with flexible solve
+Create environment
 ````
+
+This needs to be done for tools giving this problem when installing:
+`Solving environment: failed with initial frozen solve. Retrying with flexible solve`
+
 To solve that create and environtment for the tools before installation:
 
 ````
@@ -205,6 +205,7 @@ Then activate this recently created environtment
 ````
 conda activate samtools
 ````
+
 Now you can install your tool with
 ````
 conda install -c anaconda samtools
@@ -214,15 +215,17 @@ Now you can run the tool when conda is activated after activating its environtme
 ````
 conda activate samtools
 ````
-Confirm that tools is properly installed by running help command
+
+Confirm that tool is properly installed by running _help_ command
 ````
 samtools --help
 ````
+
 In case you do not want to activate tool environtment each time include this tool in your `PATH` by adding this command at the final of your .zshrc file
 ````
 nano ~.zshrc
 ````
-then copy at the end
+Then copy at the end
 ````
 export PATH=/home/USER/anaconda3/envs/samtools/bin:$PATH 
 ````
@@ -256,13 +259,13 @@ cd STAR/source
 make STAR  
 ````
 
-**NOTE: if application do not find make command, you may still need to install all the basic packages to build code and zlib library, then repeat the previous command.**
+**NOTE: if application does not find _make_ command, you may still need to install all the basic packages to build code and zlib library, then repeat the previous command.**
 ````
 sudo apt-get install build-essential
 sudo apt install zlib1g-dev
 ````
 
-4. In order to be able to run the tool from any directory without having to locate the executable file as done previously with conda, you need to add the directory to your $PATH on your .zshrc file as previously. **IMPORTANT! This would need to be done every time you install a tool**  
+4. In order to be able to run the tool from any directory without having to locate the executable file as done previously with conda, you need to add the directory to your $PATH on your .zshrc file as previously. **IMPORTANT! This will need to be done every time you install a tool**  
 
 ````
 export PATH=/home/USER/STAR-2.7.3a/bin/Linux_x86_64:$PATH 
