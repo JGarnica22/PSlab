@@ -15,7 +15,7 @@ To download and install R and RStudio follow these steps (bear in mind that <ins
 
 ### Install R <br/>
 
-1. Download R from http://cran.us.r-project.org/ (click on “Download R for Windows” or "Download R for Mac OS X)
+1. Download R from http://cran.us.r-project.org/ (click on “Download R for Windows” or "Download R for Mac OS X).
 2. In the subdirectory "base" chose "Install R for the first time".
 3. You will obtain an executable file.
 4. Run the executable file. Leave all default settings in the installation options, so click the button 'Next' until the process is complete.  
@@ -70,6 +70,17 @@ To install more than a package at a time, just write them as a character vector 
 biocLite(c(package_1", "package_2))
 ````
 
+**Load packages in RStudio**<br/>
+
+After a package is installed, you are not able to work with its functionalities unless you call it before using a command to use the package:
+````
+library("package")
+````
+Another good reminder is that using the command without arguments, it will provide you the list of packages installed in different libraries on your computer :
+````
+library()
+````
+
 **Check and remove packages in RStudio**<br/>
 
 To check what packages are installed on your computer, you can use:
@@ -91,6 +102,3 @@ You can also update all packages by using:
 ````
 update.packages()
 ````
-
-
-Need to how load a package????
