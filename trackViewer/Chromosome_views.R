@@ -225,7 +225,7 @@ show.tracks <- c(mget(grep("Methy.",names(.GlobalEnv),value=TRUE)),
 # Change the track names
 names(tracks) <- sapply(names(tracks), 
                         function(z) {
-                          names <- get(z, org.Mm.egSYMBOL)
+                          names <- get(z, org.SYMBOL)
                           return(names)
                         })
 
