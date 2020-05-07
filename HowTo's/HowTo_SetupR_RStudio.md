@@ -77,7 +77,7 @@ Everytime you open R and need to use packages that are not from base R, you will
 library("package")
 ````
 
-\* Note that that using the _library_ command without arguments provides you with the list of packages installed in the different libraries on your computer:
+\* Note that using the _library_ command without arguments provides you with the list of packages installed in the different libraries on your computer:
 ````
 library()
 ````
