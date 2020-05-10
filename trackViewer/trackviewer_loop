@@ -68,8 +68,9 @@ if (species == "mouse"){
   org.SYMBOL <- org.Hs.egSYMBOL
 }
 
-for (plot in plots) {
-  id <- get(plot, org.SYMBOL2EG)
+
+for (xy in plots) {
+  id <- get(xy, org.SYMBOL2EG)
   gr <- genes(TxDb)[id]
   agr <- if (width(gr)<100000) {
     resize(gr, 100000, fix = "center")
@@ -109,31 +110,25 @@ for (plot in plots) {
   
   comp <- c("Ctl", "Smp")
   
-  
-  # Calculate average ATAC peaks for pop[1] samples
-  for (i in 1:length(grep(paste0(pop[1],".*ATAC"),names(.GlobalEnv),value=TRUE))){
-    ATAC.Ctl1 <- eval(as.symbol(grep(paste0(pop[1],".*ATAC"),names(.GlobalEnv),,value=TRUE)[i]))
-    ATAC.Ctl2 <- eval(as.symbol(grep(paste0(pop[1],".*ATAC"),names(.GlobalEnv),,value=TRUE)[i+1]))
-    ATAC.Ctl3 <- eval(as.symbol(grep(paste0(pop[1],".*ATAC"),names(.GlobalEnv),,value=TRUE)[i+2]))
-    ATAC.Ctl4 <- eval(as.symbol(grep(paste0(pop[1],".*ATAC"),names(.GlobalEnv),,value=TRUE)[i+3]))
+
+  # Calculate average peaks for all assays and samples
+  for (l in c(1:length(pop))){
+    for (s in c("ATAC", "RNA", "ChIP", "enh", "methy")){  
+        for (i in 1:length(grep(paste0(pop[l], ".*" , s), names(.GlobalEnv),value=TRUE))){
+        me <- eval(as.symbol(grep(paste0(pop[l], ".*" , s), names(.GlobalEnv),value=TRUE)[i]))
+        assign(paste0(s, ".", comp[l], i), me)
+      }
+    }
   }
-  
+
   av.ATAC.Ctl <- ATAC.Ctl1
   av.ATAC.Ctl$dat2 <- av.ATAC.Ctl$dat
   av.ATAC.Ctl$dat <- ATAC.Ctl2$dat
-  
   av.ATAC.Ctl$dat <- GRoperator(av.ATAC.Ctl$dat, av.ATAC.Ctl$dat2, 
                                 col="score", operator=average)
   av.ATAC.Ctl$dat2 <- GRanges()
-  
-  # Calculate average for RNA peaks for pop[1] samples
-  for (i in 1:length(grep(paste0(pop[1],".*RNA"),names(.GlobalEnv),value=TRUE))){
-    RNA.Ctl1 <- eval(as.symbol(grep(paste0(pop[1],".*RNA"),names(.GlobalEnv),,value=TRUE)[i]))
-    RNA.Ctl2 <- eval(as.symbol(grep(paste0(pop[1],".*RNA"),names(.GlobalEnv),,value=TRUE)[i+1]))
-    RNA.Ctl3 <- eval(as.symbol(grep(paste0(pop[1],".*RNA"),names(.GlobalEnv),,value=TRUE)[i+2]))
-    RNA.Ctl4 <- eval(as.symbol(grep(paste0(pop[1],".*RNA"),names(.GlobalEnv),,value=TRUE)[i+3]))
-  }
-  
+  Tet_ChIP
+
   average.RNA.Ctl <- RNA.Ctl1
   average.RNA.Ctl$dat <- average.RNA.Ctl$dat
   average.RNA.Ctl$dat2 <- RNA.Ctl2$dat
@@ -156,14 +151,6 @@ for (plot in plots) {
   av.RNA.Ctl$dat2 <- GRanges()
   
   
-  # Calculate average ATAC peaks for pop[2] samples
-  for (i in 1:length(grep(paste0(pop[2],".*ATAC"),names(.GlobalEnv),value=TRUE))){
-    ATAC.Smp1 <- eval(as.symbol(grep(paste0(pop[2],".*ATAC"),names(.GlobalEnv),,value=TRUE)[i]))
-    ATAC.Smp2 <- eval(as.symbol(grep(paste0(pop[2],".*ATAC"),names(.GlobalEnv),,value=TRUE)[i+1]))
-    ATAC.Smp3 <- eval(as.symbol(grep(paste0(pop[2],".*ATAC"),names(.GlobalEnv),,value=TRUE)[i+2]))
-    ATAC.Smp4 <- eval(as.symbol(grep(paste0(pop[2],".*ATAC"),names(.GlobalEnv),,value=TRUE)[i+3]))
-  }
-  
   av.ATAC.Smp <- ATAC.Smp1
   av.ATAC.Smp$dat2 <- av.ATAC.Smp$dat
   av.ATAC.Smp$dat <- ATAC.Smp2$dat
@@ -172,15 +159,8 @@ for (plot in plots) {
                                 col="score", operator=average)
   av.ATAC.Smp$dat2 <- GRanges()
   
-  # Calculate average for RNA peaks for pop[2] samples
-  for (i in 1:length(grep(paste0(pop[2],".*RNA"),names(.GlobalEnv),value=TRUE))){
-    RNA.Smp1 <- eval(as.symbol(grep(paste0(pop[2],".*RNA"),names(.GlobalEnv),,value=TRUE)[i]))
-    RNA.Smp2 <- eval(as.symbol(grep(paste0(pop[2],".*RNA"),names(.GlobalEnv),,value=TRUE)[i+1]))
-    RNA.Smp3 <- eval(as.symbol(grep(paste0(pop[2],".*RNA"),names(.GlobalEnv),,value=TRUE)[i+2]))
-    RNA.Smp4 <- eval(as.symbol(grep(paste0(pop[2],".*RNA"),names(.GlobalEnv),,value=TRUE)[i+3]))
-  }
-  
-  average.RNA.Smp <- RNA.Smp1
+ 
+    average.RNA.Smp <- RNA.Smp1
   average.RNA.Smp$dat <- average.RNA.Smp$dat
   average.RNA.Smp$dat2 <- RNA.Smp2$dat
   average.RNA.Smp$dat <- GRoperator(average.RNA.Smp$dat, average.RNA.Smp$dat2, 
@@ -200,21 +180,11 @@ for (plot in plots) {
   av.RNA.Smp$dat <- GRoperator(av.RNA.Smp$dat, av.RNA.Smp$dat2, 
                                col="score", operator=average)
   av.RNA.Smp$dat2 <- GRanges()
-  
-  
-  ChIP.Ctl <- eval(as.symbol(grep(paste0(pop[1],".*ChIP"),names(.GlobalEnv),,value=TRUE)))
-  ChIP.Smp <- eval(as.symbol(grep(paste0(pop[2],".*ChIP"),names(.GlobalEnv),,value=TRUE)))
-  
-  Enh.Ctl <- eval(as.symbol(grep(paste0(pop[1],".*enh"),names(.GlobalEnv),,value=TRUE)))
-  Enh.Smp <- eval(as.symbol(grep(paste0(pop[2],".*enh"),names(.GlobalEnv),,value=TRUE)))
-  
-  Methy.Ctl <- eval(as.symbol(grep(paste0(pop[1],".*methy"),names(.GlobalEnv),,value=TRUE)))
-  Methy.Smp <- eval(as.symbol(grep(paste0(pop[2],".*methy"),names(.GlobalEnv),,value=TRUE)))
-  
+
   
   # Create tracks for each group:
-  show.tracks <- c(mget(grep("Methy.",names(.GlobalEnv),value=TRUE)),
-                   mget(grep("Enh.",names(.GlobalEnv),value=TRUE)),
+  show.tracks <- c(mget(grep("methy.",names(.GlobalEnv),value=TRUE)),
+                   mget(grep("enh.",names(.GlobalEnv),value=TRUE)),
                    mget(grep("ChIP.",names(.GlobalEnv),value=TRUE)),
                    mget(grep("av.ATAC.",names(.GlobalEnv),value=TRUE)),
                    mget(grep("av.RNA.",names(.GlobalEnv),value=TRUE)))
@@ -244,9 +214,9 @@ for (plot in plots) {
     setTrackViewerStyleParam(i, "xaxis", TRUE)
     setTrackViewerStyleParam(i, "margin", c(.01, .05, .01, .01))
   }
-  pdf(file = paste0("figs/",plot, ".pdf"), width = 5.5, height = 5)
-  par(mfrow=c(2,1))
-  for (u in do.call("list",mget(grep("trackList",names(.GlobalEnv),value=TRUE)))){
+  pdf(file = paste0("figs/",xy, ".pdf"), width = 5.5, height = 5)
+  #par(mfrow=c(2,1))
+    for (u in do.call("list",mget(grep("trackList",names(.GlobalEnv),value=TRUE)))){
     setTrackXscaleParam(u[[1]], "draw", FALSE)
     setTrackXscaleParam(u[[5]], "draw", TRUE) #REDUNDANT??
     setTrackXscaleParam(u[[5]], "gp", list(cex=.7))
@@ -291,7 +261,6 @@ for (plot in plots) {
       setTrackStyleParam(u[[i]], "color", "grey35")
     }
     
-    n <- grep(strsplit(names(u[1]), ".", fixed = T)[[1]][2], comp)
     
     names(u) <- c("DIFF METH", "DIFF ACT ENH", "H3K27ac", 
                   "ATAC", "RNA", names(tracks))
@@ -309,8 +278,7 @@ for (plot in plots) {
     grid.text(pop[n],
               x=.5, y=.9, just="top", 
               gp=gpar(cex=1.5, fontface="bold"))
-    #assign(paste0("vp",pop[n]), vp)
     
-    }
-  dev.off()
+      }
+    dev.off()
 }
