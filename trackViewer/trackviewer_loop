@@ -127,7 +127,7 @@ for (xy in plots) {
   av.ATAC.Ctl$dat <- GRoperator(av.ATAC.Ctl$dat, av.ATAC.Ctl$dat2, 
                                 col="score", operator=average)
   av.ATAC.Ctl$dat2 <- GRanges()
-  Tet_ChIP
+  
 
   average.RNA.Ctl <- RNA.Ctl1
   average.RNA.Ctl$dat <- average.RNA.Ctl$dat
@@ -196,27 +196,21 @@ for (xy in plots) {
                             return(names)
                           })
   
-  
-  for (i in c(1:length(pop))){
-    Pattern_list<-do.call("list",mget(grep(comp[i],names(show.tracks),value=TRUE)))
+  pdf(file = paste0("figs/",xy, ".pdf"), width = 5.5, height = 5)
+  for (m in c(1:length(pop))){
+    Pattern_list<-do.call("list",mget(grep(comp[m],names(show.tracks),value=TRUE)))
     o <- optimizeStyle(trackList(Pattern_list, tracks))
-    assign(paste0("optSty", i), o)
-    t <- o$tracks
-    assign(paste0("trackList", i), t)
-    v <- o$style
-    assign(paste0("viewerStyle", i), v)
-  }
+    assign(paste0("optSty", m), o)
+    u <- o$tracks
+    assign(paste0("trackList", m), t)
+    t <- o$style
+    assign(paste0("viewerStyle", m), u)
   
   # Adjust X axis to show scale instead of chromosome ruler:
-  for (i in do.call("list",mget(grep("viewerStyle",names(.GlobalEnv),value=TRUE)))){
-    # Adjust X axis to show scale instead of chromosome ruler:
+    setTrackViewerStyleParam(t, "xaxis", TRUE)
+    setTrackViewerStyleParam(t, "margin", c(.01, .05, .01, .01))
     
-    setTrackViewerStyleParam(i, "xaxis", TRUE)
-    setTrackViewerStyleParam(i, "margin", c(.01, .05, .01, .01))
-  }
-  pdf(file = paste0("figs/",xy, ".pdf"), width = 5.5, height = 5)
-  #par(mfrow=c(2,1))
-    for (u in do.call("list",mget(grep("trackList",names(.GlobalEnv),value=TRUE)))){
+  
     setTrackXscaleParam(u[[1]], "draw", FALSE)
     setTrackXscaleParam(u[[5]], "draw", TRUE) #REDUNDANT??
     setTrackXscaleParam(u[[5]], "gp", list(cex=.7))
@@ -232,12 +226,10 @@ for (xy in plots) {
     ## Adjust the limit of y-axis for RNA, ATAC and ChIP tracks:
     setTrackStyleParam(u[[1]], "ylim", c(0, 1))
     setTrackStyleParam(u[[2]], "ylim", c(0, 1))
-    setTrackStyleParam(u[[3]], "ylim", c(0, roundUpNice(max(trackList1[[3]]$dat$score,
-                                                            trackList2[[3]]$dat$score))))
-    setTrackStyleParam(u[[4]], "ylim", c(0, roundUpNice(max(trackList1[[4]]$dat$score,
-                                                            trackList2[[4]]$dat$score))))
-    setTrackStyleParam(u[[5]], "ylim", c(0, roundUpNice(max(trackList1[[5]]$dat$score,
-                                                            trackList2[[5]]$dat$score))))
+    setTrackStyleParam(u[[3]], "ylim", c(0, roundUpNice(max(u[[3]]$dat$score))))
+    setTrackStyleParam(u[[4]], "ylim", c(0, roundUpNice(max(u[[4]]$dat$score))))
+    setTrackStyleParam(u[[5]], "ylim", c(0, roundUpNice(max(u[[5]]$dat$score))))
+    
     for(i in 1:5){
       setTrackStyleParam(u[[i]], "marginBottom", .1)
     }
@@ -261,9 +253,10 @@ for (xy in plots) {
       setTrackStyleParam(u[[i]], "color", "grey35")
     }
     
-    
+     
     names(u) <- c("DIFF METH", "DIFF ACT ENH", "H3K27ac", 
                   "ATAC", "RNA", names(tracks))
+    
     
     # Adjust the track height
     setTrackStyleParam(u[[2]], "height", 0.04)
@@ -273,12 +266,11 @@ for (xy in plots) {
     for(i in 6:length(u)){
       setTrackStyleParam(u[[i]], "height", 0.04)
     }
-    vp <- viewTracks(u, gr=agr, viewerStyle=viewerStyle1)
+      vp <- viewTracks(u, gr=agr, viewerStyle=t)
     addGuideLine(c(start(gr), end(gr)), vp=vp)
-    grid.text(pop[n],
-              x=.5, y=.9, just="top", 
+    grid.text(pop[m], x=.5, y=.9, just="top", 
               gp=gpar(cex=1.5, fontface="bold"))
     
-      }
+    }
     dev.off()
-}
+  }
