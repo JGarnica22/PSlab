@@ -21,7 +21,14 @@ To italicize text, add one asterisk or underscore before and after a word or phr
 ### Bold and Italic
 To emphasize text with bold and italics at the same time, add three asterisks or underscores before and after a word or phrase. To bold and italicize the middle of a word for emphasis, add three asterisks without spaces around the letters.
 
-- hola
+## Ordering
+### Bullet Points
+To create bullet points add a hypen and a space before the word or sentence to write.
+
+### List
+To create an ordered list, add line items with numbers followed by periods. The numbers don’t have to be in numerical order, but the list should start with the number one.
+
+For more information you can visit this web page: https://www.markdownguide.org/basic-syntax/
 
 
-https://www.markdownguide.org/basic-syntax/
+
