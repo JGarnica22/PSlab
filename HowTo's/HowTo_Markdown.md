@@ -9,7 +9,7 @@ To create a heading, add number signs (#) in front of a word or phrase. The numb
 To create paragraphs, use a blank line to separate one or more lines of text.<br/>
 
 ### Line breaks
-To create a line break (<br>), end a line with two or more spaces, and then type return.<br/>
+To create a line break ( <br> ), end a line with two or more spaces, and then type return.<br/>
 
 ## Emphasis
 ### Bold
