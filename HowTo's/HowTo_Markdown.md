@@ -21,9 +21,7 @@ To italicize text, add one asterisk or underscore before and after a word or phr
 ### Bold and Italic
 To emphasize text with bold and italics at the same time, add three asterisks or underscores before and after a word or phrase. To bold and italicize the middle of a word for emphasis, add three asterisks without spaces around the letters.
 
--hola
--que tal
-
+- hola
 
 
 https://www.markdownguide.org/basic-syntax/
