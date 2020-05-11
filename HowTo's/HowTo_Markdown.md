@@ -37,3 +37,17 @@ R Markdown provides an authoring framework for data science. You can use a singl
 - generate high quality reports that can be shared with an audience.
 
 R Markdown documents are fully reproducible and support dozens of static and dynamic output formats. (more info: https://rmarkdown.rstudio.com/)
+
+### Install and open Markdown
+You can install it directly from RStudio:
+Tools > Install Packages
+Choose "Repository CRAN" and write "Markdown" in "Packages (separate multiple with space or comma:)"
+
+To open a new file, click File > New File > R Markdown in the RStudio menu bar. A window will pop up where you can name the project an the author ("Title" and "Author") and select the specific type of output that you wish to build (HTML, PDF or Word). Rememeber that you can swith to the other output formats anytime.
+
+Notice that the file contains three types of content:
+
+- An (optional) YAML header surrounded by ---s
+- R code chunks surrounded by ```s
+- Text mixed with simple text formatting
+
