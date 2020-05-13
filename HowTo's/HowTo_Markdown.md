@@ -1,6 +1,6 @@
 # How to use Markdown
 
-Markdown is a lightweight markup language with plain-text-formatting syntax. Its design allows it to be converted to many output formats, but the original tool by the same name only supports HTML. Markdown is often used to format readme files, for writing messages in online discussion forums, and to create rich text using a plain text editor.<br/>
+Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. Its design allows it to be converted to many output formats, but the original tool by the same name only supports HTML. Markdown is often used to format readme files, for writing messages in online discussion forums, and to create rich text using a plain text editor.<br/>
 
 ### Headings
 To create a heading, add number signs (#) in front of a word or phrase. The number of number signs you use should correspond to the heading level. For eaxh extra (#) that you use your heading will be smaller.<br/>
@@ -44,6 +44,36 @@ Tools > Install Packages
 Choose "Repository CRAN" and write "Markdown" in "Packages (separate multiple with space or comma:)"
 
 To open a new file, click File > New File > R Markdown in the RStudio menu bar. A window will pop up where you can name the project an the author ("Title" and "Author") and select the specific type of output that you wish to build (HTML, PDF or Word). Rememeber that you can swith to the other output formats anytime.
+
+A template will be opened to generete your Markdown report. Here you have  asummary of the template in order:
+
+1. Important information of your document such as the title, author, date (will apear in the final document) and output format:
+
+````
+title: "Test"
+author: "Mireia"
+date: "11/05/2020"
+output: pdf_document
+````
+
+2. An R code in a grey square that you should leave by default:
+
+````
+{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+````
+
+3. Text about Markdown. Note that this is for you to edit with info about your specific project. After the two hash symbols you can write the title of the project that you want to show. In the paragraph write the description of the project, what you are going to show or the results of your analysis (or everything).
+
+````
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+````
+4. R code that you want to show. Note that you can run that code directly from that window and you can see the progress in the "Console" window of R Studio.
 
 Notice that the file contains three types of content:
 
