@@ -1,7 +1,7 @@
 #This script is to visualize genomic data by trackViewer
 #It was created for R 3.6.3 version (2020-05-03)
-#Copyright (C) 2020  Patricia Sole Sanchez
-##########################################################
+#Copyright (C) 2020  Patricia Solé Sánchez and Josep Garnica Caparrós
+#####################################################################
 # Check if required packages are installed, if not install:
 cran.packages <- c("Cairo", "stringr", "tidyr")
 for (i in cran.packages) {
@@ -87,9 +87,9 @@ for (xy in plots) {
   #Import results files from the different analysis to be included and for each replicate:
   #List all the files in you data directory and import them depending on their format
   #IMPORTANT: name files always as type_of_sample(Tet, Tconv, TFH...)+number of replicate_tecnique (ATAC, RNA...), e.g. Tet3_ATAC, Tet1_RNA...
-  file_list_bed <- list.files(path="/home/jgarnica/R/trackviewer/data",
+  file_list_bed <- list.files(path="/Users/patri/Documents/LAB/TESIS DOCTORAL 2015-2020/INTERNSHIP/8_trackViewer/data",
                               pattern= "*.bed")
-  file_list_bw <- list.files(path="/home/jgarnica/R/trackviewer/data",
+  file_list_bw <- list.files(path="/Users/patri/Documents/LAB/TESIS DOCTORAL 2015-2020/INTERNSHIP/8_trackViewer/data",
                              pattern= "*.bw")
   
   for (file in c(file_list_bed)){
@@ -110,17 +110,17 @@ for (xy in plots) {
   
   comp <- c("Ctl", "Smp")
   
-
+  
   # Calculate average peaks for all assays and samples
   for (l in c(1:length(pop))){
     for (s in c("ATAC", "RNA", "ChIP", "enh", "methy")){  
-        for (i in 1:length(grep(paste0(pop[l], ".*" , s), names(.GlobalEnv),value=TRUE))){
+      for (i in 1:length(grep(paste0(pop[l], ".*" , s), names(.GlobalEnv),value=TRUE))){
         me <- eval(as.symbol(grep(paste0(pop[l], ".*" , s), names(.GlobalEnv),value=TRUE)[i]))
         assign(paste0(s, ".", comp[l], i), me)
       }
     }
   }
-
+  
   av.ATAC.Ctl <- ATAC.Ctl1
   av.ATAC.Ctl$dat2 <- av.ATAC.Ctl$dat
   av.ATAC.Ctl$dat <- ATAC.Ctl2$dat
@@ -128,7 +128,7 @@ for (xy in plots) {
                                 col="score", operator=average)
   av.ATAC.Ctl$dat2 <- GRanges()
   
-
+  
   average.RNA.Ctl <- RNA.Ctl1
   average.RNA.Ctl$dat <- average.RNA.Ctl$dat
   average.RNA.Ctl$dat2 <- RNA.Ctl2$dat
@@ -159,8 +159,8 @@ for (xy in plots) {
                                 col="score", operator=average)
   av.ATAC.Smp$dat2 <- GRanges()
   
- 
-    average.RNA.Smp <- RNA.Smp1
+  
+  average.RNA.Smp <- RNA.Smp1
   average.RNA.Smp$dat <- average.RNA.Smp$dat
   average.RNA.Smp$dat2 <- RNA.Smp2$dat
   average.RNA.Smp$dat <- GRoperator(average.RNA.Smp$dat, average.RNA.Smp$dat2, 
@@ -180,7 +180,7 @@ for (xy in plots) {
   av.RNA.Smp$dat <- GRoperator(av.RNA.Smp$dat, av.RNA.Smp$dat2, 
                                col="score", operator=average)
   av.RNA.Smp$dat2 <- GRanges()
-
+  
   
   # Create tracks for each group:
   show.tracks <- c(mget(grep("methy.",names(.GlobalEnv),value=TRUE)),
@@ -196,7 +196,7 @@ for (xy in plots) {
                             return(names)
                           })
   
-  pdf(file = paste0("figs/",xy, ".pdf"), width = 5.5, height = 5)
+  pdf(file = paste0("figs/",xy, ".pdf"), width = 10, height = 6)
   for (m in c(1:length(pop))){
     Pattern_list<-do.call("list",mget(grep(comp[m],names(show.tracks),value=TRUE)))
     o <- optimizeStyle(trackList(Pattern_list, tracks))
@@ -205,16 +205,16 @@ for (xy in plots) {
     assign(paste0("trackList", m), t)
     t <- o$style
     assign(paste0("viewerStyle", m), u)
-  
-  # Adjust X axis to show scale instead of chromosome ruler:
-    setTrackViewerStyleParam(t, "xaxis", TRUE)
+    
+    # Adjust X axis to show scale instead of chromosome ruler:
+    setTrackViewerStyleParam(t, "xaxis", FALSE)
     setTrackViewerStyleParam(t, "margin", c(.01, .05, .01, .01))
     
-  
     setTrackXscaleParam(u[[1]], "draw", FALSE)
     setTrackXscaleParam(u[[5]], "draw", TRUE) #REDUNDANT??
     setTrackXscaleParam(u[[5]], "gp", list(cex=.7))
     # Move scale in y axis to the right:
+    setTrackViewerStyleParam(t, "margin", c(.08, .15, .01, .1))
     for(i in 1:5){
       setTrackYaxisParam(u[[i]], "main", FALSE)
     }
@@ -226,9 +226,12 @@ for (xy in plots) {
     ## Adjust the limit of y-axis for RNA, ATAC and ChIP tracks:
     setTrackStyleParam(u[[1]], "ylim", c(0, 1))
     setTrackStyleParam(u[[2]], "ylim", c(0, 1))
-    setTrackStyleParam(u[[3]], "ylim", c(0, roundUpNice(max(u[[3]]$dat$score))))
-    setTrackStyleParam(u[[4]], "ylim", c(0, roundUpNice(max(u[[4]]$dat$score))))
-    setTrackStyleParam(u[[5]], "ylim", c(0, roundUpNice(max(u[[5]]$dat$score))))
+    setTrackStyleParam(u[[3]], "ylim", c(0, roundUpNice(max(optimizeStyle(trackList(do.call("list",mget(grep(comp[1],names(show.tracks),value=TRUE))), tracks))$tracks[[3]]$dat$score,
+                                                            optimizeStyle(trackList(do.call("list",mget(grep(comp[2],names(show.tracks),value=TRUE))), tracks))$tracks[[3]]$dat$score))))
+    setTrackStyleParam(u[[4]], "ylim", c(0, roundUpNice(max(optimizeStyle(trackList(do.call("list",mget(grep(comp[1],names(show.tracks),value=TRUE))), tracks))$tracks[[4]]$dat$score,
+                                                            optimizeStyle(trackList(do.call("list",mget(grep(comp[2],names(show.tracks),value=TRUE))), tracks))$tracks[[4]]$dat$score))))
+    setTrackStyleParam(u[[5]], "ylim", c(0, roundUpNice(max(optimizeStyle(trackList(do.call("list",mget(grep(comp[1],names(show.tracks),value=TRUE))), tracks))$tracks[[5]]$dat$score,
+                                                            optimizeStyle(trackList(do.call("list",mget(grep(comp[2],names(show.tracks),value=TRUE))), tracks))$tracks[[5]]$dat$score))))
     
     for(i in 1:5){
       setTrackStyleParam(u[[i]], "marginBottom", .1)
@@ -253,10 +256,8 @@ for (xy in plots) {
       setTrackStyleParam(u[[i]], "color", "grey35")
     }
     
-     
     names(u) <- c("DIFF METH", "DIFF ACT ENH", "H3K27ac", 
                   "ATAC", "RNA", names(tracks))
-    
     
     # Adjust the track height
     setTrackStyleParam(u[[2]], "height", 0.04)
@@ -266,11 +267,15 @@ for (xy in plots) {
     for(i in 6:length(u)){
       setTrackStyleParam(u[[i]], "height", 0.04)
     }
-      vp <- viewTracks(u, gr=agr, viewerStyle=t)
+    if (m == 1){
+      vp <- viewTracks(u, gr=agr, viewerStyle=t, newpage = F)
+    } else {
+      vp <- viewTracks(u, gr=agr, viewerStyle=t, newpage = T)
+    }
     addGuideLine(c(start(gr), end(gr)), vp=vp)
-    grid.text(pop[m], x=.5, y=.9, just="top", 
+    grid.text(pop[m], x=0.2, y=.9, just="top", 
               gp=gpar(cex=1.5, fontface="bold"))
     
-    }
-    dev.off()
   }
+  dev.off()
+}
