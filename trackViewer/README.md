@@ -3,16 +3,19 @@ This is a package with web interface for drawing elegant interactive tracks or l
 <br/>
 
 ## Prepare your input files:
-Input files for trackViewer can be **bigWig (.bw)** or **BED (.bed)** files.
+Input files for trackViewer can be **bigWig (.bw)** or **BED (.bed)** files.  
+
+
+### bigWig files:
 
 You can obtain bw files from bam files with `bamCoverage`(deeptools) in Terminal. For that, follow these instructions:  
 <br/>
 
-### 0. Install tools:
+#### 0. Install tools:
 You will need `samtools` and `deeptools`, both included in conda (to install them see [HowTo_setupTerminalWLS](https://github.com/patriciasolesanchez/PSlab/blob/master/HowTo's/HowTo_SetupTerminalWLS.md) or [HowTo_SetupTerminalMac](https://github.com/patriciasolesanchez/PSlab/blob/master/HowTo's/HowTo_SetupTerminalMac.md) if you are working on Windows or Mac, respectively).  
 <br/>
 
-### 1. Create your folder to work:
+#### 1. Create your folder to work:
 
 Define your working directory:
 ````
@@ -30,7 +33,7 @@ mkdir bam_to_bw && cd "$_"
 Download bam files or move them into bam_to_bw directory.  
 <br/>
 
-### 2. Create an index file (.bai) for each bam file in the direcotry using `samtools` and then convert bam files into bigwigs with `bamCoverage` and store them in data folder to be used by `RStudio`.
+#### 2. Create an index file (.bai) for each bam file in the direcotry using `samtools` and then convert bam files into bigwigs with `bamCoverage` and store them in data folder to be used by `RStudio`.
 
 ````
 for f in $(find . -name "*.bam" -exec basename {} \;)
@@ -45,4 +48,12 @@ done
 ````
 <br/>
 
-Use trackViewer: script.R
+### BED files:
+Bed files are easy to prepare
+
+
+## Visualize data with trackViewer:
+Once you have your input files prepared, you can use `trackViewer` to make your plots. 
+
+
+
