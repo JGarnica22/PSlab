@@ -196,6 +196,7 @@ If you want to install, for example, `samtools`, the following command should be
 ````
 Create environment
 ````  
+<br/>
 
 This needs to be done for tools giving this problem when installing:
 `Solving environment: failed with initial frozen solve. Retrying with flexible solve`
@@ -209,18 +210,17 @@ Then activate this recently created environtment:
 ````
 conda activate samtools
 ````  
-
+<br/>
 
 Now you can install your tool with:
 ````
 conda install -c anaconda samtools
 ````  
-
-Now you can run the tool when conda is activated after activating its environtment:
+and run the tool when conda is activated after activating its environtment:
 ````
 conda activate samtools
 ````  
-
+<br/>
 
 Confirm that tool is properly installed by running _help_ command:
 ````
@@ -232,7 +232,6 @@ In case you do not want to activate tool environtment each time, include this to
 ````
 nano ~.zshrc
 ````  
-
 Then copy at the end
 ````
 export PATH=/home/USER/anaconda3/envs/samtools/bin:$PATH 
