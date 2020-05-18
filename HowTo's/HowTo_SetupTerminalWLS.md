@@ -63,7 +63,7 @@ Head to the Microsoft Store and search for **“Ubuntu”**, select the App you 
 </br>
 
 ### UNIX language :u6307:
-Now you have a fully functional Linux Subsystem with full admin rights. In case you are not experienced using the Terminal, you need to first learn the basic commands. You can find a summary of **regular expressions** (Appendix 2) and **basic shell commands** (Appendix 3) in the following [Cheat Sheet] http://practicalcomputing.org/files/PCfB_Appendices.pdf  
+Now you have a fully functional Linux Subsystem with full admin rights. In case you are not experienced using the Terminal, you need to first learn the basic commands. You can find a summary of **regular expressions** (Appendix 2) and **basic shell commands** (Appendix 3) in the following [Cheat Sheet](http://practicalcomputing.org/files/PCfB_Appendices.pdf)  
 <br/>
 **IMPORTANT! As you will be using a subsystem inside Windows, `Ubuntu` will create a hidden folder in your computer. It can only be found by searching on Windows Explorer, in case you want to see how it looks like. It is highly recommended to explore Linux directories and files on `Ubuntu` app. And very important! you must not edit directories or files from the Linux subsystem using Windows explorer. Conversely, you can edit Windows files from `Ubuntu` app. In case you need to, for instance, move files from Windows system to Linux subsystem, you can explore Window directories in Terminal via `/mnt/UNIT/$USER/`.**  
 <br/>
