@@ -69,7 +69,7 @@ The BED fields are:
  _(optional fields)_  
    
 4. **name** - Defines the name of the BED line. This label is displayed to the left of the BED line in the Genome Browser window when the track is open to full display mode or directly to the left of the item in pack mode.  
-5. **score** - A score between 0 and 1000.  
+5. **score** - A score between 0 and 100.  
 6. **strand** - Defines the strand. Either "." (=no strand) or "+" or "-".  
 7. **thickStart** - The starting position at which the feature is drawn thickly (for example, the start codon in gene displays). When there is no thick part, thickStart and thickEnd are usually set to the chromStart position.  
 8. **thickEnd** - The ending position at which the feature is drawn thickly (for example the stop codon in gene displays).  
