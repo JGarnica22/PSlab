@@ -272,12 +272,14 @@ make STAR
 sudo apt-get install build-essential
 sudo apt install zlib1g-dev
 ````
+<br/>
 
 4. In order to be able to run the tool from any directory without having to locate the executable file as done previously with conda, you need to add the directory to your $PATH on your .zshrc file as previously. **IMPORTANT! This will need to be done every time you install a tool**  
 
 ````
 export PATH=/home/USER/STAR-2.7.3a/bin/Linux_x86_64:$PATH 
 ````
+<br/>
 
 5. Run `STAR`:  
 ````
