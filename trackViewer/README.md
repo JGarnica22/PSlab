@@ -2,7 +2,7 @@
 This is a package with web interface for drawing elegant interactive tracks or lollipop plots to facilitate integrated analysis of multi-omics data. You can visualize mapped reads along with annotation as track layers for different NGS datasets such as ChIP-seq, RNA-seq, miRNA-seq, DNA-seq, SNPs and methylation data.  
 <br/>
 
-Before you use the tool...
+_BEFORE YOU USE THE TOOL..._
 
 ## Prepare your input files:
 Input files for trackViewer can be **bigWig (.bw)** or **BED (.bed)** files.  
