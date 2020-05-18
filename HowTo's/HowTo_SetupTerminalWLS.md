@@ -1,7 +1,7 @@
 # How to Set up your Terminal in Windows Subsystem for Linux (WLS) :penguin:
 
 If you need to work with command-line tools and your computer is running on Windows system, you need to enable 
-Linux subsystem (WLS) in order to get access to tools only available for Linux and macOS. Moreover, scripts include in this reservoir (***PS***) will only be written in UNIX language (Linux and macOS).<br/>
+Linux subsystem (WLS) in order to get access to tools only available for Linux and macOS. Moreover, shell scripts include in this reservoir (***PS***) will only be written in UNIX language (Linux and macOS).<br/>
 
 On top of that, The Windows Subsystem for Linux lets developers run a GNU/Linux environment -- including most command-line tools, utilities, and applications -- directly on Windows, unmodified, without the overhead of a virtual machine.
 
@@ -44,7 +44,7 @@ This menu can be accessed as such by going to:<br/>
 
 Control Panel ➡ Programs ➡ Turn Windows features on and off
 
-Or by searching *“windows features”* and selecting *“Turn Windows features on or off”*.
+Or by searching *“Windows features”* and selecting *“Turn Windows features on or off”*.
 
 ![](https://miro.medium.com/max/700/1*KgnlItWjj4d525gmay_g_A.png)
 
@@ -60,10 +60,9 @@ Head to the Microsoft Store and search for **“Ubuntu”**, select the App you 
 ![](https://miro.medium.com/max/1070/1*KspvSBty03M8zl6nl9bisQ.png)
 
 ### UNIX language :u6307:
-Now you have a fully functional Linux Subsystem with full admin rights, in case you are not experienced, to use the Terminal, you need to first learn the basic commands. You can find a summary of **regular expressions** (Appendix 2) and **basic shell commands** (Appendix 3) in the following Cheat Sheet:  
-http://practicalcomputing.org/files/PCfB_Appendices.pdf  
+Now you have a fully functional Linux Subsystem with full admin rights. In case you are not experienced using the Terminal, you need to first learn the basic commands. You can find a summary of **regular expressions** (Appendix 2) and **basic shell commands** (Appendix 3) in the following [Cheat Sheet] http://practicalcomputing.org/files/PCfB_Appendices.pdf  
 <br/>
-**IMPORTANT! As you will be using a subsystem inside Windows, `Ubuntu` will create a hidden folder only found by searching on Windows Explorer in case you want to see how it looks like via explorer. It is highly recommended to explore Linux directories and files on `Ubuntu` app. Very importantly, you must not edit directories or files from the Linux subsystem using Windows explorer. Conversely, you can edit Windows files from `Ubuntu` app. In case you need to, for instance, move files from Windows system to Linux subsystem, you can explore Window directories in Terminal via `/mnt/UNIT/$USER/`.**
+**IMPORTANT! As you will be using a subsystem inside Windows, `Ubuntu` will create a hidden folder in your computer. It can only be found by searching on Windows Explorer, in case you want to see how it looks like. It is highly recommended to explore Linux directories and files on `Ubuntu` app. And very important! you must not edit directories or files from the Linux subsystem using Windows explorer. Conversely, you can edit Windows files from `Ubuntu` app. In case you need to, for instance, move files from Windows system to Linux subsystem, you can explore Window directories in Terminal via `/mnt/UNIT/$USER/`.**
 
 ## 2. (Optional) Install _Oh My Zsh_ :necktie:
 It is optional but, in order to easily manipulate your Terminal configuration, you can install `Oh-My-Zsh` following these instructions:<br/>
@@ -76,7 +75,7 @@ Open the Ubuntu app installed from the App Store. We will now install zsh:
 sudo apt-get install zsh
 ````
 
-After installing it, type `zsh`, zsh will ask you to choose some configuration. We will do this later on while installing `oh-my-zsh`, so choose option `0` to create the config file and prevent this message to show again.
+After installing it, type `zsh`. Zsh will ask you to choose some configuration. We will do this later on while installing `oh-my-zsh`, so choose option `0` to create the config file and prevent this message from showing again.
 
 ### 2.2. Installing oh-my-zsh
 First of all we need to have git installed:
@@ -106,9 +105,9 @@ fi
 Save it `Ctrl + shift X` and **restart** your Ubuntu shell. You should be on `zsh` by default now.
 
 ### 2.4. Changing the Theme of oh-my-zsh
-`oh-my-zsh` has several nice Themes. It's worth checking them out, you have some here: https://github.com/ohmyzsh/ohmyzsh/wiki/Themes 
+`oh-my-zsh` has several nice Themes. It's worth checking them out, you have some [here] https://github.com/ohmyzsh/ohmyzsh/wiki/Themes 
 
-In order to change your theme you need to modify your zsh profile (`.zshrc`). To do so use again nano: `nano ~/.zshrc`
+In order to change your theme you need to modify your zsh profile (`.zshrc`). To do so, use again nano: `nano ~/.zshrc`
 
 Edit the `~/.zshrc` again with nano: `nano ~/.zshrc`, and change `ZSH_THEME`
 
