@@ -65,11 +65,9 @@ if (species == "mouse"){
 }
 
 # Import file with methylation information for each nucleotid comparing the two populations to compare
-file_list_txt <- list.files(path="/home/jgarnica/R/trackviewer/data",pattern= "CG.")
-
-for (file in c(file_list_txt)){
-  x <- read.table(paste0("data/", file), sep = "\t", dec = ".", header = T, quote = "")
-  for (u in 1:length(comp)){
+x <- read.table("/Users/patri/Documents/LAB/TESIS DOCTORAL 2015-2020/TR1 PROJECT/2019_05_Methylome_Tet_Tconv/Methylome results_filtered/DMR_Tet_Tconv/CG.group.site.methy_ratio.txt", 
+                sep = "\t", dec = ".", header = T, quote = "")
+for (u in 1:length(comp)){
     y <- GRanges(seqnames = x$chr, 
                  ranges = IRanges(start = x$pos,
                                   width = 1), 
@@ -78,21 +76,21 @@ for (file in c(file_list_txt)){
                  #in the analysis!!
                  score = as.integer(x[,u+2]*100))
     assign(paste0("lolli.", comp[u]), y)
-  }
+}
   
-  
-  #Lolliplots overlapping samples:
-  #Call all GRanges objects to plot
-  grl <- c(mget(grep("lolli*",names(.GlobalEnv),value=TRUE)))
-  #set colors to use
-  colors <- rainbow(length(pop))
-  pdf(paste0("figs/Lolliplot_", paste0(pop, collapse ="_"), ".pdf"), width = 12, height = 6)
-  for (plot in plots) {
+
+#Lolliplots overlapping samples:
+#Call all GRanges objects to plot
+grl <- c(mget(grep("lolli*",names(.GlobalEnv),value=TRUE)))
+
+pdf(paste0("figs/Lolliplot_", paste0(pop, collapse ="_"), ".pdf"), width = 12, height = 6)
+for (plot in plots) {
     id <- get(plot, org.SYMBOL2EG)
     gr <- genes(TxDb)[id]
     gene <- geneTrack(id,TxDb)[[1]]$dat
     gene$fill <- "lightblue"
     gene$height <- 0.03
+    colors <- c("#FFD700", "#DB7575", "#81C784")[1:length(pop)]
     grlo <- GRanges()
     for (p in 1:length(grl)){
       grl[[p]]$color <- colors[p]
@@ -103,7 +101,7 @@ for (file in c(file_list_txt)){
                    to = end(gr), 
                    by = 500))
     yaxis <- c(0, 100)
-    legends <- list(list(labels=pop, 
+    legends <- list(list(labels=c(pop[2],pop[1]), 
                          fill= colors,
                          col = c("gray30","gray30")))
     
@@ -112,6 +110,5 @@ for (file in c(file_list_txt)){
               yaxis= yaxis,
               legend= legends,
               ylab= plot)
-  }
-  dev.off()
 }
+dev.off()
