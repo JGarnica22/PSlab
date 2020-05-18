@@ -80,7 +80,8 @@ library("package")
 \* Note that using the _library_ command without arguments provides you with the list of packages installed in the different libraries on your computer:
 ````
 library()
-````
+````  
+<br/>
 
 **Check and remove packages in RStudio**<br/>
 
@@ -94,7 +95,7 @@ Uninstalling a package is straightforward with the following function:
 remove.packages("package")
 ````
 
-You can check what packages need an update with a call to the function:
+You can check what packages need an update with the function:
 ````
 old.packages()
 ````
