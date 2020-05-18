@@ -1,7 +1,7 @@
 # How to Set up your Terminal in Windows Subsystem for Linux (WLS) :penguin:
 
 If you need to work with command-line tools and your computer is running on Windows system, you need to enable 
-**Linux subsystem (WLS)** in order to get access to tools only available for Linux and macOS. Moreover, shell scripts include in this reservoir (***PS***) will only be written in UNIX language (Linux and macOS).<br/>
+**Linux subsystem (WLS)** in order to get access to tools only available for Linux and macOS. Moreover, shell scripts include in this reservoir (*PS*) will only be written in UNIX language (Linux and macOS).<br/>
 
 On top of that, The Windows Subsystem for Linux lets developers run a **GNU/Linux environment** -- including most command-line tools, utilities, and applications -- directly on Windows, unmodified, without the overhead of a virtual machine.
 
@@ -18,12 +18,12 @@ On top of that, The Windows Subsystem for Linux lets developers run a **GNU/Linu
 6. Invoke GNU/Linux applications on Windows.  
 <br/>
 
-In this How-to we will:<br/>
+<insIn this How-to we will:</ins<br/>
 1. Set up **WSL** (with optional **ZSH** and **Oh-my-zsh**) for Windows 10
 2. Install and set up **Anaconda**
 3. Install some tools from Anaconda
 4. Install tools from outside Anaconda  
-
+</br>
 
 ## 1. Setting up WSL :wrench:
 First off we have to do some preliminary setup to get WSL working:<br/>
