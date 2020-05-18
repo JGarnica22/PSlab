@@ -69,7 +69,7 @@ Now you have a fully functional Linux Subsystem with full admin rights. In case 
 <br/>
 
 ## 2. (Optional) Install _Oh My Zsh_ :necktie:
-It is optional but, in order to easily manipulate your Terminal configuration, you can install `Oh-My-Zsh` following these instructions:<br/>
+It is optional but, in order to easily manipulate your Terminal configuration, you can install `Oh-My-Zsh` (https://ohmyz.sh) following these instructions:<br/>
 
 ### 2.1. Installing _zsh_
 
@@ -109,7 +109,7 @@ fi
 Save it `Ctrl + shift X` and **restart** your Ubuntu shell. You should be on `zsh` by default now.
 
 ### 2.4. Changing the Theme of oh-my-zsh
-`oh-my-zsh` has several nice Themes. It's worth checking them out, you have some [here] https://github.com/ohmyzsh/ohmyzsh/wiki/Themes 
+`oh-my-zsh` has several nice Themes. It's worth checking them out, you have some [here](https://github.com/ohmyzsh/ohmyzsh/wiki/Themes). 
 
 In order to change your theme you need to modify your zsh profile (`.zshrc`). To do so, use again nano: `nano ~/.zshrc`
 
@@ -188,7 +188,7 @@ conda deactivate
 <br/>
 
 ### 4. Install tools from Conda :cd:
-With Anaconda you will be able to install many different tools required for NGS data analysis (e.g. `deeptools`, `samtools`, `bedtools`).
+With _Anaconda_ you will be able to install many different tools required for NGS data analysis (e.g. `deeptools`, `samtools`, `bedtools`).
 
 In order to install, search the tool in https://anaconda.org and you will find which channel ("source") it can be installed from (e.g. bioconda) and the code to do so (*Remember that may the code be different for Linux and macOS installation, you must use **Linux***). For WLS you need to previously create an **environment** for the tools and then include them in the `PATH` if you do not want to activate them every time.
 
@@ -239,7 +239,7 @@ export PATH=/home/USER/anaconda3/envs/samtools/bin:$PATH
 <br/>
 
 ## 5. Install other tools outside from Anaconda :floppy_disk:
-Tools that cannot be installed from Conda will have their on **installation protocol**. Following the installation manual is recommended.
+Tools that cannot be installed from Conda will have their own **installation protocol**. Following the installation manual is recommended.
 <br/>
 
 ### EXAMPLE: How to install `STAR` (v. 2.7.3a)
