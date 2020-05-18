@@ -126,7 +126,8 @@ open .zshrc
 
 Add /path/to/yourtool into your $PATH and save.  
 <br/>
-For example: PATH=$PATH:/Users/patri/Applications/STAR-2.7.3a/bin/MacOSX_x86_64
+For example:  
+PATH=$PATH:/Users/patri/Applications/STAR-2.7.3a/bin/MacOSX_x86_64
 
 Save it and restart Terminal to see the changes.  
 <br/>
