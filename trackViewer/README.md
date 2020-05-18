@@ -8,7 +8,7 @@ Input files for trackViewer can be **bigWig (.bw)** or **BED (.bed)** files.
 
 ### bigWig files:
 
-You can obtain bw files from bam files with `bamCoverage`(deeptools) in Terminal. For that, follow these instructions:  
+bw files is the format you will use mainly to show sequencing data (to draw histograms with sequencing reads). You can obtain bw files from bam files (alignment files) with `bamCoverage`(deeptools) in Terminal. For that, follow these instructions:  
 <br/>
 
 #### 0. Install tools:
@@ -49,7 +49,9 @@ done
 <br/>
 
 ### BED files:
-BED (Browser Extensible Data) files are easy to prepare, they can usually be created from .txt files. A BED file has the following format:
+BED (Browser Extensible Data) format will be used for data indicating selected regions, such as location of active enhacers or location of differentially methylated regions (DMR). 
+
+A BED file has the following format:
 
 - BED lines have 3 required fields and nine additional optional fields.
 - The number of fields per line must be consistent throughout any single set of data in an annotation track.
@@ -76,16 +78,19 @@ _**Example**_
 chr7  127471196  127472363  Pos1  0  +  127471196  127472363  255,0,0
 chr7  127472363  127473530  Pos2  0  +  127472363  127473530  255,0,0
 chr7  127473530  127474697  Pos3  0  +  127473530  127474697  255,0,0
-chr7  127474697  127475864  Pos4  0  +  127474697  127475864  255,0,0
-chr7  127475864  127477031  Neg1  0  -  127475864  127477031  0,0,255
-chr7  127477031  127478198  Neg2  0  -  127477031  127478198  0,0,255
-chr7  127478198  127479365  Neg3  0  -  127478198  127479365  0,0,255
-chr7  127479365  127480532  Pos5  0  +  127479365  127480532  255,0,0
-chr7  127480532  127481699  Neg4  0  -  127480532  127481699  0,0,255
+````
 
+BED files are easy to prepare, you can create them from a .txt by doing the following:
+
+1. Modify your file to contain the desired columns (usally for `trackViewer`, columns 1-5 are used).
+2. Elimimate column headers!
+3. Change file extension from .txt to .bed.  
+<br/>
 
 ## Visualize data with trackViewer:
-Once you have your input files prepared, you can use `trackViewer` to make your plots. 
+Once you have your input files prepared, you can use `trackViewer` to make your plots. Here we explain how to make two types of plots: chromosome views and lolliplots.
+
+**Chromosome views** are 
 
 
 
