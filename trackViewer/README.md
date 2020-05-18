@@ -83,7 +83,8 @@ _**Example**_
 chr7  127471196  127472363  Pos1  0  +  127471196  127472363  255,0,0
 chr7  127472363  127473530  Pos2  0  +  127472363  127473530  255,0,0
 chr7  127473530  127474697  Pos3  0  +  127473530  127474697  255,0,0
-````
+````  
+<br/>
 
 BED files are easy to prepare, you can create them from a .txt by doing the following:
 
