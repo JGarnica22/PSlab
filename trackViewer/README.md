@@ -60,13 +60,13 @@ A BED file has the following format:
 - The order of the optional fields is binding: lower-numbered fields must always be populated if higher-numbered fields are used.  
 <br/>
 
-The first three required BED fields are:
+The BED fields are:
 1. **chrom** - The name of the chromosome (e.g. chr3, chrY, chr2_random) or scaffold (e.g. scaffold10671).  
 2. **chromStart** - The starting position of the feature in the chromosome or scaffold. The first base in a chromosome is numbered 0.  
 3. **chromEnd** - The ending position of the feature in the chromosome or scaffold.  
 <br/>
 
-The 9 additional optional BED fields are:  
+    (optional fields)
 4. **name** - Defines the name of the BED line. This label is displayed to the left of the BED line in the Genome Browser window when the track is open to full display mode or directly to the left of the item in pack mode.  
 5. **score** - A score between 0 and 1000.  
 6. **strand** - Defines the strand. Either "." (=no strand) or "+" or "-".  
