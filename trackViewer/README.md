@@ -10,7 +10,7 @@ Input files for trackViewer can be **bigWig (.bw)** or **BED (.bed)** files.
 
 ### bigWig files:
 
-bw files is the format you will use mainly to show sequencing data (to draw histograms with sequencing reads). You can obtain bw files from bam files (alignment files) with `bamCoverage`(deeptools) in Terminal. For that, follow these instructions:  
+bigWig is the format you will use mainly for sequencing data (to draw histograms with sequencing reads). You can obtain bw files from bam files (alignment files) with `bamCoverage`(deeptools) in Terminal. For that, follow these instructions:  
 <br/>
 
 #### 0. Install tools:
@@ -86,11 +86,11 @@ chr7  127473530  127474697  Pos3  0  +  127473530  127474697  255,0,0
 ````  
 <br/>
 
-BED files are easy to prepare, you can create them from a .txt by doing the following:
+BED files are easy to prepare, you can create them from a _.txt_ by doing the following:
 
 1. Modify your file to contain the desired columns (usally for `trackViewer`, columns 1-5 are used).
 2. Elimimate column headers!
-3. Change file extension from .txt to .bed.  
+3. Change file extension from _.txt_ to _.bed_.  
 <br/>
 
 ## Visualize data with trackViewer:
