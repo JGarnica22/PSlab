@@ -1,11 +1,11 @@
 # How to Set up your Terminal in Windows Subsystem for Linux (WLS) :penguin:
 
 If you need to work with command-line tools and your computer is running on Windows system, you need to enable 
-Linux subsystem (WLS) in order to get access to tools only available for Linux and macOS. Moreover, shell scripts include in this reservoir (***PS***) will only be written in UNIX language (Linux and macOS).<br/>
+**Linux subsystem (WLS)** in order to get access to tools only available for Linux and macOS. Moreover, shell scripts include in this reservoir (***PS***) will only be written in UNIX language (Linux and macOS).<br/>
 
-On top of that, The Windows Subsystem for Linux lets developers run a GNU/Linux environment -- including most command-line tools, utilities, and applications -- directly on Windows, unmodified, without the overhead of a virtual machine.
+On top of that, The Windows Subsystem for Linux lets developers run a **GNU/Linux environment** -- including most command-line tools, utilities, and applications -- directly on Windows, unmodified, without the overhead of a virtual machine.
 
-With WLS you can:
+<ins>With WLS you can</ins>
 
 1. Choose your favorite GNU/Linux distributions from the Microsoft Store.
 2. Run common command-line free software such as `grep`, `sed`, `awk`, or other ELF-64 binaries.
@@ -15,14 +15,15 @@ With WLS you can:
     - Services: sshd, MySQL, Apache, lighttpd
 4. Install additional software using own GNU/Linux distribution package manager.
 5. Invoke Windows applications using a Unix-like command-line shell.
-6. Invoke GNU/Linux applications on Windows.
+6. Invoke GNU/Linux applications on Windows.  
+<br/>
 
 In this How-to we will:<br/>
-- Set up **WSL** (with optional **ZSH** and **Oh-my-zsh**) for Windows 10
-- Install and set up **Anaconda**
-- Install some tools from Anaconda
-- Install tools from outside Anaconda  
-<br/>
+1. Set up **WSL** (with optional **ZSH** and **Oh-my-zsh**) for Windows 10
+2. Install and set up **Anaconda**
+3. Install some tools from Anaconda
+4. Install tools from outside Anaconda  
+
 
 ## 1. Setting up WSL :wrench:
 First off we have to do some preliminary setup to get WSL working:<br/>
