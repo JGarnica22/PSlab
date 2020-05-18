@@ -18,7 +18,7 @@ On top of that, The Windows Subsystem for Linux lets developers run a **GNU/Linu
 6. Invoke GNU/Linux applications on Windows.  
 <br/>
 
-<insIn this How-to we will:</ins<br/>
+<ins>In this How-to we will:</ins> <br/>
 1. Set up **WSL** (with optional **ZSH** and **Oh-my-zsh**) for Windows 10
 2. Install and set up **Anaconda**
 3. Install some tools from Anaconda
