@@ -6,7 +6,7 @@ Currently, after macOS Catalina, Mac uses _zsh_ as the default login and interac
 <br/>
 
 ### 1. Learn how to use the Terminal: UNIX language :u6307:
-In order to use the Terminal, you need to first learn the basic commands. You can find a summary of **regular expressions** (Appendix 2) and **basic shell commands** (Appendix 3) in the following [Cheat Sheet]http://practicalcomputing.org/files/PCfB_Appendices.pdf  
+In order to use the Terminal, you need to first learn the basic commands. You can find a summary of **regular expressions** (Appendix 2) and **basic shell commands** (Appendix 3) in the following [Cheat Sheet](http://practicalcomputing.org/files/PCfB_Appendices.pdf)  
 <br/>
 
 ### 2. (Optional) Install _Oh My Zsh_
