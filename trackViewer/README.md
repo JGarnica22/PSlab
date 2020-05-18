@@ -57,23 +57,25 @@ A BED file has the following format:
 
 - BED lines have 3 required fields and nine additional optional fields.
 - The number of fields per line must be consistent throughout any single set of data in an annotation track.
-- The order of the optional fields is binding: lower-numbered fields must always be populated if higher-numbered fields are used.
+- The order of the optional fields is binding: lower-numbered fields must always be populated if higher-numbered fields are used.  
+<br/>
 
 The first three required BED fields are:
 1. **chrom** - The name of the chromosome (e.g. chr3, chrY, chr2_random) or scaffold (e.g. scaffold10671).  
-2. **chromStart** - The starting position of the feature in the chromosome or scaffold. The first base in a chromosome is numbered 0.
-3. **chromEnd** - The ending position of the feature in the chromosome or scaffold.
+2. **chromStart** - The starting position of the feature in the chromosome or scaffold. The first base in a chromosome is numbered 0.  
+3. **chromEnd** - The ending position of the feature in the chromosome or scaffold.  
+<br/>
 
-The 9 additional optional BED fields are:
-4. **name** - Defines the name of the BED line. This label is displayed to the left of the BED line in the Genome Browser window when the track is open to full display mode or directly to the left of the item in pack mode.
-5. **score** - A score between 0 and 1000.
-6. **strand** - Defines the strand. Either "." (=no strand) or "+" or "-".
-7. **thickStart** - The starting position at which the feature is drawn thickly (for example, the start codon in gene displays). When there is no thick part, thickStart and thickEnd are usually set to the chromStart position.
-8. **thickEnd** - The ending position at which the feature is drawn thickly (for example the stop codon in gene displays).
-9. **itemRgb** - An RGB value of the form R,G,B (e.g. 255,0,0). If the track line itemRgb attribute is set to "On", this RBG value will determine the display color of the data contained in this BED line. NOTE: It is recommended that a simple color scheme (eight colors or less) be used with this attribute to avoid overwhelming the color resources of the Genome Browser and your Internet browser.
-10. **blockCount** - The number of blocks (exons) in the BED line.
-11. **blockSizes** - A comma-separated list of the block sizes. The number of items in this list should correspond to blockCount.
-12. **blockStarts** - A comma-separated list of block starts. All of the blockStart positions should be calculated relative to chromStart. The number of items in this list should correspond to blockCount.
+The 9 additional optional BED fields are:  
+4. **name** - Defines the name of the BED line. This label is displayed to the left of the BED line in the Genome Browser window when the track is open to full display mode or directly to the left of the item in pack mode.  
+5. **score** - A score between 0 and 1000.  
+6. **strand** - Defines the strand. Either "." (=no strand) or "+" or "-".  
+7. **thickStart** - The starting position at which the feature is drawn thickly (for example, the start codon in gene displays). When there is no thick part, thickStart and thickEnd are usually set to the chromStart position.  
+8. **thickEnd** - The ending position at which the feature is drawn thickly (for example the stop codon in gene displays).  
+9. **itemRgb** - An RGB value of the form R,G,B (e.g. 255,0,0). If the track line itemRgb attribute is set to "On", this RBG value will determine the display color of the data contained in this BED line. NOTE: It is recommended that a simple color scheme (eight colors or less) be used with this attribute to avoid overwhelming the color resources of the Genome Browser and your Internet browser.  
+10. **blockCount** - The number of blocks (exons) in the BED line.  
+11. **blockSizes** - A comma-separated list of the block sizes. The number of items in this list should correspond to blockCount.  
+12. **blockStarts** - A comma-separated list of block starts. All of the blockStart positions should be calculated relative to chromStart. The number of items in this list should correspond to blockCount.  
 
 _**Example**_
 ````
@@ -92,7 +94,11 @@ BED files are easy to prepare, you can create them from a .txt by doing the foll
 ## Visualize data with trackViewer:
 Once you have your input files prepared, you can use `trackViewer` to make your plots. Here we explain how to make two types of plots: chromosome views and lolliplots.
 
-**Chromosome views** are 
+**Chromosome views** are .... _Chromosome_views.R_
+
+**Lolliplots** are .... _Lolliplots_overlapping.R_
+
+Explain EXTRA: Lolliplots in active enhancers
 
 
 
