@@ -71,9 +71,9 @@ Now you have a fully functional Linux Subsystem with full admin rights. In case 
 ## 2. (Optional) Install _Oh My Zsh_ :necktie:
 It is optional but, in order to easily manipulate your Terminal configuration, you can install `Oh-My-Zsh` following these instructions:<br/>
 
-### 2.1. Install _zsh_
+### 2.1. Installing _zsh_
 
-Open the Ubuntu app installed from the App Store. We will now install zsh:
+Open the Ubuntu app installed from the App Store. Now install zsh:
 
 ````
 sudo apt-get install zsh
@@ -176,6 +176,7 @@ conda config --set auto_activate_base false
 ````
 **REMEMBER! After doing this, every time you open your Terminal and you need to use Conda, you will need to initialize**. 
 
+
 To initialize Conda, use:
 ````
 conda activate
@@ -194,45 +195,49 @@ In order to install, search the tool in https://anaconda.org and you will find w
 If you want to install, for example, `samtools`, the following command should be used:
 ````
 Create environment
-````
+````  
 
 This needs to be done for tools giving this problem when installing:
 `Solving environment: failed with initial frozen solve. Retrying with flexible solve`
 
-To solve that create and environtment for the tools before installation:
-
+To solve that, create and environtment for the tools before installation:
 ````
 conda create -n samtools
-````
+````  
+
 Then activate this recently created environtment:
 ````
 conda activate samtools
-````
+````  
+
 
 Now you can install your tool with:
 ````
 conda install -c anaconda samtools
 ````  
-Now you can run the tool when conda is activated after activating its environtment:
 
+Now you can run the tool when conda is activated after activating its environtment:
 ````
 conda activate samtools
-````
+````  
+
 
 Confirm that tool is properly installed by running _help_ command:
 ````
 samtools --help
-````
+````  
 
-In case you do not want to activate tool environtment each time, include this tool in your `PATH` by adding this command at the final of your .zshrc file
+
+In case you do not want to activate tool environtment each time, include this tool in your `PATH` by adding this command at the final of your .zshrc file:
 ````
 nano ~.zshrc
-````
+````  
+
 Then copy at the end
 ````
 export PATH=/home/USER/anaconda3/envs/samtools/bin:$PATH 
-````
-
+````  
+<br/>
 
 ## 5. Install other tools outside from Anaconda :floppy_disk:
 Tools that cannot be installed from Conda will have their on **installation protocol**. Following the installation manual is recommended.
