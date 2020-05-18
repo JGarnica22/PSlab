@@ -65,12 +65,13 @@ Head to the Microsoft Store and search for **“Ubuntu”**, select the App you 
 ### UNIX language :u6307:
 Now you have a fully functional Linux Subsystem with full admin rights. In case you are not experienced using the Terminal, you need to first learn the basic commands. You can find a summary of **regular expressions** (Appendix 2) and **basic shell commands** (Appendix 3) in the following [Cheat Sheet] http://practicalcomputing.org/files/PCfB_Appendices.pdf  
 <br/>
-**IMPORTANT! As you will be using a subsystem inside Windows, `Ubuntu` will create a hidden folder in your computer. It can only be found by searching on Windows Explorer, in case you want to see how it looks like. It is highly recommended to explore Linux directories and files on `Ubuntu` app. And very important! you must not edit directories or files from the Linux subsystem using Windows explorer. Conversely, you can edit Windows files from `Ubuntu` app. In case you need to, for instance, move files from Windows system to Linux subsystem, you can explore Window directories in Terminal via `/mnt/UNIT/$USER/`.**
+**IMPORTANT! As you will be using a subsystem inside Windows, `Ubuntu` will create a hidden folder in your computer. It can only be found by searching on Windows Explorer, in case you want to see how it looks like. It is highly recommended to explore Linux directories and files on `Ubuntu` app. And very important! you must not edit directories or files from the Linux subsystem using Windows explorer. Conversely, you can edit Windows files from `Ubuntu` app. In case you need to, for instance, move files from Windows system to Linux subsystem, you can explore Window directories in Terminal via `/mnt/UNIT/$USER/`.**  
+<br/>
 
 ## 2. (Optional) Install _Oh My Zsh_ :necktie:
 It is optional but, in order to easily manipulate your Terminal configuration, you can install `Oh-My-Zsh` following these instructions:<br/>
 
-### 2.1. Install zsh
+### 2.1. Install _zsh_
 
 Open the Ubuntu app installed from the App Store. We will now install zsh:
 
@@ -80,7 +81,7 @@ sudo apt-get install zsh
 
 After installing it, type `zsh`. Zsh will ask you to choose some configuration. We will do this later on while installing `oh-my-zsh`, so choose option `0` to create the config file and prevent this message from showing again.
 
-### 2.2. Installing oh-my-zsh
+### 2.2. Installing _oh-my-zsh_
 First of all we need to have git installed:
 ````
 sudo apt-get install git
@@ -122,13 +123,13 @@ ZSH_THEME="robbyrussell"
 ZSH_THEME="agnoster"
 ````
 
-Save it and restart your Ubuntu shell again to see the changes.
-
+Save it and restart your Ubuntu shell again to see the changes.  
+<br/>
 
 
 ## 3. Install and set up Anaconda :snake:
 
-Analysis of NGS data requires many different tools. [Anaconda](https://docs.conda.io/en/latest/) is one of the most widely used solutions for package management for R and Python, it comes with 1.500+ popular packages out of the box which is more than enough for 99% of all Data Science related tasks.
+Analysis of NGS data requires many different tools. [Anaconda](https://docs.conda.io/en/latest/) is one of the most widely used solutions for package management for R and Python, it comes with 1.500+ popular packages out of the box which is more than enough for 99% of all Data Science-related tasks.
 
 ### 3.1. Download Anaconda
 Start up your WSL and **download** Anaconda:
@@ -160,7 +161,7 @@ Now you should be able to start up your Anaconda **environment**:
 source ~anaconda3/bin/activate
 ````
 
-*“~anaconda3/bin/activate”* is default place where Anaconda will be installed, but if you chose elsewhere simply point to that directory.
+*“~anaconda3/bin/activate”* is the default place where Anaconda will be installed, but if you chose elsewhere simply point to that directory.
 
 Once activated, initiate a full update:
 ````
@@ -203,12 +204,12 @@ To solve that create and environtment for the tools before installation:
 ````
 conda create -n samtools
 ````
-Then activate this recently created environtment
+Then activate this recently created environtment:
 ````
 conda activate samtools
 ````
 
-Now you can install your tool with
+Now you can install your tool with:
 ````
 conda install -c anaconda samtools
 ````  
@@ -218,12 +219,12 @@ Now you can run the tool when conda is activated after activating its environtme
 conda activate samtools
 ````
 
-Confirm that tool is properly installed by running _help_ command
+Confirm that tool is properly installed by running _help_ command:
 ````
 samtools --help
 ````
 
-In case you do not want to activate tool environtment each time include this tool in your `PATH` by adding this command at the final of your .zshrc file
+In case you do not want to activate tool environtment each time, include this tool in your `PATH` by adding this command at the final of your .zshrc file
 ````
 nano ~.zshrc
 ````
@@ -239,7 +240,7 @@ Tools that cannot be installed from Conda will have their on **installation prot
 
 ### EXAMPLE: How to install `STAR` (v. 2.7.3a)
 
-1. Change directory to the folder you are using to store applications
+1. Change directory to the folder you are using to store applications:
 ````
 cd /Users/$USER/*
 ````
