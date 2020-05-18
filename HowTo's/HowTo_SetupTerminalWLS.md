@@ -3,7 +3,8 @@
 If you need to work with command-line tools and your computer is running on Windows system, you need to enable 
 **Linux subsystem (WLS)** in order to get access to tools only available for Linux and macOS. Moreover, shell scripts include in this reservoir (*PS*) will only be written in UNIX language (Linux and macOS).<br/>
 
-On top of that, The Windows Subsystem for Linux lets developers run a **GNU/Linux environment** -- including most command-line tools, utilities, and applications -- directly on Windows, unmodified, without the overhead of a virtual machine.
+On top of that, The Windows Subsystem for Linux lets developers run a **GNU/Linux environment** -- including most command-line tools, utilities, and applications -- directly on Windows, unmodified, without the overhead of a virtual machine.  
+<br/>
 
 <ins>With WLS you can</ins>
 
@@ -49,16 +50,17 @@ Or by searching *“Windows features”* and selecting *“Turn Windows features
 
 ![](https://miro.medium.com/max/700/1*KgnlItWjj4d525gmay_g_A.png)
 
-\!! Make sure the feature “Windows Subsystem for Linux” is ticked:<br/>
+:warning: Make sure the feature “Windows Subsystem for Linux” is ticked:<br/>
 
 ![](https://miro.medium.com/max/413/1*f7vMExOir3iPyfbNGcJ8Tw.png)
 
 ### 1.3. Restart your computer
 
 ### 1.4. Install Ubuntu :minidisc:
-Head to the Microsoft Store and search for **“Ubuntu”**, select the App you prefer and install it. This app will enable to run Linux commands in your Windows system.
+Head to the Microsoft Store and search for **“Ubuntu”**, select the App you prefer and install it. This app will allow you to run Linux commands in your Windows system.
 
 ![](https://miro.medium.com/max/1070/1*KspvSBty03M8zl6nl9bisQ.png)
+</br>
 
 ### UNIX language :u6307:
 Now you have a fully functional Linux Subsystem with full admin rights. In case you are not experienced using the Terminal, you need to first learn the basic commands. You can find a summary of **regular expressions** (Appendix 2) and **basic shell commands** (Appendix 3) in the following [Cheat Sheet] http://practicalcomputing.org/files/PCfB_Appendices.pdf  
