@@ -28,7 +28,10 @@ To create bullet points add a hypen and a space before the word or sentence to w
 ### List
 To create an ordered list, add line items with numbers followed by periods. The numbers don’t have to be in numerical order, but the list should start with the number one.
 
-For more information you can visit this web page: https://www.markdownguide.org/basic-syntax/
+For more information you can visit this web pages: 
+https://www.markdownguide.org/basic-syntax/
+https://rstudio.com/resources/cheatsheets/
+https://rstudio.com/resources/webinars/getting-started-with-r-markdown/
 
 # How to use R Markdown
 R Markdown provides an authoring framework for data science. You can use a single R Markdown file to both:
@@ -64,6 +67,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ````
 
 3. Text about Markdown. Note that this is for you to edit with info about your specific project. After the two hash symbols you can write the title of the project that you want to show. In the paragraph write the description of the project, what you are going to show or the results of your analysis (or everything).
+You can use this paragraph with different information in multiple ocasions during the report.
 
 ````
 ## R Markdown
@@ -75,9 +79,8 @@ When you click the **Knit** button a document will be generated that includes bo
 ````
 4. R code that you want to show. Note that you can run that code directly from that window and you can see the progress in the "Console" window of R Studio.
 
-Notice that the file contains three types of content:
-
-- An (optional) YAML header surrounded by ---s
-- R code chunks surrounded by ```s
-- Text mixed with simple text formatting
+````
+{r}
+# some code
+````
 
