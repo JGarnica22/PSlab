@@ -3,17 +3,23 @@
 Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. Its design allows it to be converted to many output formats, but the original tool by the same name only supports HTML. Markdown is often used to format readme files, for writing messages in online discussion forums, and to create rich text using a plain text editor.<br/>
 
 ### Headings
-To create a heading, add number signs (#) in front of a word or phrase. The number of number signs you use should correspond to the heading level. For eaxh extra (#) that you use your heading will be smaller.<br/>
+To create a heading, add a hasthaf (#) in front of a word or phrase. The number hasthags you use should correspond to the heading level. For each extra (#) that you use your heading will be smaller.<br/>
 
 ### Paragraphs
 To create paragraphs, use a blank line to separate one or more lines of text.<br/>
 
 ### Line breaks
-To create a line break (<br>), end a line with two or more spaces, and then type return.<br/>
+To create a line break, end a line with two or more spaces, and then type return.<br/>
+````
+<br/>
+````
 
 ## Emphasis
 ### Bold
 To bold text, add two asterisks or underscores before and after a word or phrase. To bold the middle of a word for emphasis, add two asterisks without spaces around the letters. 
+````
+**example**
+````
 
 ### Italic
 To italicize text, add one asterisk or underscore before and after a word or phrase. To italicize the middle of a word for emphasis, add one asterisk without spaces around the letters.
