@@ -54,9 +54,9 @@ To create an ordered list, add line items with numbers followed by periods. The 
 ````
 
 For more information you can visit this web pages: 
-https://www.markdownguide.org/basic-syntax/
-https://rstudio.com/resources/cheatsheets/
-https://rstudio.com/resources/webinars/getting-started-with-r-markdown/
+- https://www.markdownguide.org/basic-syntax/
+- https://rstudio.com/resources/cheatsheets/
+- https://rstudio.com/resources/webinars/getting-started-with-r-markdown/
 
 # How to use R Markdown
 R Markdown provides an authoring framework for data science. You can use a single R Markdown file to both:
