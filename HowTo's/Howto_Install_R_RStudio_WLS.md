@@ -1,6 +1,6 @@
-# How to install R and rstudio in WLS ubuntu :computer:
+# How to install R and RStudio in WLS Ubuntu :computer:
 
-As any other tools you can install `r-base` and `rstudio` in your ubuntu terminal in WLS. This will be useful in case you want to have all in the same system avoiding moving files from linux to windows, or to use some `R` features not available for windows such as Bigwig files import in `trackViewer` package.
+As any other tools you can install `r-base` and `rstudio` in your Ubuntu terminal in WLS. This will be useful in case you want to have all in the same system avoiding moving files from Linux to Windows, or in order to use some `R` features that not available for windows, such as Bigwig files import in `trackViewer` package.
 
 R is a programming language commonly used for statistical computing and graphical representation of data. RStudio is a set of integrated tools designed to help R developers be more productive.
 
@@ -17,7 +17,7 @@ To install **R 4.0 packages** (only allowed for ubuntu 19.10 or superior), use:
 ````
 sudo echo https://cloud.r-project.org/bin/linux/ubuntu focal-cran40/
 ````
-Then  update your applications source list
+Then update your applications source list
 ````
 sudo tee -a /etc/apt/sources.list
 sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E084DAB9
@@ -28,25 +28,23 @@ Now you're all set to install the latest version of R, which can be done with:
 ````
 sudo apt-get install r-base
 ````
-In case you encounter problems with packages or older versions, use a more interactive installation debian tool: `aptitude` and be able to spot and solve possible problems, as well as removing unnecessary packages:
+In case you encounter problems with packages or older versions, use a more interactive installation debian tool: `aptitude`. You will be able to spot and solve possible problems, as well as remove unnecessary packages:
 ````
 sudo apt-get install -y aptitude
 sudo aptitude install r-base
 ````
 
-And that's it! (Once all the dependencies install, which can take a while the first time.) Now you're all ready to run R from the Linux command line! 
-Keep in mind that like with other ubuntu applications you will need to have all your R files in the linux subsystem folders.
+And that's it! (Once all the dependencies are installed, which can take a while the first time.) Now you're all ready to run R from the Linux command line! 
+Keep in mind that like with other Ubuntu applications, you will need to have all your R files in the Linux subsystem folders.
 
 If you want to start R in your terminal just run:
 ````
 R
-````
-
-
-
+````  
+<br/>
 
 ## Install RStudio :surfer:
-First, visit the  [RStudio downloads page](https://rstudio.com/products/rstudio/download/#download) to grab the latest release of `RStudio` for your Debian based Linux distribution, then you can manually download it (and move it to your linux folders) or use wget to get the version you want:
+First, visit the  [RStudio downloads page](https://rstudio.com/products/rstudio/download/#download) to grab the latest release of `RStudio` for your Debian based Linux distribution, then you can manually download it (and move it to your Linux folders) or use `wget` to get the version you want:
 
 ````
 --- Ubuntu 18.04 / Linux Mint 19 / Debian 10 ---
@@ -69,13 +67,13 @@ If you encounter any dependency problems, use:
 sudo apt -f install "your_rstudio_version"
 ````
 
-Finally, to start enjoying your ubuntu-RStudio you will need to visualize your data and code in your default browser, to do so run:
+Finally, to start enjoying your Ubuntu-RStudio you will need to visualize your data and code in your default browser, to do so run:
 
 ````
 sudo rstudio-server start
 ````
-Then open you explorer (in windows system) and visit this page: **http://localhost:8787/**
+Then open your explorer (in Windows system) and visit this page: **http://localhost:8787/**
 
 It will ask you for a user and password and you will be ready to go!
 
-You will need to do these final two steps every time you want to run `RStudio` from linux WLS, but you will not need to be running R in your terminal at the moment.
+You will need to do these final two steps every time you want to run `RStudio` from Linux WLS, but you will not need to be running R in your Terminal at the moment.
