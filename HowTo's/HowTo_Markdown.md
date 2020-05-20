@@ -106,7 +106,7 @@ When you click the **Knit** button a document will be generated that includes bo
 
 There are two way to include code to the document:
 
-1. Embeded code: Insert a chunck of code as the example below. When you compile, R markdown will run the code and include its results. R markdown will also remove the ```{r} and ```. Yo can hide the code by clicking the triangle botton that there are in the line.
+**1. Embeded code:** Insert a chunck of code as the example below. When you compile, R markdown will run the code and include its results. R markdown will also remove the ```{r} and ```. Yo can hide the code by clicking the triangle botton that there are in the line.
 ````
 ```{r}
 # some code
@@ -141,7 +141,7 @@ Useful tips options in the brackets after r:
 ````
 More chunck options in: https://rstudio.com/resources/cheatsheets/
 
-2. Inline code: Place code in a sentence with `r #code`. R markdown will replace the code with its results.
+**2. Inline code:** Place code in a sentence with `r #code`. R markdown will replace the code with its results.
 ````
 Today is `r Sys.date()` --> Today is 2020-05-20
 ````
