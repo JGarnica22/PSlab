@@ -79,8 +79,52 @@ When you click the **Knit** button a document will be generated that includes bo
 ````
 4. R code that you want to show. Note that you can run that code directly from that window and you can see the progress in the "Console" window of R Studio.
 
+There are two way to include code to the document:
+
+1. Embeded code: Insert a chunck of code as the example below. When you compile, R markdown will run the code and include its results. R markdown will also remove the ```{r} and ```. Yo can hide the code by clicking the triangle botton that there are in the line.
 ````
-{r}
+```{r}
 # some code
+```
 ````
 
+Useful tips: Options in the brackets after r
+* echo = FALSE --> hides the code (useful if you want to show only a plot).
+* eval = FALSE --> prevent the code from being run. As a result, no results will be displayed with the code.
+* message = FALSE --> supresses messages from appearing in the output, for example warnings.
+* engine = 'python' --> to embed non R code, set the engine option to the language you want to embed. 
+````
+```{r echo = FALSE}
+# some code
+```
+````
+````
+```{r eval = FALSE}
+# some code
+```
+````
+````
+```{r message = FALSE}
+# some code
+```
+````
+````
+```{r engine = 'python'}
+# some code
+```
+````
+
+2. Inline code: Place code in a sentence with `r #code`. R markdown will replace the code with its results.
+````
+Today is `r Sys.date()` --> Today is 2020-05-20
+````
+
+5. A place to embed your plots with echo = FALSO to avoid showing the code:
+```{r name of the plot, echo=FALSE}
+plot(name of the plot)
+```
+
+Finally, to get your repot you can click on "Knit" botton and choose your favovourite format: HTML, PDF or Word.
+I stongly recommend you this webinar to start using R Markdown:
+
+https://rstudio.com/resources/webinars/getting-started-with-r-markdown/
