@@ -112,7 +112,7 @@ There are two way to include code to the document:
 # some code
 ```
 ````
-:
+
 Useful tips options in the brackets after r:
 
 * echo = FALSE --> hides the code (useful if you want to show only a plot).
