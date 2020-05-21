@@ -77,6 +77,14 @@ To create an ordered list, add line items with numbers followed by periods. The 
 ````
 <br/>
 
+I THINK THIS ALSO NEEDS TO BE EXPLAINE HERE, IS ESSENTIAL
+
+- HOW TO ADD CHUNKS OF CODE WITH ```` ````
+- HOW TO ADD LINKS
+- HOW TO ADD IMAGES
+- YOU CAN ALSO COMMENT ON THE EMOJIS (IT'S JUST FUN). THEY CAN BE ADDED IN MD AND LINK THE GITHUB PAGE THAT HAD ALL OF THEM
+
+
 For more information you can visit these web pages: 
 - https://www.markdownguide.org/basic-syntax/
 - https://rstudio.com/resources/cheatsheets/
