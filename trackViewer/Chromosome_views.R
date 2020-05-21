@@ -77,11 +77,6 @@ for (xy in plots) {
   } else {
     resize(gr, width(gr)+20000, fix = "center")
   }
-  # agr.gene <- if (width(gr)<100000) {
-  #   resize(gr, 300000, fix = "center")
-  # } else {
-  #   resize(gr, width(gr)+50000, fix = "center")
-  # }
   genesinrange <- mapRangesToIds(TxDb, agr, type = "gene", ignore.strand = T)
   tracks <- sapply(genesinrange[[1]][[1]], 
                    function(z) {
