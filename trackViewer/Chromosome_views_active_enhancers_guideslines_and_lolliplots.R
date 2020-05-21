@@ -36,6 +36,7 @@ library(org.Hs.eg.db)
 library(tidyr)
 library(stringr)
 library(Cairo)
+library(biomaRt)
 
 # Set your working directory (the project you are working in):
 setwd("/home/jgarnica/R/trackviewer")
