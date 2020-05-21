@@ -6,7 +6,7 @@ R is a programming language commonly used for statistical computing and graphica
 
 
 ## Install R :fishing_pole_and_fish:
-From here you can go ahead and install R, but if you use the default Ubuntu repository you'll get an old version of R (R 3.2.3, from 2015). You probably want the latest version of R, so add CRAN as a new package repository for Ubuntu. If you have an Ubuntu version 18.04 or older you can download R 3.6, but if you have newer Ubuntu version you can download R 4.0. You can explore [CRAN website](https://cran.r-project.org/bin/linux/ubuntu/) to choose the best version for you.
+From here you can go ahead and install R, but if you use the default Ubuntu repository you'll get an old version of R (R 3.2.3, from 2015). You probably want the latest version of R, so add CRAN as a new package repository for Ubuntu. If you have an Ubuntu version 18.04 or older you can download R 3.6, but if you have a newer Ubuntu version you can download R 4.0. You can explore [CRAN website](https://cran.r-project.org/bin/linux/ubuntu/) to choose the best version for you.
 
 You'll need to run these commands as root, so as you type `sudo` before any command it will be run as root or administrator, and thus it will ask for your account's password you created when you initiated Ubuntu. For instance you could use these repositories:
 
