@@ -88,19 +88,23 @@ chr7  127473530  127474697  Pos3  0  +  127473530  127474697  255,0,0
 
 BED files are easy to prepare, you can create them from a _.txt_ by doing the following:
 
-1. Modify your file to contain the desired columns (usally for `trackViewer`, columns 1-5 are used).
+1. Modify your file to contain the desired columns (usally for `trackViewer`, columns 1-5 are used). If using WLS you must do this from your Ubuntu terminal using your preferred text editor, for instance nano:
+````
+nano your_file.txt
+````
 2. Elimimate column headers!
-3. Change file extension from _.txt_ to _.bed_.  
+3. Change file extension from _.txt_ to _.bed_. From terminal use `mv` (*move*) command to change the extension of the file
+````
+mv your_file.txt your_file.bed
+````
 <br/>
 
-## Visualize data with trackViewer:
+## Visualize data with trackViewer::lollipop:
 Once you have your input files prepared, you can use `trackViewer` to make your plots. Here we explain how to make two types of plots: chromosome views and lolliplots.
 
-**Chromosome views** are .... _Chromosome_views.R_
+**Chromosome views** are allow you to represent graphically in the same graph the different genomic and transcriptomic data from the same samples. In this case, `Chromosome_views.R` is designed to represent data from **RNA-seq, ChIP, ATAC-seq, methylation** and inferred **active enhancers** (see Active_enhancers_analysis folder) for your genes of interest.
 
-**Lolliplots** are .... _Lolliplots_overlapping.R_
-
-Explain EXTRA: Lolliplots in active enhancers
+**Lolliplots** are a type of graph which allow to clearly represent nucleotid-specific characteristics, such as methylation status or SNP (Single Nucleotide Polymorphism). `Lolliplots_overlapping.R` scripts is prepared to represent the differential methylation between your samples in your genes of interest. 
 
 
-
+Finally, `Chromosome_views_active_enhancers_guideslines_and_lolliplots.R`script replicate the graphs described in `Chromosome_views.R`but adding guidelines markin the inferred active enhancers. Moreover, lolliplots graphs ploting the methylation status of nucleotids in the active enhancers inferred 100 Kb close to your genes of interest.
