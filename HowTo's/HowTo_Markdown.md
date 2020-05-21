@@ -22,8 +22,7 @@ To create paragraphs, use a blank line to separate one or more lines of text.<br
 To create a line break, end a line with two or more spaces, and then type return.<br/>
 ````
 <br/>
-````
-<br/>
+````  
 
 ### Emphasis
 
