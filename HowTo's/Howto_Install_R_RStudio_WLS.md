@@ -29,8 +29,10 @@ sudo apt-get update
 Now you're all set to install the latest version of R, which can be done with:
 ````
 sudo apt-get install r-base
-````
-In case you encounter problems with packages or older versions, use a more interactive installation debian tool: `aptitude`. You will be able to spot and solve possible problems, as well as remove unnecessary packages:
+````  
+<br/>
+
+\* In case you encounter problems with packages or older versions, use a more interactive installation debian tool: `aptitude`. You will be able to spot and solve possible problems, as well as remove unnecessary packages:
 ````
 sudo apt-get install -y aptitude
 sudo aptitude install r-base
