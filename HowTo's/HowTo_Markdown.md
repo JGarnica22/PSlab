@@ -2,6 +2,16 @@
 
 Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. Its design allows it to be converted to many output formats, but the original tool by the same name only supports HTML. Markdown is often used to format readme files, for writing messages in online discussion forums, and to create rich text using a plain text editor.<br/>
 
+EXPLAIN EXTENSION (.md)
+
+EXPLAIN WHERE YOU CAN CREATE A MD. For example: 
+- You can create mds in GitHub to make nice-readable files, with format (vs. an unformatted txt file)
+- You can create mds in an app??
+- You can create mds in R to make nice reports including text, code and the figures all in one file.
+
+
+## SYNTAX: How to format a Markdown file
+
 ### Headings
 To create a heading, add a hash symbol (#) in front of a word or phrase. The number hash symbols you use should correspond to the heading level. For each extra (#) that you use your heading will be smaller.<br/>
 
