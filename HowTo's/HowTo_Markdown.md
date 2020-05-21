@@ -101,11 +101,13 @@ R Markdown provides an authoring framework for data science. You can use a singl
 R Markdown documents are fully reproducible and support dozens of static and dynamic output formats (more info: https://rmarkdown.rstudio.com/).
 
 ### Install and open Markdown
-You can install it directly from RStudio:
->Tools > Install Packages <br/>
->Choose "Repository CRAN" and write "Markdown" in "Packages (separate multiple with space or comma:)"
+You can install it directly from RStudio:  
 
-To open a new file, click File > New File > R Markdown in the RStudio menu bar. A window will pop up where you can name the project an the author ("Title" and "Author") and select the specific type of output that you wish to build (HTML, PDF or Word). Rememeber that you can swith to the other output formats anytime.
+Tools > Install Packages <br/>
+Choose "Repository CRAN" and write "Markdown" in "Packages (separate multiple with space or comma:)"
+
+To open a new file, click File > New File > R Markdown in the RStudio menu bar. 
+A window will pop up where you can name the project an the author ("Title" and "Author") and select the specific type of output that you wish to build (HTML, PDF or Word). Rememeber that you can switch to the other output formats anytime.
 
 A template will be opened to generete your Markdown report. Here you have a summary of the template in order of appearance:
 
@@ -138,9 +140,9 @@ When you click the **Knit** button a document will be generated that includes bo
 ````
 **4. R code that you want to show. Note that you can run that code directly from that window and you can see the progress in the "Console" window of R Studio.**
 
-There are two way to include code to the document:
+There are two ways to include code to the document:
 
-**1. Embeded code:** Insert a chunck of code as the example below. When you compile, R markdown will run the code and include its results. R markdown will also remove the ```{r} and ```. Yo can hide the code by clicking the triangle botton that there are in the line.
+**1. Embeded code:** Insert a chunck of code as the example below. When you compile, R markdown will run the code and include its results. R markdown will also remove the ```{r} and ```. You can hide the code by clicking the triangle botton that there are in the line.
 ````
 ```{r}
 # some code
@@ -153,6 +155,9 @@ Useful tips options in the brackets after r:
 * eval = FALSE --> prevent the code from being run. As a result, no results will be displayed with the code.
 * message = FALSE --> supresses messages from appearing in the output, for example warnings.
 * engine = 'python' --> to embed non R code, set the engine option to the language you want to embed. 
+
+MAYBE ADD EXAMPLES? WE COULD USE R DATA (LIKE MTCARS, THAT DOES NOT NEED TO BE DOWNLOADED) SO THAT SOMEONE COULD TRY THE CODE AND SEE THE DIFFERENCES: IF THE PLOT IS MADE, IF THE CODE APPEARS OR NOT, HOW THE TEXT LOOKS, ETC.
+
 ````
 ```{r echo = FALSE}
 # some code
@@ -180,12 +185,13 @@ More chunck options in: https://rstudio.com/resources/cheatsheets/
 Today is `r Sys.date()` --> Today is 2020-05-20
 ````
 
-**5. A place to embed your plots with echo = FALSO to avoid showing the code:**
+**5. A place to embed your plots with echo = FALSE to avoid showing the code:**
 ```{r name of the plot, echo=FALSE}
 plot(name of the plot)
 ```
 
-Finally, to get your repot you can click on "Knit" botton and choose your favovourite format: HTML, PDF or Word.
+Finally, to get your repot you can click on "Knit" botton and choose your favourite format: HTML, PDF or Word.
 
-I stongly recommend you this webinar to start using R Markdown:
+I strongly recommend you this webinar to start using R Markdown:
 https://rstudio.com/resources/webinars/getting-started-with-r-markdown/
+
