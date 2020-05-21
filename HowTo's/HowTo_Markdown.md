@@ -102,7 +102,7 @@ R Markdown documents are fully reproducible and support dozens of static and dyn
 
 ### Install and open Markdown
 You can install it directly from RStudio:
->Tools > Install Packages
+>Tools > Install Packages <br/>
 >Choose "Repository CRAN" and write "Markdown" in "Packages (separate multiple with space or comma:)"
 
 To open a new file, click File > New File > R Markdown in the RStudio menu bar. A window will pop up where you can name the project an the author ("Title" and "Author") and select the specific type of output that you wish to build (HTML, PDF or Word). Rememeber that you can swith to the other output formats anytime.
