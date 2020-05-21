@@ -23,53 +23,64 @@ To create a line break, end a line with two or more spaces, and then type return
 ````
 <br/>
 ````
+<br/>
 
 ### Emphasis
 
 #### Bold
 To bold text, add two asterisks or underscores before and after a word or phrase. To bold the middle of a word for emphasis, add two asterisks without spaces around the letters. 
+
+**example**
 ````
 **example**
 __example__
 ````
 
-### Italic
+#### Italic
 To italicize text, add one asterisk or underscore before and after a word or phrase. To italicize the middle of a word for emphasis, add one asterisk without spaces around the letters.
+
+*example*
 ````
 *example*
 _example_
 ````
 
-
-### Bold and Italic
+#### Bold and Italic
 To emphasize text with bold and italics at the same time, add three asterisks or underscores before and after a word or phrase. To bold and italicize the middle of a word for emphasis, add three asterisks without spaces around the letters.
+
+***example***
 ````
 ***example***
 ___example___
 ````
 
-## Ordering
-### Bullet Points
+### Ordering
+#### Bullet Points
 To create bullet points add a hypen and a space before the word or sentence to write.
+
+* Example 1
 ````
 * Example 1
 * Example 2
 ````
 
-### List
+#### List
 To create an ordered list, add line items with numbers followed by periods. The numbers don’t have to be in numerical order, but the list should start with the number one.
 
+1. Example 1
+2. Example 2
 ````
 1. Example 1
 2. Example 2
 ````
 
-For more information you can visit this web pages: 
+For more information you can visit these web pages: 
 - https://www.markdownguide.org/basic-syntax/
 - https://rstudio.com/resources/cheatsheets/
 - https://rstudio.com/resources/webinars/getting-started-with-r-markdown/
 
-# How to use R Markdown
+
+## How to use R Markdown
 R Markdown provides an authoring framework for data science. You can use a single R Markdown file to both:
 
 - save and execute code.
