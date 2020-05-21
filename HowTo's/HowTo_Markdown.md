@@ -4,10 +4,12 @@ Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word docu
 
 EXPLAIN EXTENSION (.md)
 
-EXPLAIN WHERE YOU CAN CREATE A MD. For example: 
+EXPLAIN BRIEFLY WHERE/WHAT FOR YOU CAN CREATE A MD (as an intro) For example: 
 - You can create mds in GitHub to make nice-readable files, with format (vs. an unformatted txt file)
 - You can create mds in an app??
 - You can create mds in R to make nice reports including text, code and the figures all in one file.
+
+Later you create sections that contained detailed info
 
 
 ## SYNTAX: How to format a Markdown file
@@ -58,6 +60,7 @@ ___example___
 To create bullet points add a hypen and a space before the word or sentence to write.
 
 * Example 1
+* Example 2
 ````
 * Example 1
 * Example 2
@@ -72,12 +75,13 @@ To create an ordered list, add line items with numbers followed by periods. The 
 1. Example 1
 2. Example 2
 ````
+<br/>
 
 For more information you can visit these web pages: 
 - https://www.markdownguide.org/basic-syntax/
 - https://rstudio.com/resources/cheatsheets/
 - https://rstudio.com/resources/webinars/getting-started-with-r-markdown/
-
+<br/>
 
 ## How to use R Markdown
 R Markdown provides an authoring framework for data science. You can use a single R Markdown file to both:
@@ -85,12 +89,12 @@ R Markdown provides an authoring framework for data science. You can use a singl
 - save and execute code.
 - generate high quality reports that can be shared with an audience.
 
-R Markdown documents are fully reproducible and support dozens of static and dynamic output formats. (more info: https://rmarkdown.rstudio.com/)
+R Markdown documents are fully reproducible and support dozens of static and dynamic output formats (more info: https://rmarkdown.rstudio.com/).
 
 ### Install and open Markdown
 You can install it directly from RStudio:
-Tools > Install Packages
-Choose "Repository CRAN" and write "Markdown" in "Packages (separate multiple with space or comma:)"
+>Tools > Install Packages
+>Choose "Repository CRAN" and write "Markdown" in "Packages (separate multiple with space or comma:)"
 
 To open a new file, click File > New File > R Markdown in the RStudio menu bar. A window will pop up where you can name the project an the author ("Title" and "Author") and select the specific type of output that you wish to build (HTML, PDF or Word). Rememeber that you can swith to the other output formats anytime.
 
