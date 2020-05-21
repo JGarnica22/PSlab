@@ -24,8 +24,9 @@ To create a line break, end a line with two or more spaces, and then type return
 <br/>
 ````
 
-## Emphasis
-### Bold
+### Emphasis
+
+#### Bold
 To bold text, add two asterisks or underscores before and after a word or phrase. To bold the middle of a word for emphasis, add two asterisks without spaces around the letters. 
 ````
 **example**
