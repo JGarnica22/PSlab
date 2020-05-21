@@ -38,7 +38,7 @@ sudo apt-get install -y aptitude
 sudo aptitude install r-base
 ````
 
-And that's it! (Once all the dependencies are installed, which can take a while the first time.) Now you're all ready to run R from the Linux command line! :+1:  
+**And that's it! (Once all the dependencies are installed, which can take a while the first time.) Now you're all ready to run R from the Linux command line!** :+1:  
 
 :bulb: Keep in mind that like with other Ubuntu applications, you will need to have all your R files in the Linux subsystem folders.  
 <br/>
