@@ -97,7 +97,7 @@ for (xy in plots) {
                      track <- geneTrack(z,TxDb)[[1]]
                      return(track)
                    })
- 
+  
   #Import results files from the different analysis to be included and for each replicate:
   #List all the files in you data directory and import them depending on their format
   #IMPORTANT: name files always as type_of_sample(Tet, Tconv, TFH...)+number of replicate_tecnique (ATAC, RNA...), e.g. Tet3_ATAC, Tet1_RNA...
@@ -227,7 +227,7 @@ for (xy in plots) {
     grlo <- c(grlo, grl[[p]])
   }
   
-  pdf(file = paste0("figs/",xy, "_active_enhancers.pdf"), width = 10, height = 6)
+  
   for (m in 1:length(pop)){
     Pattern_list<-do.call("list",mget(grep(comp[m],names(show.tracks),value=TRUE)))
     o <- optimizeStyle(trackList(Pattern_list, tracks))
@@ -287,7 +287,7 @@ for (xy in plots) {
     for(i in 6:length(u)){
       grx <- genes(TxDb)[as.data.frame(genesinrange)[i-5,1]]
       if (start(ranges(grx)) <= start(ranges(agr))){
-          setTrackStyleParam(u[[i]], "ylabpos", "left")
+        setTrackStyleParam(u[[i]], "ylabpos", "left")
       } 
       if(end(ranges(grx)) >= end(ranges(agr))){
         setTrackStyleParam(u[[i]], "ylabpos", "right")
@@ -332,6 +332,7 @@ for (xy in plots) {
       } 
     } 
     
+    pdf(file = paste0("figs/",xy, "_", pop[m] , "_active_enhancers_lolliplots.pdf"), width = 10, height = 6)
     if (m == 1){
       vp <- viewTracks(u, gr=agr, viewerStyle=t, newpage = F)
     } else {
@@ -344,47 +345,42 @@ for (xy in plots) {
     if (nrow(xy.enh.DMR)!=0){
       for (c in 1:nrow(xy.enh.DMR)){
         addGuideLine(c(xy.enh.DMR$Start[c], xy.enh.DMR$End[c]), vp=vp)
-       }
-    }
-  }
-    dev.off()
-    
-    for (mi in 1:length(pop)){
-    #Read table of previously elaborated active enhancers map and prepare dataframe
-    hun100kb <- read.table(paste0("data/", grep(pop[mi], file_list_DMR, value = T)))
-    hun100kb <- hun100kb[, c(1:3, 9, 7)]
-    names(hun100kb) <- c("Chr", "Start", "End", "Strand", "EntrezID")
-    hun100kb <- merge(hun100kb, BM, by.x = "EntrezID", by.y = "entrezgene_id")
-    hun100kb <- hun100kb[, c(-1)]
-    names(hun100kb) <- c("Chr", "Start", "End", "Strand", "Gene")
-    
-    #select only active enhancers for the gene to be represented
-    xy.enh.DMR <-  hun100kb[which(hun100kb$Gene==xy),]
-    xy.enh.DMR <- xy.enh.DMR[order(as.numeric(gsub("chr", "", xy.enh.DMR$Chr)), 
-                                   as.numeric(xy.enh.DMR$Start),
-                                   decreasing = F, na.last = T), ]
-    if (nrow(xy.enh.DMR)!=0){
-      pdf(paste0("figs/Lolliplot_",xy, "_", paste0(pop, collapse ="_"), "_on_", pop[mi], "_AE", ".pdf"), width = 12, height = 6)
+      }
+      #Read table of previously elaborated active enhancers map and prepare dataframe
+      hun100kb <- read.table(paste0("data/", grep(pop[m], file_list_DMR, value = T)))
+      hun100kb <- hun100kb[, c(1:3, 9, 7)]
+      names(hun100kb) <- c("Chr", "Start", "End", "Strand", "EntrezID")
+      hun100kb <- merge(hun100kb, BM, by.x = "EntrezID", by.y = "entrezgene_id")
+      hun100kb <- hun100kb[, c(-1)]
+      names(hun100kb) <- c("Chr", "Start", "End", "Strand", "Gene")
+      
+      #select only active enhancers for the gene to be represented
+      xy.enh.DMR <-  hun100kb[which(hun100kb$Gene==xy),]
+      xy.enh.DMR <- xy.enh.DMR[order(as.numeric(gsub("chr", "", xy.enh.DMR$Chr)), 
+                                     as.numeric(xy.enh.DMR$Start),
+                                     decreasing = F, na.last = T), ]
+      
       for (ic in 1:nrow(xy.enh.DMR)){
-                #Do also the lolliplots for nucleotid-specific metilation status on the active enhancers
-        grpi <- GRanges(seqnames = xy.enh.DMR$Chr[ic], 
-                        ranges = paste0(xy.enh.DMR$Start[ic], "-", xy.enh.DMR$End[ic]), 
-                        strand = NULL)
-        xaxis <- c(seq(from = start(gr), 
-                       to = end(gr), 
-                       by = 500))
-        yaxis <- c(0, 100)
-        legends <- list(list(labels=c(pop[2],pop[1]), 
-                             fill= colors,
-                             col = c("gray30","gray30")))
-        lolliplot(grlo, grpi, type = "circle", 
-                  xaxis= xaxis,
-                  yaxis= yaxis,
-                  legend= legends,
-                  ylab= paste0(xy, "-", seqnames(grpi), ":", start(grpi), "-", end(grpi)))
-      }
-      dev.off()
-      }
+          #Do also the lolliplots for nucleotid-specific metilation status on the active enhancers
+          grpi <- GRanges(seqnames = xy.enh.DMR$Chr[ic], 
+                          ranges = paste0(xy.enh.DMR$Start[ic], "-", xy.enh.DMR$End[ic]), 
+                          strand = NULL)
+          xaxis <- c(seq(from = start(gr), 
+                         to = end(gr), 
+                         by = 500))
+          yaxis <- c(0, 100)
+          legends <- list(list(labels=c(pop[2],pop[1]), 
+                               fill= colors,
+                               col = c("gray30","gray30")))
+          lolliplot(grlo, grpi, type = "circle", 
+                    xaxis= xaxis,
+                    yaxis= yaxis,
+                    legend= legends,
+                    ylab= paste0(xy, "-", seqnames(grpi), ":", start(grpi), "-", end(grpi)))
+        }
     }
-  
+    
+    dev.off()   
+  }
+   
 }
