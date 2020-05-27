@@ -6,8 +6,8 @@ Implementations of Markdown are available for over a dozen programming languages
 
 Examples:
 - The sourcecode documentation generator Doxygen supports Markdown with extra features.
-- RStudio, an IDE for R, provides a C++ wrapper function for a markdown variant called sundown.
-- GitHub Flavored Markdown (GFM) ignores underscores in words, and adds syntax highlighting, task lists, and tables.
+- **RStudio**, an IDE for R, provides a C++ wrapper function for a markdown variant called sundown.
+- **GitHub** Flavored Markdown (GFM) ignores underscores in words, and adds syntax highlighting, task lists, and tables.
 - Discount – a C implementation.
 - MarkAPL is a converter written in Dyalog APL. It supports fenced blocks, smart typography, link references, and special attributes,     and can generate a table of contents.
 - PHP Markdown - a library package that includes the PHP Markdown parser and its sibling PHP Markdown Extra with additional features.
@@ -118,6 +118,8 @@ You can also add emjis to your text or report copying its code from the multiple
 I THINK THIS ALSO NEEDS TO BE EXPLAINE HERE, IS ESSENTIAL (FALTA)
 
 - OR LABEL A TOOL (1 grave accent \`)
+
+`python
 
 
 For more information you can visit these web pages: 
