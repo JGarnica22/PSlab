@@ -23,13 +23,6 @@ Projects created with GitHub, often use a file named README.md, which contains t
 
 To sum up, it's a very simple language used to create beautiful and presentable readme files that summarize your project where you can include text but also code and figures in the same file.<br/>
 
-EXPLAIN BRIEFLY WHERE/WHAT FOR YOU CAN CREATE A MD (as an intro) For example: 
-- You can create mds in GitHub to make nice-readable files, with format (vs. an unformatted txt file)
-- You can create mds in an app??
-- You can create mds in R to make nice reports including text, code and the figures all in one file.
-
-Later you create sections that contained detailed info
-
 
 ## SYNTAX: How to format a Markdown file
 
@@ -94,6 +87,12 @@ To create an ordered list, add line items with numbers followed by periods. The 
 1. Example 1
 2. Example 2
 ````
+#### Special characters without effect
+To produce a literal character (an asterisk or underscore for example) at a position where it would otherwise be used as an emphasis delimiter, you can backslash escape it.
+````
+\*this text is surrounded by literal asterisks\*
+````
+
 #### Introduce chunks of code
 To insert chunks of code into your file with type 4 grave accents \`\`\`\` before and after the code. When you render your .Rmd file, R Markdown will run each code chunk and embed the results beneath the code chunk in your final report (unless you use special chunk options described below).<br/>
 \`\`\`\`<br/>
@@ -114,16 +113,11 @@ To create an inline image link, enter an exclamation point ( ! ), wrap the alt t
 #### Embed emojis :blush:
 You can also add emjis to your text or report copying its code from the multiple web pages for example this one: https://gist.github.com/rxaviers/7360908
 
-:wink:
-\:wink:\
 
 
-
-I THINK THIS ALSO NEEDS TO BE EXPLAINE HERE, IS ESSENTIAL
+I THINK THIS ALSO NEEDS TO BE EXPLAINE HERE, IS ESSENTIAL (FALTA)
 
 - OR LABEL A TOOL (1 grave accent \`)
-- HOW TO WRITE SPECIAL CHARACTERS WRITTEN LITTERALLY WITH a back slash '\\'
-- YOU CAN ALSO COMMENT ON THE EMOJIS (IT'S JUST FUN). THEY CAN BE ADDED IN MD AND LINK THE GITHUB PAGE THAT HAD ALL OF THEM
 
 
 For more information you can visit these web pages: 
