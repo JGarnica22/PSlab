@@ -113,9 +113,10 @@ To create an inline image link, enter an exclamation point ( ! ), wrap the alt t
 ````
 #### Embed emojis :blush:
 You can also add emjis to your text or report copying its code from the multiple web pages for example this one: https://gist.github.com/rxaviers/7360908
-````
-:wink: \:wink:\
-````
+
+:wink:
+\:wink:\
+
 
 
 I THINK THIS ALSO NEEDS TO BE EXPLAINE HERE, IS ESSENTIAL
