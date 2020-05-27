@@ -95,10 +95,10 @@ To create an ordered list, add line items with numbers followed by periods. The 
 2. Example 2
 ````
 #### Introduce chunks of code
-To insert chunks of code into your file with type 4 grave accents \`\`\`\` before and after the code.
-\`\`\`\`
-Code Example
-\`\`\`\`
+To insert chunks of code into your file with type 4 grave accents \`\`\`\` before and after the code.<br/>
+\`\`\`\`<br/>
+Code Example<br/><br/>
+\`\`\`\`<br/>
 
 I THINK THIS ALSO NEEDS TO BE EXPLAINE HERE, IS ESSENTIAL
 
