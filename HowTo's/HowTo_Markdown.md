@@ -1,4 +1,4 @@
-# How to use Markdown
+# How to use Markdown :closed_book: :pencil2:
 
 Markdown is a lightweight markup language with plain-text-formatting syntax. Its design allows it to be converted to many output formats: HTML, PDF, Word documents and slides. Markdown is often used to format readme files, and to create rich text using a plain text editor creating an .md file (MD).<br/>
 
