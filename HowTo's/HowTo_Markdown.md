@@ -9,9 +9,9 @@ Examples:
 - RStudio, an IDE for R, provides a C++ wrapper function for a markdown variant called sundown.
 - GitHub Flavored Markdown (GFM) ignores underscores in words, and adds syntax highlighting, task lists, and tables.
 - Discount – a C implementation.
-- MarkAPL is a converter written in Dyalog APL. It supports fenced blocks, smart typography, link references, and special attributes,  and can generate a table of contents.
+- MarkAPL is a converter written in Dyalog APL. It supports fenced blocks, smart typography, link references, and special attributes,     and can generate a table of contents.
 - PHP Markdown - a library package that includes the PHP Markdown parser and its sibling PHP Markdown Extra with additional features.
-- Markdig – A .NET library that follows the CommonMark specifications, and includes a collection of extensions and the ability for the user to create their own.
+- Markdig – A .NET library that follows the CommonMark specifications, and includes a collection of extensions and the ability for the     user to create their own.
 
 Markdown is often used to format readme files, and to create rich text using a plain text editor creating an .md file (MD).<br/>
 
@@ -95,17 +95,33 @@ To create an ordered list, add line items with numbers followed by periods. The 
 2. Example 2
 ````
 #### Introduce chunks of code
-To insert chunks of code into your file with type 4 grave accents \`\`\`\` before and after the code.<br/>
+To insert chunks of code into your file with type 4 grave accents \`\`\`\` before and after the code. When you render your .Rmd file, R Markdown will run each code chunk and embed the results beneath the code chunk in your final report (unless you use special chunk options described below).<br/>
 \`\`\`\`<br/>
 Code Example<br/><br/>
 \`\`\`\`<br/>
 
+#### Add links
+To embed links into a topic you can either use the markdown syntax as below where the word "link" will be converted to a clickable link.
+````
+Go to this [link](https://write_here_your_link.com)
+````
+
+#### Embed images
+To create an inline image link, enter an exclamation point ( ! ), wrap the alt text in brackets ( [ ] ), and then wrap the link in parenthesis ( ( ) ). (Alt text is a phrase or sentence that describes the image.)
+````
+![Alt Text](url)
+````
+#### Embed emojis :blush:
+You can also add emjis to your text or report copying its code from the multiple web pages for example this one: https://gist.github.com/rxaviers/7360908
+````
+:wink: \:wink:\
+````
+
+
 I THINK THIS ALSO NEEDS TO BE EXPLAINE HERE, IS ESSENTIAL
 
-- HOW TO ADD CHUNKS OF CODE (4 grave accents \`\`\`\`) OR LABEL A TOOL (1 grave accent \`)
+- OR LABEL A TOOL (1 grave accent \`)
 - HOW TO WRITE SPECIAL CHARACTERS WRITTEN LITTERALLY WITH a back slash '\\'
-- HOW TO ADD LINKS
-- HOW TO ADD IMAGES
 - YOU CAN ALSO COMMENT ON THE EMOJIS (IT'S JUST FUN). THEY CAN BE ADDED IN MD AND LINK THE GITHUB PAGE THAT HAD ALL OF THEM
 
 
