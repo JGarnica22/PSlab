@@ -115,11 +115,10 @@ You can also add emjis to your text or report copying its code from the multiple
 
 
 
-I THINK THIS ALSO NEEDS TO BE EXPLAINE HERE, IS ESSENTIAL (FALTA)
+I THINK THIS ALSO NEEDS TO BE EXPLAINE HERE, IS ESSENTIAL (**FALTA**)
 
 - OR LABEL A TOOL (1 grave accent \`)
 
-'python'
 
 
 For more information you can visit these web pages: 
