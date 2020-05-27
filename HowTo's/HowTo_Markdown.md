@@ -197,9 +197,7 @@ MAYBE ADD EXAMPLES? WE COULD USE R DATA (LIKE MTCARS, THAT DOES NOT NEED TO BE D
 # some code
 ```
 ````
-![example echo](echo plot.png)
-
-
+![echo example](file://echo_plot.png)
 
 
 ````
