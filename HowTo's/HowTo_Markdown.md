@@ -1,8 +1,27 @@
 # How to use Markdown
 
-Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. Its design allows it to be converted to many output formats, but the original tool by the same name only supports HTML. Markdown is often used to format readme files, for writing messages in online discussion forums, and to create rich text using a plain text editor.<br/>
+Markdown is a lightweight markup language with plain-text-formatting syntax. Its design allows it to be converted to many output formats: HTML, PDF, Word documents and slides. Markdown is often used to format readme files, and to create rich text using a plain text editor creating an .md file (MD).<br/>
 
-EXPLAIN EXTENSION (.md)
+Implementations of Markdown are available for over a dozen programming languages; in addition, many platforms and frameworks support Markdown. For example, Markdown plugins exist for every major blogging platform.<br/>
+
+Examples:
+- The sourcecode documentation generator Doxygen supports Markdown with extra features.
+- RStudio, an IDE for R, provides a C++ wrapper function for a markdown variant called sundown.
+- GitHub Flavored Markdown (GFM) ignores underscores in words, and adds syntax highlighting, task lists, and tables.
+- Discount – a C implementation.
+- MarkAPL is a converter written in Dyalog APL. It supports fenced blocks, smart typography, link references, and special attributes,  and can generate a table of contents.
+- PHP Markdown - a library package that includes the PHP Markdown parser and its sibling PHP Markdown Extra with additional features.
+- Markdig – A .NET library that follows the CommonMark specifications, and includes a collection of extensions and the ability for the user to create their own.
+
+Markdown is often used to format readme files, and to create rich text using a plain text editor creating an .md file (MD).<br/>
+
+An MD file is a text file created using one of several possible dialects of the Markdown language. It is saved in plain text format but includes inline text symbols that define how to format the text (e.g., bold, indentations, headers, table formatting).<br/>
+
+MD files are not only useful for HTML documentation systems, but also for source code version control. This is because the files can be compared against historical revisions in human-readable text (whereas a binary format cannot be easily compared).<br/>
+
+Projects created with GitHub, often use a file named README.md, which contains the readme for the project.<br/>
+
+To sum up, it's a very simple language used to create beautiful and presentable readme files that summarize your project where you can include text but also code and figures in the same file.<br/>
 
 EXPLAIN BRIEFLY WHERE/WHAT FOR YOU CAN CREATE A MD (as an intro) For example: 
 - You can create mds in GitHub to make nice-readable files, with format (vs. an unformatted txt file)
@@ -75,7 +94,11 @@ To create an ordered list, add line items with numbers followed by periods. The 
 1. Example 1
 2. Example 2
 ````
-<br/>
+#### Introduce chunks of code
+To insert chunks of code into your file with type 4 grave accents \`\`\`\` before and after the code.
+\`\`\`\`
+Code Example
+\`\`\`\`
 
 I THINK THIS ALSO NEEDS TO BE EXPLAINE HERE, IS ESSENTIAL
 
