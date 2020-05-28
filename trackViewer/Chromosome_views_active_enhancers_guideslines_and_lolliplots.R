@@ -332,6 +332,7 @@ for (xy in plots) {
     } else {
       vp <- viewTracks(u, gr=agr, viewerStyle=t, newpage = T)
     }
+    addGuideLine(c(start(gr), end(gr)), col = "grey20", vp=vp)
     grid.text(pop[m], x=0.2, y=.9, just="top", 
               gp=gpar(cex=1.5, fontface="bold"))
     # Add guidelines to mark inferred active enhancers
