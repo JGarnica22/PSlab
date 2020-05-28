@@ -5,15 +5,15 @@ Markdown is a lightweight markup language with plain-text-formatting syntax. Its
 Implementations of Markdown are available for over a dozen programming languages; in addition, many platforms and frameworks support Markdown. For example, Markdown plugins exist for every major blogging platform.<br/>
 
 Examples:
-- The sourcecode documentation generator Doxygen supports Markdown with extra features.
-- **RStudio**, an IDE for R, provides a C++ wrapper function for a markdown variant called sundown.
 - **GitHub** Flavored Markdown (GFM) ignores underscores in words, and adds syntax highlighting, task lists, and tables.
+- **RStudio**, an IDE for R, provides a C++ wrapper function for a markdown variant called sundown.
+- The sourcecode documentation generator Doxygen supports Markdown with extra features.
 - Discount – a C implementation.
-- MarkAPL is a converter written in Dyalog APL. It supports fenced blocks, smart typography, link references, and special attributes,     and can generate a table of contents.
+- MarkAPL is a converter written in Dyalog APL. It supports fenced blocks, smart typography, link references, and special attributes, and can generate a table of contents.
 - PHP Markdown - a library package that includes the PHP Markdown parser and its sibling PHP Markdown Extra with additional features.
-- Markdig – A .NET library that follows the CommonMark specifications, and includes a collection of extensions and the ability for the     user to create their own.
+- Markdig – A .NET library that follows the CommonMark specifications, and includes a collection of extensions and the ability for the user to create their own.
 
-Markdown is often used to format readme files, and to create rich text using a plain text editor creating an .md file (MD).<br/>
+Markdown is often used <ins>to format readme files<ins/>, and to create rich text using a plain text editor creating an .md file (MD).<br/>
 
 An MD file is a text file created using one of several possible dialects of the Markdown language. It is saved in plain text format but includes inline text symbols that define how to format the text (e.g., bold, indentations, headers, table formatting).<br/>
 
@@ -27,16 +27,13 @@ To sum up, it's a very simple language used to create beautiful and presentable 
 ## SYNTAX: How to format a Markdown file
 
 ### Headings
-To create a heading, add a hash symbol (#) in front of a word or phrase. The number hash symbols you use should correspond to the heading level. For each extra (#) that you use your heading will be smaller.<br/>
+To create a heading, add a hash symbol (#) in front of a word or phrase. The number of hash symbols you use should correspond to the heading level. For each extra (#) that you use your heading will be smaller.<br/>
 
 ### Paragraphs
 To create paragraphs, use a blank line to separate one or more lines of text.<br/>
 
 ### Line breaks
-To create a line break, end a line with two or more spaces, and then type return.<br/>
-````
-<br/>
-````  
+To create a line break, end a line with two or more spaces, and then type \<br/> (return).<br/>
 
 ### Emphasis
 
@@ -50,7 +47,7 @@ __example__
 ````
 
 #### Italic
-To italicize text, add one asterisk or underscore before and after a word or phrase. To italicize the middle of a word for emphasis, add one asterisk without spaces around the letters.
+To italicize text, add one single asterisk or underscore before and after a word or phrase. To italicize the middle of a word for emphasis, add one asterisk without spaces around the letters.
 
 *example*
 ````
@@ -69,13 +66,13 @@ ___example___
 
 ### Ordering
 #### Bullet Points
-To create bullet points add a hypen and a space before the word or sentence to write.
+To create bullet points add a hyphen or an asterisk and a space before the word or sentence to write.
 
 * Example 1
-* Example 2
+- Example 2
 ````
 * Example 1
-* Example 2
+- Example 2
 ````
 
 #### List
@@ -87,8 +84,11 @@ To create an ordered list, add line items with numbers followed by periods. The 
 1. Example 1
 2. Example 2
 ````
+
 #### Special characters without effect
 To produce a literal character (an asterisk or underscore for example) at a position where it would otherwise be used as an emphasis delimiter, you can backslash escape it.
+
+\*this text is surrounded by literal asterisks\*
 ````
 \*this text is surrounded by literal asterisks\*
 ````
@@ -100,18 +100,19 @@ Code Example<br/><br/>
 \`\`\`\`<br/>
 
 #### Add links
-To embed links into a topic you can either use the markdown syntax as below where the word "link" will be converted to a clickable link.
+To embed links into a topic you can either add the link (will be seen as the whole link text) or use the markdown syntax as below where the word "link" will be converted to a clickable link (use [ ] around the linkable word, followed without space for the link in brackets.
 ````
 Go to this [link](https://write_here_your_link.com)
 ````
 
 #### Embed images
-To create an inline image link, enter an exclamation point ( ! ), wrap the alt text in brackets ( [ ] ), and then wrap the link in parenthesis ( ( ) ). (Alt text is a phrase or sentence that describes the image.)
+To create an inline image link, enter an exclamation point ( ! ), wrap the alt text in brackets ( [ ] ), and then wrap the link in parenthesis ( ( ) ). (\*_Alt text_ is a phrase or sentence that describes the image.)
 ````
 ![Alt Text](url)
 ````
+
 #### Embed emojis :blush:
-You can also add emjis to your text or report copying its code from the multiple web pages for example this one: https://gist.github.com/rxaviers/7360908
+You can also add emojis to your text or report copying its code (\:emojiX\:). You can find the code for different emojis in multiple web pages, for example this one: https://gist.github.com/rxaviers/7360908
 
 
 
@@ -142,9 +143,9 @@ Tools > Install Packages <br/>
 Choose "Repository CRAN" and write "Markdown" in "Packages (separate multiple with space or comma:)"
 
 To open a new file, click File > New File > R Markdown in the RStudio menu bar. 
-A window will pop up where you can name the project an the author ("Title" and "Author") and select the specific type of output that you wish to build (HTML, PDF or Word). Rememeber that you can switch to the other output formats anytime.
+A window will pop up where you can name the project an the author ("Title" and "Author") and select the specific type of output that you wish to build (HTML, PDF or Word). Remember that you can switch to the other output formats anytime.
 
-A template will be opened to generete your Markdown report. Here you have a summary of the template in order of appearance:
+A template will be opened to generate your Markdown report. Here you have a summary of the template in order of appearance:
 
 **1. Important information of your document such as the title, author, date (will apear in the final document) and output format (you can change it at any moment):**
 
@@ -177,14 +178,14 @@ When you click the **Knit** button a document will be generated that includes bo
 
 There are two ways to include code to the document:
 
-**1. Embeded code:** Insert a chunck of code as the example below. When you compile, R markdown will run the code and include its results. R markdown will also remove the ```{r} and ```. You can hide the code by clicking the triangle botton that there are in the line.
+**1. Embeded code:** Insert a chunck of code as the example below. When you compile, R markdown will run the code and include its results. R markdown will also remove the ```{r} and ```. You can hide the code by clicking the triangle botton found at the end of each line.
 ````
 ```{r}
 # some code
 ```
 ````
 
-Useful tips options in the brackets after r:
+Options in the brackets after {r}:
 
 * echo = FALSE --> hides the code (useful if you want to show only a plot).
 * eval = FALSE --> prevent the code from being run. As a result, no results will be displayed with the code.
@@ -216,7 +217,7 @@ MAYBE ADD EXAMPLES? WE COULD USE R DATA (LIKE MTCARS, THAT DOES NOT NEED TO BE D
 # some code
 ```
 ````
-More chunck options in: https://rstudio.com/resources/cheatsheets/
+More chunk options in: https://rstudio.com/resources/cheatsheets/
 
 **2. Inline code:** Place code in a sentence with `r #code`. R markdown will replace the code with its results.
 ````
