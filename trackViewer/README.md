@@ -14,7 +14,7 @@ bigWig is the format you will use mainly for sequencing data (to draw histograms
 <br/>
 
 #### 0. Install tools:
-You will need `samtools` and `deeptools`, both included in conda (to install them see [HowTo_setupTerminalWLS](https://github.com/patriciasolesanchez/PSlab/blob/master/HowTo's/HowTo_SetupTerminalWLS.md) or [HowTo_SetupTerminalMac](https://github.com/patriciasolesanchez/PSlab/blob/master/HowTo's/HowTo_SetupTerminalMac.md) if you are working on Windows or Mac, respectively).  
+You will need `samtools` and `deeptools`, both included in conda (to install them see [HowTo_SetupTerminalWLS](https://github.com/patriciasolesanchez/PSlab/blob/master/HowTo's/HowTo_SetupTerminalWLS.md) or [HowTo_SetupTerminalMac](https://github.com/patriciasolesanchez/PSlab/blob/master/HowTo's/HowTo_SetupTerminalMac.md) if you are working on Windows or Mac, respectively).  
 <br/>
 
 #### 1. Create your folder to work:
@@ -51,7 +51,7 @@ done
 <br/>
 
 ### BED files:
-BED (Browser Extensible Data) format will be used for data indicating selected regions, such as location of active enhacers or location of differentially methylated regions (DMR). 
+BED (Browser Extensible Data) format will be used for data indicating selected regions, such as location of active enhacers or location of differentially methylated regions (DMRs). 
 
 A BED file has the following format:
 
@@ -88,23 +88,22 @@ chr7  127473530  127474697  Pos3  0  +  127473530  127474697  255,0,0
 
 BED files are easy to prepare, you can create them from a _.txt_ by doing the following:
 
-1. Modify your file to contain the desired columns (usally for `trackViewer`, columns 1-5 are used). If using WLS you must do this from your Ubuntu terminal using your preferred text editor, for instance nano:
+1. Modify your file to contain the desired columns (usally for `trackViewer`, columns 1-5 are used). If using WLS you must do this from your Ubuntu terminal using your preferred text editor, for instance ´nano´:
 ````
 nano your_file.txt
 ````
-2. Elimimate column headers!
-3. Change file extension from _.txt_ to _.bed_. From terminal use `mv` (*move*) command to change the extension of the file
+2. Eliminate column headers!
+3. Change file extension from _.txt_ to _.bed_. From terminal use `mv` (*move*) command to change the extension of the file:
 ````
 mv your_file.txt your_file.bed
 ````
 <br/>
 
-## Visualize data with trackViewer::lollipop:
+## Visualize data with trackViewer: :lollipop:
 Once you have your input files prepared, you can use `trackViewer` to make your plots. Here we explain how to make two types of plots: chromosome views and lolliplots.
 
-**Chromosome views** are allow you to represent graphically in the same graph the different genomic and transcriptomic data from the same samples. In this case, `Chromosome_views.R` is designed to represent data from **RNA-seq, ChIP, ATAC-seq, methylation** and inferred **active enhancers** (see Active_enhancers_analysis folder) for your genes of interest.
+**Chromosome views** allow you to represent graphically in the same plot the different genomic and transcriptomic data from the same samples. In this case, _Chromosome_views.R_ is designed to represent data from **RNA-seq, ChIP, ATAC-seq, methylation** and inferred **active enhancers** (see [Active_enhancers_analysis folder] (https://github.com/patriciasolesanchez/PSlab/tree/master/Active_enhancers_analysis)) for your genes of interest.  
 
-**Lolliplots** are a type of graph which allow to clearly represent nucleotid-specific characteristics, such as methylation status or SNP (Single Nucleotide Polymorphism). `Lolliplots_overlapping.R` scripts is prepared to represent the differential methylation between your samples in your genes of interest. 
+**Lolliplots** are a type of graph which allow you to clearly represent nucleotid-specific characteristics, such as methylation status or SNPs (Single Nucleotide Polymorphisms). _Lolliplots_overlapping.R_ script is prepared to represent the differential methylation between your samples in your genes of interest.  
 
-
-Finally, `Chromosome_views_active_enhancers_guideslines_and_lolliplots.R`script replicate the graphs described in `Chromosome_views.R`but adding guidelines markin the inferred active enhancers. Moreover, lolliplots graphs ploting the methylation status of nucleotids in the active enhancers inferred 100 Kb close to your genes of interest.
+Finally, _Chromosome_views_active_enhancers_guideslines_and_lolliplots.R_ script is thought to visualize the methylation status of a gene-associated active enhancers. It will make a first Chromosome view plot (like in _Chromosome_views.R_), but adding guidelines marking the position of active enhancers. Next, it will draw a lolliplot graph for each active enhancer (plotting the methylation status at the single C level in these active enhancers found 100 kb close to your genes of interest).
