@@ -13,15 +13,14 @@ Examples:
 - PHP Markdown - a library package that includes the PHP Markdown parser and its sibling PHP Markdown Extra with additional features.
 - Markdig – A .NET library that follows the CommonMark specifications, and includes a collection of extensions and the ability for the user to create their own.
 
-Markdown is often used <ins>to format readme files<ins/>, and to create rich text using a plain text editor creating an .md file (MD).<br/>
+Markdown is often used <ins>to format readme files</ins>, and to create rich text using a plain text editor creating an **.md file (MD)**. An MD file is a text file created using one of several possible dialects of the Markdown language. It is saved in plain text format but includes inline text symbols that define how to format the text (e.g., bold, indentations, headers, table formatting).<br/>
 
-An MD file is a text file created using one of several possible dialects of the Markdown language. It is saved in plain text format but includes inline text symbols that define how to format the text (e.g., bold, indentations, headers, table formatting).<br/>
+MD files are not only useful for HTML documentation systems, but also for source code version control. This is because the files can be compared against historical revisions in human-readable text (whereas a binary format cannot be easily compared).  
 
-MD files are not only useful for HTML documentation systems, but also for source code version control. This is because the files can be compared against historical revisions in human-readable text (whereas a binary format cannot be easily compared).<br/>
+Projects created with GitHub, often use a file named README.md, which contains the readme for the project.  
 
-Projects created with GitHub, often use a file named README.md, which contains the readme for the project.<br/>
-
-To sum up, it's a very simple language used to create beautiful and presentable readme files that summarize your project where you can include text but also code and figures in the same file.<br/>
+To sum up, it's a very simple language used to create beautiful and presentable readme files that summarize your project where you can include text but also code and figures in the same file.  
+<br/>
 
 
 ## SYNTAX: How to format a Markdown file
