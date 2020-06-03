@@ -86,11 +86,20 @@ To create an ordered list, add line items with numbers followed by periods. The 
 
 #### Special characters without effect
 To produce a literal character (an asterisk or underscore for example) at a position where it would otherwise be used as an emphasis delimiter, you can backslash escape it.
+`Example`
 
 \*this text is surrounded by literal asterisks\*
 ````
 \*this text is surrounded by literal asterisks\*
 ````
+
+#### Naming tools with backticks
+The backtick (also known as the grave accent or backquote) is used to mention a tool or package. Include a backtick after and before the world that you want to highlight.<br/>
+`Example`
+
+\`\`\`\`<br/>
+\`Example\`
+\`\`\`\`<br/>
 
 #### Introduce chunks of code
 To insert chunks of code into your file with type 4 grave accents \`\`\`\` before and after the code. When you render your .Rmd file, R Markdown will run each code chunk and embed the results beneath the code chunk in your final report (unless you use special chunk options described below).<br/>
@@ -112,13 +121,6 @@ To create an inline image link, enter an exclamation point ( ! ), wrap the alt t
 
 #### Embed emojis :blush:
 You can also add emojis to your text or report copying its code (\:emojiX\:). You can find the code for different emojis in multiple web pages, for example this one: https://gist.github.com/rxaviers/7360908
-
-
-
-I THINK THIS ALSO NEEDS TO BE EXPLAINE HERE, IS ESSENTIAL (**FALTA**)
-
-- OR LABEL A TOOL (1 grave accent \`)
-
 
 
 For more information you can visit these web pages: 
@@ -196,24 +198,35 @@ Options in the brackets after {r}:
 # some code
 ```
 ````
-![](https://github.com/patriciasolesanchez/PSlab/blob/master/HowTo's/Screenshots/echo_example.png) 
 
+![](https://github.com/patriciasolesanchez/PSlab/blob/master/HowTo's/Screenshots/echo_example.png) 
+![](https://github.com/patriciasolesanchez/PSlab/blob/master/HowTo's/Screenshots/echo_plot.png) 
 
 ````
 ```{r eval = FALSE}
 # some code
 ```
 ````
+
+![](https://github.com/patriciasolesanchez/PSlab/blob/master/HowTo's/Screenshots/eval_example.png) 
+
 ````
 ```{r message = FALSE}
 # some code
 ```
 ````
+
+![](https://github.com/patriciasolesanchez/PSlab/blob/master/HowTo's/Screenshots/message_example.png) 
+
 ````
 ```{r engine = 'python'}
 # some code
 ```
 ````
+
+![](https://github.com/patriciasolesanchez/PSlab/blob/master/HowTo's/Screenshots/engine_example.png) 
+
+
 More chunk options in: https://rstudio.com/resources/cheatsheets/
 
 **2. Inline code:** Place code in a sentence with `r #code`. R markdown will replace the code with its results.
