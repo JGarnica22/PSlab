@@ -113,7 +113,7 @@ To create an inline image link, enter an exclamation point ( ! ), wrap the alt t
 #### Embed emojis :blush:
 You can also add emojis to your text or report copying its code (\:emojiX\:). You can find the code for different emojis in multiple web pages, for example this one: https://gist.github.com/rxaviers/7360908
 
-'hola'
+
 
 I THINK THIS ALSO NEEDS TO BE EXPLAINE HERE, IS ESSENTIAL (**FALTA**)
 
@@ -191,14 +191,12 @@ Options in the brackets after {r}:
 * message = FALSE --> supresses messages from appearing in the output, for example warnings.
 * engine = 'python' --> to embed non R code, set the engine option to the language you want to embed. 
 
-MAYBE ADD EXAMPLES? WE COULD USE R DATA (LIKE MTCARS, THAT DOES NOT NEED TO BE DOWNLOADED) SO THAT SOMEONE COULD TRY THE CODE AND SEE THE DIFFERENCES: IF THE PLOT IS MADE, IF THE CODE APPEARS OR NOT, HOW THE TEXT LOOKS, ETC.
-
 ````
 ```{r echo = FALSE}
 # some code
 ```
 ````
-![](file://C:/Users/Mireia/Desktop/echo_plot.png) (NOT WORKING)
+![](C:\Users\Mireia\Desktop\message_example.png) 
 
 
 ````
