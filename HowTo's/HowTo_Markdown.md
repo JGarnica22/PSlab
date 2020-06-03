@@ -128,18 +128,19 @@ To create an inline image link, enter an exclamation point ( ! ), wrap the alt t
 #### Embed emojis :blush:
 You can also add emojis to your text or report copying its code (\:emojiX\:). You can find the code for different emojis in multiple web pages, for example this one: https://gist.github.com/rxaviers/7360908
 
-
-For more information you can visit these web pages: 
+<br/>
+For more information on Markdown you can visit these web pages: 
 - https://www.markdownguide.org/basic-syntax/
 - https://rstudio.com/resources/cheatsheets/
 - https://rstudio.com/resources/webinars/getting-started-with-r-markdown/
 <br/>
 
+
 ## How to use R Markdown
 R Markdown provides an authoring framework for data science. You can use a single R Markdown file to both:
 
-- save and execute code.
-- generate high quality reports that can be shared with an audience.
+- Save and execute code.
+- Generate high quality reports that can be shared with an audience.
 
 R Markdown documents are fully reproducible and support dozens of static and dynamic output formats (more info: https://rmarkdown.rstudio.com/).
 
@@ -181,7 +182,8 @@ This is an R Markdown document. Markdown is a simple formatting syntax for autho
 When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
 
 ````
-**4. R code that you want to show. Note that you can run that code directly from that window and you can see the progress in the "Console" window of R Studio.**
+**4. R code that you want to show. Similarly to what was explained above for conventional markdown, you can add chunks of code in R Markdown by using 3 backticks before the code \`\`\` followed by {r _and any info you want to add to contextualize this chunk_}. Close the chunk by using again 3 backticks after code \`\`\`.  
+When you render your .Rmd file, R Markdown will run each code chunk and embed the results beneath the code chunk in your final report (unless you use special chunk options described below). Note that you can run that code directly from that window and you can see the progress in the "Console" window of R Studio.**
 
 There are two ways to include code to the document:
 
@@ -206,7 +208,9 @@ Options in the brackets after {r}:
 ````
 
 ![](https://github.com/patriciasolesanchez/PSlab/blob/master/HowTo's/Screenshots/echo_example.png) 
-![](https://github.com/patriciasolesanchez/PSlab/blob/master/HowTo's/Screenshots/echo_plot.png) 
+
+I WOULD SHOW ONE IMAGE WITH echo=FALSE AND ONE WITH echo=TRUE SO THAT THE DIFFERENCE IS CLEAR. SAME FOR THE OTHER OPTIONS!!
+
 
 ````
 ```{r eval = FALSE}
