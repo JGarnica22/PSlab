@@ -142,7 +142,7 @@ R Markdown provides an authoring framework for data science. You can use a singl
 - Save and execute code.
 - Generate high quality reports that can be shared with an audience.
 
-R Markdown documents are fully reproducible and support dozens of static and dynamic output formats (more info: https://rmarkdown.rstudio.com/).
+R Markdown documents are fully reproducible and support dozens of static and dynamic output formats ([more info](https://rmarkdown.rstudio.com/)).
 
 ### Install and open Markdown
 You can install it directly from RStudio:  
