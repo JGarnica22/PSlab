@@ -127,10 +127,10 @@ To create an inline image link, enter an exclamation point ( ! ), wrap the alt t
 ````
 
 ### Embed emojis :blush:
-You can also add emojis to your text or report copying its code (\:emojiX\:). You can find the code for different emojis in multiple web pages, for example this one: https://gist.github.com/rxaviers/7360908
-
+You can also add emojis to your text or report copying its code (\:emojiX\:). You can find the code for different emojis in multiple web pages, for example this one: https://gist.github.com/rxaviers/7360908  
 <br/>
-For more information on Markdown you can visit these web pages: 
+
+For more information on Markdown you can visit these web pages:<br/>
 - https://www.markdownguide.org/basic-syntax/  
 - https://rstudio.com/resources/cheatsheets/  
 - https://rstudio.com/resources/webinars/getting-started-with-r-markdown/  
