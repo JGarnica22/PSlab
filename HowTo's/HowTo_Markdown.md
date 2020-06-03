@@ -86,11 +86,18 @@ To create an ordered list, add line items with numbers followed by periods. The 
 
 #### Special characters without effect
 To produce a literal character (an asterisk or underscore for example) at a position where it would otherwise be used as an emphasis delimiter, you can backslash escape it.
+`Example`
 
 \*this text is surrounded by literal asterisks\*
 ````
 \*this text is surrounded by literal asterisks\*
 ````
+
+#### Naming tools with backticks
+The backtick (also known as the grave accent or backquote) is used to mention a tool or package. Include a backtick after and before the world that yyou want to highlight.<br/>
+\`\`\`\`<br/>
+Code Example<br/><br/>
+\`\`\`\`<br/>
 
 #### Introduce chunks of code
 To insert chunks of code into your file with type 4 grave accents \`\`\`\` before and after the code. When you render your .Rmd file, R Markdown will run each code chunk and embed the results beneath the code chunk in your final report (unless you use special chunk options described below).<br/>
