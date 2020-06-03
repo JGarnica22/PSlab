@@ -188,7 +188,7 @@ When you click the **Knit** button a document will be generated that includes bo
 
 There are two ways to include code to the document:
 
-**1. Embeded code:** Similarly to what was explained above for conventional markdown, you can add chunks of code in R Markdown by using 3 backticks before the code \`\`\` followed by {r _info to contextualize this chunk_ and _code chunk options_}. Close the chunk by using again 3 backticks after code \`\`\`. When you compile, R markdown will run the code and by default include the code and its results in the output. R markdown will remove the ```{r} and ```.
+**1. Embeded code:** Similarly to what was explained above for conventional markdown, you can add chunks of code in R Markdown by using 3 backticks before the code \`\`\` followed by {r _info to contextualize this chunk_ and _code chunk options_}. Close the chunk by using again 3 backticks after code \`\`\`. When you compile, R markdown will run the code and by default include the code and its results in the output. R markdown will remove the first \`\`\`{r} and last \`\`\` lines.
 ````
 ```{r}
 Some code
@@ -198,13 +198,13 @@ Some code
 Options in the brackets after {r}:
 
 * echo = FALSE --> hides the code (useful if you want to show only the results/plot).
-* eval = FALSE --> prevent the code from being run. As a result, no results will be displayed with the code.
+* eval = FALSE --> prevents the code from being run. As a result, no results will be displayed with the code.
 * message = FALSE --> supresses messages from appearing in the output, for example warnings.
 * engine = 'python' --> to embed non R code, set the engine option to the language you want to embed. 
 
 ````
 ```{r echo = FALSE}
-# some code
+Some code
 ```
 ````
 
