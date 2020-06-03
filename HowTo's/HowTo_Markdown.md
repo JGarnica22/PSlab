@@ -191,7 +191,7 @@ There are two ways to include code to the document:
 **1. Embeded code:** Similarly to what was explained above for conventional markdown, you can add chunks of code in R Markdown by using 3 backticks before the code \`\`\` followed by {r _info to contextualize this chunk_ and _code chunk options_}. Close the chunk by using again 3 backticks after code \`\`\`. When you compile, R markdown will run the code and by default include the code and its results in the output. R markdown will remove the ```{r} and ```.
 ````
 ```{r}
-# some code
+Some code
 ```
 ````
 
