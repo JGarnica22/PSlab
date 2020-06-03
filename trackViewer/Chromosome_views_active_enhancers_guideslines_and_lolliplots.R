@@ -39,7 +39,7 @@ library(Cairo)
 library(biomaRt)
 
 # Set your working directory (the project you are working in):
-setwd("/home/jgarnica/R/trackviewer")
+setwd("/Users/patri/Documents/LAB/TESIS DOCTORAL 2015-2020/INTERNSHIP/8_trackViewer")
 
 # Indicate populations to work with
 pop <- c("Tconv", "Tet")
@@ -48,7 +48,7 @@ pop <- c("Tconv", "Tet")
 species <- "mouse"
 
 # Indicate the genes to visualize
-plots <- c("Il10", "Il21", "Mapkapk2", "Il19" )
+plots <- c("Il10", "Il21")
 # or read a txt file containing a list with all the plots
 
 # Create functions to be used:
@@ -69,13 +69,13 @@ if (species == "mouse"){
   TxDb <- TxDb.Hsapiens.UCSC.hg38.knownGene
   org.SYMBOL2EG <- org.Hs.egSYMBOL2EG
   org.SYMBOL <- org.Hs.egSYMBOL
-  ensembl <- useMart("ensembl", dataset="hsapiens_gene_ensembl")
+  ensembl <- useMart("ENSEMBL_MART_ENSEMBL", dataset="hsapiens_gene_ensembl")
 }
 BM <- getBM (attributes=c("entrezgene_id", "external_gene_name"),
              mart = ensembl, verbose = T)
 
-#Load methylation comparison of samples
-CG.methy <- read.table(paste0("data/", list.files(path="/home/jgarnica/R/trackviewer/data", pattern= "*CG.*")), 
+# Load single C-methylation data for both populations
+CG.methy <- read.table(paste0("data/", list.files(path= paste0(getwd(), "/data"), pattern= "*CG.*")), 
                        sep = "\t", dec = ".", header = T, quote = "")
 
 for (xy in plots) {
@@ -86,11 +86,6 @@ for (xy in plots) {
   } else {
     resize(gr, width(gr)+20000, fix = "center")
   }
-  # agr.gene <- if (width(gr)<100000) {
-  #   resize(gr, 300000, fix = "center")
-  # } else {
-  #   resize(gr, width(gr)+50000, fix = "center")
-  # }
   genesinrange <- mapRangesToIds(TxDb, agr, type = "gene", ignore.strand = T)
   tracks <- sapply(genesinrange[[1]][[1]], 
                    function(z) {
@@ -98,14 +93,14 @@ for (xy in plots) {
                      return(track)
                    })
   
-  #Import results files from the different analysis to be included and for each replicate:
-  #List all the files in you data directory and import them depending on their format
+  # Import results files from the different analysis to be included and for each replicate:
+  # List all the files in you data directory and import them depending on their format
   #IMPORTANT: name files always as type_of_sample(Tet, Tconv, TFH...)+number of replicate_tecnique (ATAC, RNA...), e.g. Tet3_ATAC, Tet1_RNA...
-  file_list_bed <- list.files(path="/home/jgarnica/R/trackviewer/data",
+  file_list_bed <- list.files(path= paste0(getwd(), "/data"),
                               pattern= "*.bed")
-  file_list_bw <- list.files(path="/home/jgarnica/R/trackviewer/data",
+  file_list_bw <- list.files(path= paste0(getwd(), "/data"),
                              pattern= "*.bw")
-  file_list_DMR <- list.files(path="/home/jgarnica/R/trackviewer/data",
+  file_list_DMR <- list.files(path= paste0(getwd(), "/data"),
                               pattern= "*DMR*")
   
   for (file in c(file_list_bed)){
@@ -127,7 +122,6 @@ for (xy in plots) {
   comp <- c("Ctl", "Smp")
   
   
-  
   # Calculate average peaks for all assays and samples
   for (l in 1:length(pop)){
     for (s in c("ATAC", "RNA", "ChIP", "enh", "methy")){  
@@ -137,9 +131,9 @@ for (xy in plots) {
       }
     }
     
-    #indicate experiments with multiple replicates
+    # Indicate experiments with multiple replicates
     for (n in c("ATAC", "RNA")){
-      #assign all objects to be used for operations
+      # Assign all objects to be used for operations
       for(w in 1:length(grep(paste0(n, "*.",comp[l], "."), names(.GlobalEnv),value=TRUE))){
         a <- eval(as.symbol(grep(paste0(n, ".",comp[l], "."), names(.GlobalEnv),value=TRUE)[w]))
         assign(paste0("mit",w), a)
@@ -209,7 +203,7 @@ for (xy in plots) {
                             names <- get(z, org.Mm.egSYMBOL)
                             return(names)
                           })
-  #Prepare Granges objects for lolliplots over methylation status on Active enhancer mapping
+  # Prepare GRanges objects for lolliplots over methylation status on Active enhancer mapping
   for (gh in 1:length(pop)){
     y <- GRanges(seqnames = CG.methy$chr, ranges = IRanges(start = CG.methy$pos,
                                                            width = 1), strand = NULL,
@@ -221,12 +215,12 @@ for (xy in plots) {
   grl <- c(mget(grep("lolli.*",names(.GlobalEnv),value=TRUE)))
   colors <- c("#FFD700", "#DB7575", "#81C784")[1:length(pop)]
   grlo <- GRanges()
+  
   for (p in 1:length(grl)){
     grl[[p]]$color <- colors[p]
     grl[[p]]$border <- "gray30"
     grlo <- c(grlo, grl[[p]])
   }
-  
   
   for (m in 1:length(pop)){
     Pattern_list<-do.call("list",mget(grep(comp[m],names(show.tracks),value=TRUE)))
@@ -237,16 +231,17 @@ for (xy in plots) {
     t <- o$style
     assign(paste0("viewerStyle", m), u)
     
-    ##Generate active enhancers guidelines
-    #Read table of previously elaborated active enhancers map and prepare dataframe
-    hun100kb <- read.table(paste0("data/", grep(pop[m], file_list_DMR, value = T)))
+    ## Generate active enhancers guidelines
+    # Read table of previously elaborated active enhancers map and prepare dataframe
+    hun100kb <- read.table(paste0("data/", grep(pop[m], file_list_DMR, value = T)),
+                           sep = "\t", header = T, quote = "")
     hun100kb <- hun100kb[, c(1:3, 9, 7)]
     names(hun100kb) <- c("Chr", "Start", "End", "Strand", "EntrezID")
     hun100kb <- merge(hun100kb, BM, by.x = "EntrezID", by.y = "entrezgene_id")
     hun100kb <- hun100kb[, c(-1)]
     names(hun100kb) <- c("Chr", "Start", "End", "Strand", "Gene")
     
-    #select only active enhancers for the gene to be represented
+    # Select only active enhancers for the gene to be represented
     xy.enh.DMR <-  hun100kb[which(hun100kb$Gene==xy),]
     xy.enh.DMR <- xy.enh.DMR[order(as.numeric(gsub("chr", "", xy.enh.DMR$Chr)), 
                                    as.numeric(xy.enh.DMR$Start),
@@ -269,7 +264,7 @@ for (xy in plots) {
     }
     # Eliminate scale for Active enhancers track:
     setTrackYaxisParam(u[[2]], "draw", FALSE)
-    ## Adjust the limit of y-axis for RNA, ATAC and ChIP tracks:
+    # Adjust the limit of y-axis for RNA, ATAC and ChIP tracks:
     setTrackStyleParam(u[[1]], "ylim", c(0, 1))
     setTrackStyleParam(u[[2]], "ylim", c(0, 1))
     setTrackStyleParam(u[[3]], "ylim", c(0, roundUpNice(max(optimizeStyle(trackList(do.call("list",mget(grep(comp[1],names(show.tracks),value=TRUE))), tracks))$tracks[[3]]$dat$score,
@@ -282,8 +277,7 @@ for (xy in plots) {
     for(i in 1:5){
       setTrackStyleParam(u[[i]], "marginBottom", .1)
     }
-    # For each transcript, the transcript name can be put on the upstream or downstream 
-    #of the transcript
+    # For each transcript, the transcript name can be put on the upstream or downstream of the transcript
     for(i in 6:length(u)){
       grx <- genes(TxDb)[as.data.frame(genesinrange)[i-5,1]]
       if (start(ranges(grx)) <= start(ranges(agr))){
@@ -338,15 +332,15 @@ for (xy in plots) {
     } else {
       vp <- viewTracks(u, gr=agr, viewerStyle=t, newpage = T)
     }
-    addGuideLine(c(start(gr), end(gr)), vp=vp)
+    addGuideLine(c(start(gr), end(gr)), col = "grey20", vp=vp)
     grid.text(pop[m], x=0.2, y=.9, just="top", 
               gp=gpar(cex=1.5, fontface="bold"))
-    #add guidelines to mark inferred active enhancers
+    # Add guidelines to mark inferred active enhancers
     if (nrow(xy.enh.DMR)!=0){
       for (c in 1:nrow(xy.enh.DMR)){
         addGuideLine(c(xy.enh.DMR$Start[c], xy.enh.DMR$End[c]), vp=vp)
       }
-      #Read table of previously elaborated active enhancers map and prepare dataframe
+      # Read table of previously elaborated active enhancers map and prepare dataframe
       hun100kb <- read.table(paste0("data/", grep(pop[m], file_list_DMR, value = T)))
       hun100kb <- hun100kb[, c(1:3, 9, 7)]
       names(hun100kb) <- c("Chr", "Start", "End", "Strand", "EntrezID")
@@ -354,33 +348,31 @@ for (xy in plots) {
       hun100kb <- hun100kb[, c(-1)]
       names(hun100kb) <- c("Chr", "Start", "End", "Strand", "Gene")
       
-      #select only active enhancers for the gene to be represented
+      # Select only active enhancers for the gene to be represented
       xy.enh.DMR <-  hun100kb[which(hun100kb$Gene==xy),]
       xy.enh.DMR <- xy.enh.DMR[order(as.numeric(gsub("chr", "", xy.enh.DMR$Chr)), 
                                      as.numeric(xy.enh.DMR$Start),
                                      decreasing = F, na.last = T), ]
       
       for (ic in 1:nrow(xy.enh.DMR)){
-          #Do also the lolliplots for nucleotid-specific metilation status on the active enhancers
-          grpi <- GRanges(seqnames = xy.enh.DMR$Chr[ic], 
-                          ranges = paste0(xy.enh.DMR$Start[ic], "-", xy.enh.DMR$End[ic]), 
-                          strand = NULL)
-          xaxis <- c(seq(from = start(gr), 
-                         to = end(gr), 
-                         by = 500))
-          yaxis <- c(0, 100)
-          legends <- list(list(labels=c(pop[2],pop[1]), 
-                               fill= colors,
-                               col = c("gray30","gray30")))
-          lolliplot(grlo, grpi, type = "circle", 
-                    xaxis= xaxis,
-                    yaxis= yaxis,
-                    legend= legends,
-                    ylab= paste0(xy, "-", seqnames(grpi), ":", start(grpi), "-", end(grpi)))
-        }
+        # Do the lolliplots for nucleotid-specific metilation status on the active enhancers
+        grpi <- GRanges(seqnames = xy.enh.DMR$Chr[ic], 
+                        ranges = paste0(xy.enh.DMR$Start[ic], "-", xy.enh.DMR$End[ic]), 
+                        strand = NULL)
+        xaxis <- c(seq(from = start(gr), 
+                       to = end(gr), 
+                       by = 500))
+        yaxis <- c(0, 100)
+        legends <- list(list(labels=c(pop[2],pop[1]), 
+                             fill= colors,
+                             col = c("gray30","gray30")))
+        lolliplot(grlo, grpi, type = "circle", 
+                  xaxis= xaxis,
+                  yaxis= yaxis,
+                  legend= legends,
+                  ylab= paste0(xy, "-", seqnames(grpi), ":", start(grpi), "-", end(grpi)))
+      }
     }
-    
     dev.off()   
   }
-   
 }
