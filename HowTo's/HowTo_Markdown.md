@@ -95,14 +95,15 @@ To produce a literal character (an asterisk or underscore, for example) at a pos
 #### Naming tools with backticks
 The backtick (also known as the grave accent or backquote) is used to mention a tool or package. Include a backtick after and before the world that you want to highlight.<br/>
 
-`Example`
+`Example` <br/>
 \`Example\`
 
 
 #### Introduce chunks of code
-To insert chunks of code into your file with type 4 grave accents \`\`\`\` before and after the code. When you render your .Rmd file, R Markdown will run each code chunk and embed the results beneath the code chunk in your final report (unless you use special chunk options described below).<br/>
+To insert chunks of code into your file type 4 grave accents \`\`\`\` before and after the code. In a conventional .md file (to read in GitHub or export to html or PDF), the code chunks will appear within a blue background.<br/>
+
 \`\`\`\`<br/>
-Code Example<br/><br/>
+Code Example <br/>
 \`\`\`\`<br/>
 
 #### Add links
