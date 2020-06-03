@@ -217,7 +217,7 @@ ALTERNATIVELY, SHOW A FIRST IMAGE (AS A REFERENCE) WITH NO OPTIONS, SO THAT THE 
 
 ````
 ```{r eval = FALSE}
-# some code
+Some code
 ```
 ````
 
@@ -225,7 +225,7 @@ ALTERNATIVELY, SHOW A FIRST IMAGE (AS A REFERENCE) WITH NO OPTIONS, SO THAT THE 
 
 ````
 ```{r message = FALSE}
-# some code
+Some code
 ```
 ````
 
@@ -233,7 +233,7 @@ ALTERNATIVELY, SHOW A FIRST IMAGE (AS A REFERENCE) WITH NO OPTIONS, SO THAT THE 
 
 ````
 ```{r engine = 'python'}
-# some code
+Some code
 ```
 ````
 
@@ -247,9 +247,10 @@ More chunk options in: https://rstudio.com/resources/cheatsheets/
 ````
 Today is `r Sys.date()`
 ````
-Today is 2020-05-20  
+_Today is 2020-05-20_
+<br/>
 
-I DONT' UNDERSTAND THIS INLINE CODE. 
+I DONT' UNDERSTAND WELL HOW THIS INLINE CODE WORKS. I TRIED IN A MARKDOWN AND RESULTS APPEAR WEIRD. LET'S DISCUSS.
 <br/>
 
 Finally, to get your report you can click on "Knit" botton and choose your favourite format: HTML, PDF or Word.
