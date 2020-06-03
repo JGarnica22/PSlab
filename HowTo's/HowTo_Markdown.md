@@ -97,7 +97,7 @@ The backtick (also known as the grave accent or backquote) is used to mention a 
 
 `Example`
 ````
-\`Example\`
+`Example`
 ````
 
 
