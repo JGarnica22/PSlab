@@ -94,9 +94,11 @@ To produce a literal character (an asterisk or underscore for example) at a posi
 ````
 
 #### Naming tools with backticks
-The backtick (also known as the grave accent or backquote) is used to mention a tool or package. Include a backtick after and before the world that yyou want to highlight.<br/>
+The backtick (also known as the grave accent or backquote) is used to mention a tool or package. Include a backtick after and before the world that you want to highlight.<br/>
+`Example`
+
 \`\`\`\`<br/>
-Code Example<br/><br/>
+\`Example\`
 \`\`\`\`<br/>
 
 #### Introduce chunks of code
@@ -119,13 +121,6 @@ To create an inline image link, enter an exclamation point ( ! ), wrap the alt t
 
 #### Embed emojis :blush:
 You can also add emojis to your text or report copying its code (\:emojiX\:). You can find the code for different emojis in multiple web pages, for example this one: https://gist.github.com/rxaviers/7360908
-
-
-
-I THINK THIS ALSO NEEDS TO BE EXPLAINE HERE, IS ESSENTIAL (**FALTA**)
-
-- OR LABEL A TOOL (1 grave accent \`)
-
 
 
 For more information you can visit these web pages: 
