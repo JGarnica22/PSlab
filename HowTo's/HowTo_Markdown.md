@@ -113,7 +113,7 @@ To create an inline image link, enter an exclamation point ( ! ), wrap the alt t
 #### Embed emojis :blush:
 You can also add emojis to your text or report copying its code (\:emojiX\:). You can find the code for different emojis in multiple web pages, for example this one: https://gist.github.com/rxaviers/7360908
 
-
+'hola'
 
 I THINK THIS ALSO NEEDS TO BE EXPLAINE HERE, IS ESSENTIAL (**FALTA**)
 
