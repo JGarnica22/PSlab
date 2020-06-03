@@ -12,7 +12,7 @@ Input files for trackViewer can be **bigWig (.bw)** or **BED (.bed)** files.
 
 bigWig is the format you will use mainly for sequencing data (to draw histograms with sequencing reads). You can obtain bw files from bam files (alignment files) with `bamCoverage`(deeptools) in Terminal. For that, follow these instructions:  
 <br/>
-**IMPORTANT**: R running in a window system does not allow importing Bigwig files, it need thus they need to be imported from R running in Ubuntu or Mac.
+**IMPORTANT**: R running in a window system does not allow importing Bigwig files, it need thus they need to be imported from R running in Ubuntu or Mac. If you are using a window system check out [`HowTo_Install_R_RStudio_WLS.md`](https://github.com/patriciasolesanchez/PSlab/blob/master/HowTo's/HowTo_Install_R_RStudio_WLS.md) to install R in your Ubuntu subsystem.
 
 
 #### 0. Install tools:
