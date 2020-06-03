@@ -196,7 +196,7 @@ Options in the brackets after {r}:
 # some code
 ```
 ````
-![](C:\Users\Mireia\Desktop\message_example.png) 
+![](https://github.com/patriciasolesanchez/PSlab/blob/master/HowTo's/Screenshots/echo_example.png) 
 
 
 ````
