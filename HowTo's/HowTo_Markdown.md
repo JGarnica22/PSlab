@@ -95,8 +95,10 @@ To produce a literal character (an asterisk or underscore, for example) at a pos
 #### Naming tools with backticks
 The backtick (also known as the grave accent or backquote) is used to mention a tool or package. Include a backtick after and before the world that you want to highlight.<br/>
 
-`Example` <br/>
+`Example`
+````
 \`Example\`
+````
 
 
 #### Introduce chunks of code
@@ -105,6 +107,11 @@ To insert chunks of code into your file type 4 grave accents \`\`\`\` before and
 \`\`\`\`<br/>
 Code Example <br/>
 \`\`\`\`<br/>
+
+````
+Code Example
+````
+
 
 #### Add links
 To embed links into a topic you can either add the link (will be seen as the whole link text) or use the markdown syntax as below where the word "link" will be converted to a clickable link (use [ ] around the linkable word, followed without space for the link in brackets.
