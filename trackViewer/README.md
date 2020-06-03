@@ -12,6 +12,8 @@ Input files for trackViewer can be **bigWig (.bw)** or **BED (.bed)** files.
 
 bigWig is the format you will use mainly for sequencing data (to draw histograms with sequencing reads). You can obtain bw files from bam files (alignment files) with `bamCoverage`(deeptools) in Terminal. For that, follow these instructions:  
 <br/>
+**IMPORTANT**: R running in a window system does not allow importing Bigwig files, it need thus they need to be imported from R running in Ubuntu or Mac.
+
 
 #### 0. Install tools:
 You will need `samtools` and `deeptools`, both included in conda (to install them see [HowTo_SetupTerminalWLS](https://github.com/patriciasolesanchez/PSlab/blob/master/HowTo's/HowTo_SetupTerminalWLS.md) or [HowTo_SetupTerminalMac](https://github.com/patriciasolesanchez/PSlab/blob/master/HowTo's/HowTo_SetupTerminalMac.md) if you are working on Windows or Mac, respectively).  
