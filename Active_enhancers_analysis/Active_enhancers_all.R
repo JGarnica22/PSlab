@@ -3,7 +3,7 @@
 #Copyright (C) 2020  Patricia Solé Sánchez and Josep Garnica Caparrós
 #####################################################################
 # Check if required packages are installed, if not install:
-cran.packages <- c("Cairo", "stringr", "tidyr", "snakecase", "plyr", "writexl")
+cran.packages <- c("tidyr", "stringr", "Cairo", "snakecase", "plyr", "dplyr", "writexl", "ggplot2", "gridExtra")
 for (i in cran.packages) {
   if(!require(i, character.only = TRUE)) {
     install.packages(i)
@@ -13,9 +13,10 @@ for (i in cran.packages) {
     print(paste(i,"was already installed"))
   }
 }
-bioc.packages <- c("GenomicRanges", "Gviz", "trackViewer", "rtracklayer", 
+bioc.packages <- c("GenomicRanges", "trackViewer",
                    "TxDb.Mmusculus.UCSC.mm10.knownGene", "org.Mm.eg.db",
-                   "TxDb.Hsapiens.UCSC.hg38.knownGene", "org.Hs.eg.db", "ggplot")
+                   "TxDb.Hsapiens.UCSC.hg38.knownGene", "org.Hs.eg.db",
+                   "biomaRt")
 for (i in bioc.packages) {
   if (!require(i, character.only = TRUE)) {
     BiocManager::install(i)
@@ -39,7 +40,6 @@ library(plyr)
 library(dplyr)
 library(biomaRt)
 library(writexl)
-library(stringr)
 library(ggplot2)
 library(gridExtra)
 
@@ -64,7 +64,7 @@ if (species == "mouse"){
   TxDb <- TxDb.Hsapiens.UCSC.hg38.knownGene
   org.SYMBOL2EG <- org.Hs.egSYMBOL2EG
   org.SYMBOL <- org.Hs.egSYMBOL
-  ensembl <- useMart("ensembl", dataset="hsapiens_gene_ensembl")
+  ensembl <- useMart("ENSEMBL_MART_ENSEMBL", dataset="hsapiens_gene_ensembl")
 }
 BM <- getBM (attributes=c("entrezgene_id", "external_gene_name"),
              mart = ensembl, verbose = T)
@@ -81,70 +81,72 @@ DMR <- DMR[order(as.numeric(gsub("chr", "", DMR$Chr)),
 
 #Add to your data directory the DESeq2 file comparing you samples to analyse
 
-DESeq2 <- read.table (file = paste0("data/", list.files(path="/home/jgarnica/R/GenomicRanges_Active_enhancers/data", pattern= "DESeq2_")),
-                      sep = "\t", quote = "", dec = ".", header=T)
+DESeq2 <- read.table (file = paste0("data/", list.files(path= paste0(getwd(), "/data"), pattern= "DESeq2_")),
+                      sep = "\t", quote = "", dec = ".", header=T, na.strings = "NA")
 
 #Load and prepare shared OCR between two populations:
-socr <- read.table(paste0("data/", list.files(path="/home/jgarnica/R/GenomicRanges_Active_enhancers/data", pattern= "OCR")),
+socr <- read.table(paste0("data/", list.files(path= paste0(getwd(), "/data"), pattern= "OCR")),
                    sep = "\t", dec = ".",header = TRUE, quote = "", stringsAsFactors = F)
 socr <- socr[, "Region.ID", drop = F]
 socr$Chr <- sapply(strsplit(socr$Region.ID, split=':', fixed=TRUE), function(x) (x[1]))
 socr$ranges <- sapply(strsplit(socr$Region.ID, split=':', fixed=TRUE), function(x) (x[2]))
 grocr <- GRanges(seqnames = socr$Chr, 
-               ranges = socr$ranges, 
-               strand = NULL)
+                 ranges = socr$ranges, 
+                 strand = NULL)
+
 #Create an empty dataframe to be filled with data over the loop
 Overall_summary <- data.frame(matrix(ncol=3))
 names(Overall_summary) <- c("Analysis",pop[2],pop[1])
 
 for (i in c(1:length(pop))) {
   for (m in c("ChIP", "ATAC")){
-  file_list <- list.files(path="/home/jgarnica/R/GenomicRanges_Active_enhancers/data", pattern= m)
-  #Read file tables
-  tble <- read.table(paste0("data/", grep(pop[i], file_list, value = T)),sep = "\t", quote = "",
-                   dec = ".", header = T, na.strings = T)
-  if (m == "ChIP"){
-  tble[, c("Sample.name", "Absolute.summit", "Pileup", "X.log10.qvalue.",
-           "Peak.name", "Transcript.IDs")] <- NULL
-  tble[, 14:ncol(tble)] <- NULL
-  
-  names(tble) <- c("Chr", "Start", "End", "Length", "-log10.pval", "FoldEnrichment",
-                   "Anno.Gene", "Strand", "Transcript.start", "Transcript.end",
-                   "Gene.section", "Distance.to.TSS", "Distance.to.TTS")
-  tble <- tble[order(as.numeric(gsub("chr", "", tble$Chr)), 
-                     as.numeric(tble$Start),
-                     decreasing = F, na.last = T), ]
-  
-  gr <- GRanges(seqnames = tble$Chr, 
-                ranges = paste0(tble$Start,"-",tble$End), 
-                strand = NULL,
-                `-log10.pval`= tble$`-log10.pval`,
-                FoldEnrichment = tble$FoldEnrichment,
-                Anno.Gene = tble$Anno.Gene,
-                Peak.location = tble$Gene.section,
-                Distance.to.TSS = tble$Distance.to.TSS)
-  grchip <- GRanges(seqnames = tble$Chr, 
-                ranges = paste0(tble$Start,"-",tble$End), 
-                strand = NULL,
-                `-log10.pval`= tble$`-log10.pval`,
-                FoldEnrichment = tble$FoldEnrichment,
-                Anno.Gene = tble$Anno.Gene,
-                Peak.location = tble$Gene.section,
-                Distance.to.TSS = tble$Distance.to.TSS)
-  } else {
-    tble <- tble[, c(2:4,12)]
-    names(tble) <- c("Chr", "Start", "End", "Anno.Gene")
-    atac <- tble[order(as.numeric(gsub("chr", "", tble$Chr)), 
-                       as.numeric(tble$Start),
-                       decreasing = F, na.last = T), ]
+    file_list <- list.files(path= paste0(getwd(), "/data"), pattern= m)
+    #Read file tables
+    tble <- read.table(paste0("data/", grep(pop[i], file_list, value = T)),sep = "\t", quote = "",
+                       dec = ".", header = T, na.strings = T)
+    if (m == "ChIP"){
+      tble[, c("Sample.name", "Absolute.summit", "Pileup", "X.log10.qvalue.",
+               "Peak.name", "Transcript.IDs")] <- NULL
+      tble[, 14:ncol(tble)] <- NULL
+      
+      names(tble) <- c("Chr", "Start", "End", "Length", "-log10.pval", "FoldEnrichment",
+                       "Anno.Gene", "Strand", "Transcript.start", "Transcript.end",
+                       "Gene.section", "Distance.to.TSS", "Distance.to.TTS")
+      tble <- tble[order(as.numeric(gsub("chr", "", tble$Chr)), 
+                         as.numeric(tble$Start),
+                         decreasing = F, na.last = T), ]
+      
+      gr <- GRanges(seqnames = tble$Chr, 
+                        ranges = paste0(tble$Start,"-",tble$End), 
+                        strand = NULL,
+                        `-log10.pval`= tble$`-log10.pval`,
+                        FoldEnrichment = tble$FoldEnrichment,
+                        Anno.Gene = tble$Anno.Gene,
+                        Peak.location = tble$Gene.section,
+                        Distance.to.TSS = tble$Distance.to.TSS)
+      
+      grchip <- GRanges(seqnames = tble$Chr, 
+                        ranges = paste0(tble$Start,"-",tble$End), 
+                        strand = NULL,
+                        `-log10.pval`= tble$`-log10.pval`,
+                        FoldEnrichment = tble$FoldEnrichment,
+                        Anno.Gene = tble$Anno.Gene,
+                        Peak.location = tble$Gene.section,
+                        Distance.to.TSS = tble$Distance.to.TSS)
+    } else {
+      tble <- tble[, c(2:4,12)]
+      names(tble) <- c("Chr", "Start", "End", "Anno.Gene")
+      atac <- tble[order(as.numeric(gsub("chr", "", tble$Chr)), 
+                         as.numeric(tble$Start),
+                         decreasing = F, na.last = T), ]
+      
+      gr <- GRanges(seqnames = atac$Chr, 
+                    ranges = paste0(atac$Start,"-",atac$End), 
+                    strand = NULL,
+                    Anno.Gene = atac$Anno.Gene)
+    }
     
-    gr <- GRanges(seqnames = atac$Chr, 
-                   ranges = paste0(atac$Start,"-",atac$End), 
-                   strand = NULL,
-                   Anno.Gene = atac$Anno.Gene)
-  }
-
-  assign(paste0(m,".", pop[i], ".gr"), gr)
+    assign(paste0(m,".", pop[i], ".gr"), gr)
   }
   
   
@@ -170,77 +172,77 @@ for (i in c(1:length(pop))) {
   
   #Export files in desired formats
   for (o in c(".txt", ".bed")){
-  write.table(act.enh, file = paste0("output/", pop[i] ,"_Active_enhancers", o),
-              sep = "\t", quote = F, dec = ".", row.names = F, col.names = T)
-  
-  #Methylation in active enhancers
-  gr4 <- GRanges(seqnames = act.enh$Chr, 
-                 ranges = paste0(act.enh$Start,"-",act.enh$End), 
-                 strand = NULL)
-  gr5 <- GRanges(seqnames = DMR$Chr, 
-                 ranges = paste0(DMR$Start,"-",DMR$End), 
-                 strand = NULL,
-                 Met.smp = DMR[,pop[2]],
-                 Met.ctl = DMR[,pop[1]])
-  overlap <- findOverlaps(gr5, gr4)
-  act.enh.DMR <- act.enh[unique(subjectHits(overlap)),]
-  write.table(act.enh.DMR, file = paste0("output/", pop[i] ,"_Active_enhancers_not_promoter_with_DMR", o),
-              sep = "\t", quote = F, dec = ".", row.names = F, col.names = F)
-  Overall_summary[3,1] <- "Active_enhancers_with_DMR"
-  Overall_summary[3,4-i] <- nrow(act.enh.DMR)
-  
-  #do the overlap in the other direction
-  overlap2 <- findOverlaps(gr4, gr5)
-  DMR.act.enh <- DMR[unique(subjectHits(overlap2)),]
-  write.table(DMR.act.enh, paste0("output/", pop[i] ,"_DMR_Overlapping_Active_enhancers", o),
-              sep = "\t", dec = ".", quote = F, row.names = F, col.names = T)
-  Overall_summary[8,1] <- "DMR_Overlapping_Active_enhancers"
-  Overall_summary[8,4-i] <- nrow(DMR.act.enh)
-  Overall_summary[9,1] <- "of_which_hypomethylated"
-  if (i == 1){
-  Overall_summary[9,4-i] <- nrow(DMR.act.enh[which(DMR.act.enh[,pop[2]]>DMR.act.enh[,pop[1]]),])
-  } else {
-    Overall_summary[9,4-i] <- nrow(DMR.act.enh[which(DMR.act.enh[,pop[2]]<DMR.act.enh[,pop[1]]),])
-  }
-  
-  #Methylation in H3k27ac
-  #Find overlapping peaks (population-specific H3K27ac mark + open region)
-  overlap3 <- findOverlaps(grchip, grocr)
-  openH3K27ac <- socr[unique(subjectHits(overlap3)),]
-  grH3 <- GRanges(seqnames = openH3K27ac$Chr, 
-                 ranges = openH3K27ac$ranges, 
-                 strand = NULL)
-  openH3K27ac <- separate(openH3K27ac, col = "ranges", into = c("Start", "End"), sep = "-", remove = T)
-  openH3K27ac <- openH3K27ac[, c("Chr", "Start", "End")]
-  write.table(openH3K27ac, file = paste0("output/", pop[i] ,"_shared_ATAC_H3K27ac", o),
-              sep = "\t", dec = ".", quote = F, row.names = F, col.names = T)
-  Overall_summary[10,1] <- "Shared_ATAC_H3K27ac"
-  Overall_summary[10,4-i] <- nrow(openH3K27ac)
-  
-  #Obtain active enhancers by filtering overlapping peaks in promoters:
-  inpromoters <- findOverlaps(prom, grH3)
-  openH3K27acp <- openH3K27ac[-c(unique(subjectHits(inpromoters))), 1:3]
-  write.table(openH3K27acp, file = paste0("output/", pop[i] ,"_shared_ATAC_H3K27ac_not_promoter", o),
-              sep = "\t", quote = F, dec = ".", row.names = F, col.names = T)
-  Overall_summary[11,1] <- "Shared_ATAC_H3K27ac_not_promoter"
-  Overall_summary[11,4-i] <- nrow(openH3K27acp)
-  
-  overlap5 <- findOverlaps(gr5, grH3)
-  H3K27open.DMR <- openH3K27ac[unique(subjectHits(overlap5)),]
-  H3K27open.DMR <- H3K27open.DMR[which(H3K27open.DMR$Chr!="NA"),]
-  write.table(H3K27open.DMR, file = paste0("output/", pop[i] ,"_shared_ATAC_H3K27ac_not_promoter_with_DMR", o),
-              sep = "\t", dec = ".", quote = F, row.names = F, col.names = F)
-  Overall_summary[12,1] <- "Shared_ATAC_H3K27ac_not_promoter_with_DMR"
-  Overall_summary[12,4-i] <- nrow(H3K27open.DMR)
-  
-  #!!! for bed file do not include col.names????
-  
-  overlap6 <- findOverlaps(grH3, gr5)
-  DMR.H3K27open <- DMR[unique(subjectHits(overlap6)),]
-  write.table(DMR.H3K27open, file = paste0("output/", pop[i] ,"_DMR_Overlapping_shared_ATAC_H3K27ac_not_promoter", o),
-              sep = "\t", dec = ".", quote = F, row.names = F, col.names = T)
-  Overall_summary[17,1] <- "DMR_Overlapping_shared_ATAC_H3K27ac_not_promoter"
-  Overall_summary[17,4-i] <- nrow(DMR.H3K27open)
+    write.table(act.enh, file = paste0("output/", pop[i] ,"_Active_enhancers", o),
+                sep = "\t", quote = F, dec = ".", row.names = F, col.names = T)
+    
+    #Methylation in active enhancers
+    gr4 <- GRanges(seqnames = act.enh$Chr, 
+                   ranges = paste0(act.enh$Start,"-",act.enh$End), 
+                   strand = NULL)
+    gr5 <- GRanges(seqnames = DMR$Chr, 
+                   ranges = paste0(DMR$Start,"-",DMR$End), 
+                   strand = NULL,
+                   Met.smp = DMR[,pop[2]],
+                   Met.ctl = DMR[,pop[1]])
+    overlap <- findOverlaps(gr5, gr4)
+    act.enh.DMR <- act.enh[unique(subjectHits(overlap)),]
+    write.table(act.enh.DMR, file = paste0("output/", pop[i] ,"_Active_enhancers_not_promoter_with_DMR", o),
+                sep = "\t", quote = F, dec = ".", row.names = F, col.names = F)
+    Overall_summary[3,1] <- "Active_enhancers_with_DMR"
+    Overall_summary[3,4-i] <- nrow(act.enh.DMR)
+    
+    #do the overlap in the other direction
+    overlap2 <- findOverlaps(gr4, gr5)
+    DMR.act.enh <- DMR[unique(subjectHits(overlap2)),]
+    write.table(DMR.act.enh, paste0("output/", pop[i] ,"_DMR_Overlapping_Active_enhancers", o),
+                sep = "\t", dec = ".", quote = F, row.names = F, col.names = T)
+    Overall_summary[8,1] <- "DMR_Overlapping_Active_enhancers"
+    Overall_summary[8,4-i] <- nrow(DMR.act.enh)
+    Overall_summary[9,1] <- "of_which_hypomethylated"
+    if (i == 1){
+      Overall_summary[9,4-i] <- nrow(DMR.act.enh[which(DMR.act.enh[,pop[2]]>DMR.act.enh[,pop[1]]),])
+    } else {
+      Overall_summary[9,4-i] <- nrow(DMR.act.enh[which(DMR.act.enh[,pop[2]]<DMR.act.enh[,pop[1]]),])
+    }
+    
+    #Methylation in H3k27ac
+    #Find overlapping peaks (population-specific H3K27ac mark + open region)
+    overlap3 <- findOverlaps(grchip, grocr)
+    openH3K27ac <- socr[unique(subjectHits(overlap3)),]
+    grH3 <- GRanges(seqnames = openH3K27ac$Chr, 
+                    ranges = openH3K27ac$ranges, 
+                    strand = NULL)
+    openH3K27ac <- separate(openH3K27ac, col = "ranges", into = c("Start", "End"), sep = "-", remove = T)
+    openH3K27ac <- openH3K27ac[, c("Chr", "Start", "End")]
+    write.table(openH3K27ac, file = paste0("output/", pop[i] ,"_shared_ATAC_H3K27ac", o),
+                sep = "\t", dec = ".", quote = F, row.names = F, col.names = T)
+    Overall_summary[10,1] <- "Shared_ATAC_H3K27ac"
+    Overall_summary[10,4-i] <- nrow(openH3K27ac)
+    
+    #Obtain active enhancers by filtering overlapping peaks in promoters:
+    inpromoters <- findOverlaps(prom, grH3)
+    openH3K27acp <- openH3K27ac[-c(unique(subjectHits(inpromoters))), 1:3]
+    write.table(openH3K27acp, file = paste0("output/", pop[i] ,"_shared_ATAC_H3K27ac_not_promoter", o),
+                sep = "\t", quote = F, dec = ".", row.names = F, col.names = T)
+    Overall_summary[11,1] <- "Shared_ATAC_H3K27ac_not_promoter"
+    Overall_summary[11,4-i] <- nrow(openH3K27acp)
+    
+    overlap5 <- findOverlaps(gr5, grH3)
+    H3K27open.DMR <- openH3K27ac[unique(subjectHits(overlap5)),]
+    H3K27open.DMR <- H3K27open.DMR[which(H3K27open.DMR$Chr!="NA"),]
+    write.table(H3K27open.DMR, file = paste0("output/", pop[i] ,"_shared_ATAC_H3K27ac_not_promoter_with_DMR", o),
+                sep = "\t", dec = ".", quote = F, row.names = F, col.names = F)
+    Overall_summary[12,1] <- "Shared_ATAC_H3K27ac_not_promoter_with_DMR"
+    Overall_summary[12,4-i] <- nrow(H3K27open.DMR)
+    
+    #!!! for bed file do not include col.names????
+    
+    overlap6 <- findOverlaps(grH3, gr5)
+    DMR.H3K27open <- DMR[unique(subjectHits(overlap6)),]
+    write.table(DMR.H3K27open, file = paste0("output/", pop[i] ,"_DMR_Overlapping_shared_ATAC_H3K27ac_not_promoter", o),
+                sep = "\t", dec = ".", quote = F, row.names = F, col.names = T)
+    Overall_summary[17,1] <- "DMR_Overlapping_shared_ATAC_H3K27ac_not_promoter"
+    Overall_summary[17,4-i] <- nrow(DMR.H3K27open)
   }
   
 }
@@ -263,18 +265,18 @@ write.table(genes, "output/genes.bed",
 #Use -w to set the window. Indicates number of bp added to each side of the region in A:
 #REMEMBER that bed file must not have col.names
 #Terminal loop:
-  # cd GenomicRanges_Active_enhancers
-  # for f in $(find . -name "*not_promoter_with_DMR.bed" -exec basename {} \;)
-  # do
-  # bedtools window -a output/$f -b output/genes.bed -w 50000 > output/$(cut -d'.' -f1 <<< $f)_100kb.txt 
-  # done
+# cd GenomicRanges_Active_enhancers
+# for f in $(find . -name "*not_promoter_with_DMR.bed" -exec basename {} \;)
+# do
+# bedtools window -a output/$f -b output/genes.bed -w 50000 > output/$(cut -d'.' -f1 <<< $f)_100kb.txt 
+# done
 
 #List the files genereated from bedtools window which should contain *_100kb*
-files100 <- list.files(path="/home/jgarnica/R/GenomicRanges_Active_enhancers/output", pattern= "*_100kb*")
+files100 <- list.files(path= paste0(getwd(), "/output"), pattern= "*_100kb*")
 #Read all of them
 for (u in files100) {
-az <- read.table(paste0("output/", u))
-assign(paste(strsplit(u, ".", fixed=T)[1][[1]][1]), az)
+  az <- read.table(paste0("output/", u))
+  assign(paste(strsplit(u, ".", fixed=T)[1][[1]][1]), az)
 }
 
 #Complete Overall_summary table
@@ -293,18 +295,18 @@ for (i in 1:length(grep("not_promoter_with_DMR", names(.GlobalEnv),value=TRUE)))
   Tables <- merge(Tables, BM, by.x = "EntrezID", by.y = "entrezgene_id")
   Tables <- Tables[, c(-1)]
   names(Tables) <- c("Chr", "Start", "End", "Strand", "Gene")
-    write.table(Tables, paste0("output/", strsplit(files100[i], ".", fixed=T)[1][[1]][1], "_annotation_more_rows.txt"),
+  write.table(Tables, paste0("output/", strsplit(files100[i], ".", fixed=T)[1][[1]][1], "_annotation_more_rows.txt"),
               sep = "\t", dec = ".", quote = F, row.names = F, col.names = T)
-    
+  
   Tables2 <- ddply(Tables, .(Start), summarize,
-                       Chr = paste(unique(Chr),collapse=","),
-                       Start =  paste(unique(Start),collapse=","),
-                       End = paste(unique(End),collapse=","),
-                       Strand = paste(unique(Strand),collapse=","),
-                       Gene= paste(unique(Gene),collapse=","))
+                   Chr = paste(unique(Chr),collapse=","),
+                   Start =  paste(unique(Start),collapse=","),
+                   End = paste(unique(End),collapse=","),
+                   Strand = paste(unique(Strand),collapse=","),
+                   Gene= paste(unique(Gene),collapse=","))
   Tables2 <- Tables2[order(as.numeric(gsub("chr", "", Tables2$Chr)), 
-                                   as.numeric(Tables2$Start),
-                                   decreasing = F, na.last = T), ]
+                           as.numeric(Tables2$Start),
+                           decreasing = F, na.last = T), ]
   write.table(Tables2, paste0("output/", strsplit(files100[i], ".", fixed=T)[1][[1]][1], "_annotation.txt"),
               sep = "\t", dec = ".", quote = F, row.names = F, col.names = T)
   #generate also excel file
@@ -320,10 +322,10 @@ for (i in 1:length(grep("not_promoter_with_DMR", names(.GlobalEnv),value=TRUE)))
       n <- 4
     }
   if (str_detect(grep("not_promoter_with_DMR", names(.GlobalEnv),value=TRUE)[i], pop[1])){
-  Overall_summary[n,3] <- nrow(subset(trans_DMR, trans_DMR$log2FoldChange>0 & trans_DMR$padj<=0.01))
-  Overall_summary[n+1,3] <- nrow(subset(trans_DMR, trans_DMR$log2FoldChange>=2 & trans_DMR$padj<=0.01))
-  Overall_summary[n+2,3] <- nrow(subset(trans_DMR, trans_DMR$log2FoldChange<0 & trans_DMR$padj<=0.01))
-  Overall_summary[n+3,3] <- nrow(subset(trans_DMR, trans_DMR$log2FoldChange<=-2 & trans_DMR$padj<=0.01))
+    Overall_summary[n,3] <- nrow(subset(trans_DMR, trans_DMR$log2FoldChange>0 & trans_DMR$padj<=0.01))
+    Overall_summary[n+1,3] <- nrow(subset(trans_DMR, trans_DMR$log2FoldChange>=2 & trans_DMR$padj<=0.01))
+    Overall_summary[n+2,3] <- nrow(subset(trans_DMR, trans_DMR$log2FoldChange<0 & trans_DMR$padj<=0.01))
+    Overall_summary[n+3,3] <- nrow(subset(trans_DMR, trans_DMR$log2FoldChange<=-2 & trans_DMR$padj<=0.01))
   } else {
     Overall_summary[n,2] <- nrow(subset(trans_DMR, trans_DMR$log2FoldChange>0 & trans_DMR$padj<=0.01))
     Overall_summary[n+1,2] <- nrow(subset(trans_DMR, trans_DMR$log2FoldChange>=2 & trans_DMR$padj<=0.01))
