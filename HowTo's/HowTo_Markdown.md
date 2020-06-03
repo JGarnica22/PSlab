@@ -183,12 +183,12 @@ When you click the **Knit** button a document will be generated that includes bo
 
 ````  
 
-**4. R code chunks. Similarly to what was explained above for conventional markdown, you can add chunks of code in R Markdown by using 3 backticks before the code \`\`\` followed by {r _and any info you want to add to contextualize this chunk_}. Close the chunk by using again 3 backticks after code \`\`\`. When you render your .Rmd file, R Markdown will run each code chunk and embed the results beneath the code chunk in your final report (unless you use special chunk options described below). Note that you can run that code directly from that window and you can see the progress in the "Console" window of R Studio.**  
+**4. R code chunks. When you render your .Rmd file, R Markdown will run each code chunk and embed the results beneath the code chunk in your final report (unless you use special chunk options described below). Note that you can run that code directly from that window and you can see the progress in the "Console" window of R Studio.**  
 <br/>
 
 There are two ways to include code to the document:
 
-**1. Embeded code:** Insert a chunck of code as the example below. When you compile, R markdown will run the code and include its results. R markdown will also remove the ```{r} and ```. You can hide the code by clicking the triangle botton found at the end of each line.
+**1. Embeded code:** Similarly to what was explained above for conventional markdown, you can add chunks of code in R Markdown by using 3 backticks before the code \`\`\` followed by {r _info to contextualize this chunk_ and _code chunk options_}. Close the chunk by using again 3 backticks after code \`\`\`. When you compile, R markdown will run the code and by default include the code and its results in the output. R markdown will remove the ```{r} and ```.
 ````
 ```{r}
 # some code
