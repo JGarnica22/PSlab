@@ -135,7 +135,6 @@ For more information on Markdown you can visit these web pages:<br/>
 - https://rstudio.com/resources/cheatsheets/  
 - https://rstudio.com/resources/webinars/getting-started-with-r-markdown/  
 <br/>
-<br/>
 
 ## How to use R Markdown
 R Markdown provides an authoring framework for data science. You can use a single R Markdown file to both:
