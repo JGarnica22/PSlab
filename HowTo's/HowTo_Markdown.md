@@ -130,11 +130,11 @@ You can also add emojis to your text or report copying its code (\:emojiX\:). Yo
 
 <br/>
 For more information on Markdown you can visit these web pages: 
-- https://www.markdownguide.org/basic-syntax/
-- https://rstudio.com/resources/cheatsheets/
-- https://rstudio.com/resources/webinars/getting-started-with-r-markdown/
+- https://www.markdownguide.org/basic-syntax/  
+- https://rstudio.com/resources/cheatsheets/  
+- https://rstudio.com/resources/webinars/getting-started-with-r-markdown/  
 <br/>
-
+<br/>
 
 ## How to use R Markdown
 R Markdown provides an authoring framework for data science. You can use a single R Markdown file to both:
@@ -151,28 +151,28 @@ Tools > Install Packages <br/>
 Choose "Repository CRAN" and write "Markdown" in "Packages (separate multiple with space or comma:)"
 
 To open a new file, click File > New File > R Markdown in the RStudio menu bar. 
-A window will pop up where you can name the project an the author ("Title" and "Author") and select the specific type of output that you wish to build (HTML, PDF or Word). Remember that you can switch to the other output formats anytime.
+A window will pop up where you can name the project an the author ("Title" and "Author") and select the specific type of output that you wish to build (HTML, PDF or Word). Remember that you can switch to the other output formats anytime.  
 
-A template will be opened to generate your Markdown report. Here you have a summary of the template in order of appearance:
 
-**1. Important information of your document such as the title, author, date (will apear in the final document) and output format (you can change it at any moment):**
+A template will be opened to generate your Markdown report. The Markdown template contains:
+
+**1. A description of your document such as the title, author, date (will apear in the final document) and output format (you can change it at any moment):**
 
 ````
 title: "Test"
 author: "Mireia"
 date: "11/05/2020"
 output: pdf_document
-````
+````  
 
-**2. An R code in a grey square that you should leave by default:**
+**2. A first R code chunk that you should leave by default:**
 
 ````
 {r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-````
+````  
 
-**3. Text about Markdown. Note that this is for you to edit with info about your specific project. After the two hash symbols you can write the title of the project that you want to show. In the paragraph write the description of the project, what you are going to show or the results of your analysis (or everything).
-You can use this paragraph with different information in multiple ocasions during the report.**
+**3. Text about R Markdown. You can add text along your file to describe your project or explain each code chunk or results. Use Markdown syntax as explained above.**
 
 ````
 ## R Markdown
@@ -181,9 +181,10 @@ This is an R Markdown document. Markdown is a simple formatting syntax for autho
 
 When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
 
-````
-**4. R code that you want to show. Similarly to what was explained above for conventional markdown, you can add chunks of code in R Markdown by using 3 backticks before the code \`\`\` followed by {r _and any info you want to add to contextualize this chunk_}. Close the chunk by using again 3 backticks after code \`\`\`.  
-When you render your .Rmd file, R Markdown will run each code chunk and embed the results beneath the code chunk in your final report (unless you use special chunk options described below). Note that you can run that code directly from that window and you can see the progress in the "Console" window of R Studio.**
+````  
+
+**4. R code chunks. Similarly to what was explained above for conventional markdown, you can add chunks of code in R Markdown by using 3 backticks before the code \`\`\` followed by {r _and any info you want to add to contextualize this chunk_}. Close the chunk by using again 3 backticks after code \`\`\`. When you render your .Rmd file, R Markdown will run each code chunk and embed the results beneath the code chunk in your final report (unless you use special chunk options described below). Note that you can run that code directly from that window and you can see the progress in the "Console" window of R Studio.**  
+<br/>
 
 There are two ways to include code to the document:
 
@@ -196,7 +197,7 @@ There are two ways to include code to the document:
 
 Options in the brackets after {r}:
 
-* echo = FALSE --> hides the code (useful if you want to show only a plot).
+* echo = FALSE --> hides the code (useful if you want to show only the results/plot).
 * eval = FALSE --> prevent the code from being run. As a result, no results will be displayed with the code.
 * message = FALSE --> supresses messages from appearing in the output, for example warnings.
 * engine = 'python' --> to embed non R code, set the engine option to the language you want to embed. 
@@ -210,6 +211,8 @@ Options in the brackets after {r}:
 ![](https://github.com/patriciasolesanchez/PSlab/blob/master/HowTo's/Screenshots/echo_example.png) 
 
 I WOULD SHOW ONE IMAGE WITH echo=FALSE AND ONE WITH echo=TRUE SO THAT THE DIFFERENCE IS CLEAR. SAME FOR THE OTHER OPTIONS!!
+
+ALTERNATIVELY, SHOW A FIRST IMAGE (AS A REFERENCE) WITH NO OPTIONS, SO THAT THE OPTIONS BELOW ARE COMPARED TO THIS ONE. BUT THEN ALL EXAMPLES OF CODE WOULD NEED TO BE THE SAME... I THINK THE FIRST OPTION MIGHT BE EASIER :)
 
 
 ````
@@ -237,17 +240,16 @@ I WOULD SHOW ONE IMAGE WITH echo=FALSE AND ONE WITH echo=TRUE SO THAT THE DIFFER
 ![](https://github.com/patriciasolesanchez/PSlab/blob/master/HowTo's/Screenshots/engine_example.png) 
 
 
-More chunk options in: https://rstudio.com/resources/cheatsheets/
+More chunk options in: https://rstudio.com/resources/cheatsheets/  
+<br/>
 
 **2. Inline code:** Place code in a sentence with `r #code`. R markdown will replace the code with its results.
 ````
 Today is `r Sys.date()` --> Today is 2020-05-20
 ````
 
-**5. A place to embed your plots with echo = FALSE to avoid showing the code:**
-```{r name of the plot, echo=FALSE}
-plot(name of the plot)
-```
+I DONT' UNDERSTAND THIS INLINE CODE
+
 
 Finally, to get your repot you can click on "Knit" botton and choose your favourite format: HTML, PDF or Word.
 
