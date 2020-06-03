@@ -172,7 +172,7 @@ output: pdf_document
 knitr::opts_chunk$set(echo = TRUE)
 ````  
 
-**3. Text about R Markdown. You can add text along your file to describe your project or explain each code chunk or results. Use Markdown syntax as explained above.**
+**3. Text. You can add text along your file to describe your project or explain each code chunk or results. Use Markdown syntax as explained above.**
 
 ````
 ## R Markdown
