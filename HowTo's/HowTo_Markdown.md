@@ -243,15 +243,16 @@ ALTERNATIVELY, SHOW A FIRST IMAGE (AS A REFERENCE) WITH NO OPTIONS, SO THAT THE 
 More chunk options in: https://rstudio.com/resources/cheatsheets/  
 <br/>
 
-**2. Inline code:** Place code in a sentence with `r #code`. R markdown will replace the code with its results.
+**2. Inline code:** Place code in a sentence with \`r _followed by your code_\`. R markdown will replace the code with its results.
 ````
-Today is `r Sys.date()` --> Today is 2020-05-20
+Today is `r Sys.date()`
 ````
+Today is 2020-05-20  
 
-I DONT' UNDERSTAND THIS INLINE CODE
+I DONT' UNDERSTAND THIS INLINE CODE. 
+<br/>
 
-
-Finally, to get your repot you can click on "Knit" botton and choose your favourite format: HTML, PDF or Word.
+Finally, to get your report you can click on "Knit" botton and choose your favourite format: HTML, PDF or Word.
 
 I strongly recommend you this webinar to start using R Markdown:
 https://rstudio.com/resources/webinars/getting-started-with-r-markdown/
