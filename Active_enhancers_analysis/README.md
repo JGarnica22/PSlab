@@ -9,7 +9,7 @@ You will need the following input data files:
 - ATACseq annotated peaks for each of your samples
 - ATACseq shared OCR between samples
 - DMR data file (Differentially Methylated egions) comparing your samples
-- DESeq2 comparing your populations, as a data frame detailed in [DE_analysis_RNAseq](https://github.com/patriciasolesanchez/PSlab/blob/master/DE_analysis_RNAseq/DE_analysis_RNAseq_1vs1.R).
+- DESeq2 comparing your populations, as a data frame detailed in [`DE_analysis_RNAseq`](https://github.com/patriciasolesanchez/PSlab/blob/master/DE_analysis_RNAseq/DE_analysis_RNAseq_1vs1.R).
 
 [`Active_enhancers_all.R`](https://github.com/patriciasolesanchez/PSlab/blob/master/Active_enhancers_analysis/Active_enhancers_all.R) is a comprehensive script overlapping ChIP, ATAC, DMR and DESeq2 data to compare active enhancers between samples, giving as outputs files for each analysis and a final **summary table** and **bar chart** for all of them.
 
