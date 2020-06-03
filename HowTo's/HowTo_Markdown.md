@@ -84,7 +84,7 @@ To create an ordered list, add line items with numbers followed by periods. The 
 2. Example 2
 ````
 
-#### Special characters without effect
+### Special characters without effect
 To produce a literal character (an asterisk or underscore, for example) at a position where it would otherwise be used as a formatting character, you can backslash escape it.  
 
 \*this text is surrounded by literal asterisks\*
@@ -92,7 +92,8 @@ To produce a literal character (an asterisk or underscore, for example) at a pos
 \*this text is surrounded by literal asterisks\*
 ````
 
-#### Naming tools with backticks
+
+### Naming tools with backticks
 The backtick (also known as the grave accent or backquote) is used to mention a tool or package. Include a backtick after and before the world that you want to highlight.<br/>
 
 `Example`
@@ -101,7 +102,7 @@ The backtick (also known as the grave accent or backquote) is used to mention a 
 ````
 
 
-#### Introduce chunks of code
+### Introduce chunks of code
 To insert chunks of code into your file type 4 grave accents \`\`\`\` before and after the code. In a conventional .md file (to read in GitHub or export to html or PDF), the code chunks will appear within a blue background.<br/>
 
 \`\`\`\`<br/>
@@ -113,19 +114,19 @@ Code Example
 ````
 
 
-#### Add links
+### Add links
 To embed links into a topic you can either add the link (will be seen as the whole link text) or use the markdown syntax as below where the word "link" will be converted to a clickable link (use [ ] around the linkable word, followed without space for the link in brackets.
 ````
 Go to this [link](https://write_here_your_link.com)
 ````
 
-#### Embed images
+### Embed images
 To create an inline image link, enter an exclamation point ( ! ), wrap the alt text in brackets ( [ ] ), and then wrap the link in parenthesis ( ( ) ). (\*_Alt text_ is a phrase or sentence that describes the image.)
 ````
 ![Alt Text](url)
 ````
 
-#### Embed emojis :blush:
+### Embed emojis :blush:
 You can also add emojis to your text or report copying its code (\:emojiX\:). You can find the code for different emojis in multiple web pages, for example this one: https://gist.github.com/rxaviers/7360908
 
 <br/>
