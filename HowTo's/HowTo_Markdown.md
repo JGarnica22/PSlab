@@ -196,24 +196,35 @@ Options in the brackets after {r}:
 # some code
 ```
 ````
-![](https://github.com/patriciasolesanchez/PSlab/blob/master/HowTo's/Screenshots/echo_example.png) 
 
+![](https://github.com/patriciasolesanchez/PSlab/blob/master/HowTo's/Screenshots/echo_example.png) 
+![](https://github.com/patriciasolesanchez/PSlab/blob/master/HowTo's/Screenshots/echo_plot.png) 
 
 ````
 ```{r eval = FALSE}
 # some code
 ```
 ````
+
+![](https://github.com/patriciasolesanchez/PSlab/blob/master/HowTo's/Screenshots/eval_example.png) 
+
 ````
 ```{r message = FALSE}
 # some code
 ```
 ````
+
+![](https://github.com/patriciasolesanchez/PSlab/blob/master/HowTo's/Screenshots/message_example.png) 
+
 ````
 ```{r engine = 'python'}
 # some code
 ```
 ````
+
+![](https://github.com/patriciasolesanchez/PSlab/blob/master/HowTo's/Screenshots/engine_example.png) 
+
+
 More chunk options in: https://rstudio.com/resources/cheatsheets/
 
 **2. Inline code:** Place code in a sentence with `r #code`. R markdown will replace the code with its results.
