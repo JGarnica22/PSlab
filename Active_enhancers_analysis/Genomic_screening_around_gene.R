@@ -98,11 +98,11 @@ for (g in names(Act.enh.gene)) {
                 gene=paste(unique(gene),collapse=","),
                 location=paste(unique(location),collapse=","))
     enhancers <- df[,"location"]
-    Act.enhancers[[g]] <- enhancers
+    Act.enh.gene[[g]] <- enhancers
   }
   
-  if (file.exists("Act.enhancers")){
-    trial <-as.data.frame(unlist(Act.enhancers))
+  if (file.exists("Act.enh.gene")){
+    trial <-as.data.frame(unlist(Act.enh.gene))
     write.table(trial, paste0("output/", "your_element" ,"_around_genes.txt"),
                 sep = "\t", row.names = T, col.names = F, quote = F)
     #rm(Act.enhancers)
