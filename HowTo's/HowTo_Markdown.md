@@ -156,7 +156,8 @@ A window will pop up where you can name the project an the author ("Title" and "
 
 A template will be opened to generate your Markdown report. The Markdown template contains:
 
-**1. A description of your document such as the title, author, date (will apear in the final document) and output format (you can change it at any moment):**
+**1. A description of your document:**
+It includes info on the title, author, date and output format. This description will apear in the final document; you can change it at any moment.
 
 ````
 title: "Test"
@@ -172,7 +173,8 @@ output: pdf_document
 knitr::opts_chunk$set(echo = TRUE)
 ````  
 
-**3. Text. You can add text along your file to describe your project or explain each code chunk or results. Use Markdown syntax as explained above.**
+**3. Text.** 
+You can add text along your file to describe your project or explain each code chunk or results. Use Markdown syntax as explained above.
 
 ````
 ## R Markdown
@@ -183,12 +185,14 @@ When you click the **Knit** button a document will be generated that includes bo
 
 ````  
 
-**4. R code chunks. When you render your .Rmd file, R Markdown will run each code chunk and embed the results beneath the code chunk in your final report (unless you use special chunk options described below). Note that you can run that code directly from that window and you can see the progress in the "Console" window of R Studio.**  
-<br/>
+**4. R code chunks.** 
+When you render your .Rmd file, R Markdown will run each code chunk and embed the results beneath the code chunk in your final report (unless you use special chunk options described below). Note that you can run that code directly from that window and you can see the progress in the "Console" window of R Studio.  
 
 There are two ways to include code to the document:
 
-**1. Embeded code:** Similarly to what was explained above for conventional markdown, you can add chunks of code in R Markdown by using 3 backticks before the code \`\`\` followed by {r _info to contextualize this chunk_ and _code chunk options_}. Close the chunk by using again 3 backticks after code \`\`\`. When you compile, R markdown will run the code and by default include the code and its results in the output. R markdown will remove the first \`\`\`{r} and last \`\`\` lines.
+**A) Embeded code:** 
+Similarly to what was explained above for conventional markdown, you can add chunks of code in R Markdown by using 3 backticks before the code \`\`\` followed by {r _info to contextualize this chunk_ and _code chunk options_}. Close the chunk by using again 3 backticks after code \`\`\`. When you compile, R markdown will run the code and by default include the code and its results in the output. R markdown will remove the first \`\`\`{r} and last \`\`\` lines.  
+
 ````
 ```{r}
 Some code
@@ -200,7 +204,9 @@ Options in the brackets after {r}:
 * echo = FALSE --> hides the code (useful if you want to show only the results/plot).
 * eval = FALSE --> prevents the code from being run. As a result, no results will be displayed with the code.
 * message = FALSE --> supresses messages from appearing in the output, for example warnings.
-* engine = 'python' --> to embed non R code, set the engine option to the language you want to embed. 
+* engine = 'python' --> to embed non R code, set the engine option to the language you want to embed.  
+
+See examples below:
 
 ````
 ```{r echo = FALSE}
@@ -243,14 +249,15 @@ Some code
 More chunk options in: https://rstudio.com/resources/cheatsheets/  
 <br/>
 
-**2. Inline code:** Place code in a sentence with \`r _followed by your code_\`. R markdown will replace the code with its results.
+**B) Inline code:** 
+Place code in a sentence with \`r _followed by your code_\`. R markdown will replace the code with its results.
 ````
 Today is `r Sys.date()`
 ````
 _Today is 2020-05-20_
 <br/>
 
-I DONT' UNDERSTAND WELL HOW THIS INLINE CODE WORKS. I TRIED IN A MARKDOWN AND RESULTS APPEAR WEIRD. LET'S DISCUSS.
+I DONT' UNDERSTAND WELL HOW THIS INLINE CODE WORKS. I TRIED IN A MARKDOWN AND RESULTS APPEAR WEIRD. LET'S DISCUSS.  
 <br/>
 
 Finally, to get your report you can click on "Knit" botton and choose your favourite format: HTML, PDF or Word.
