@@ -309,7 +309,7 @@ for (i in 1:length(grep("not_promoter_with_DMR", names(.GlobalEnv),value=TRUE)))
   write.table(Tables2, paste0("output/", strsplit(files100[i], ".", fixed=T)[1][[1]][1], "_annotation.txt"),
               sep = "\t", dec = ".", quote = F, row.names = F, col.names = T)
   #generate also excel file
-  write_xlsx(Tables, paste0("output/", strsplit(files100[i], ".", fixed=T)[1][[1]][1], "_annotation.xlsx"))
+  write_xlsx(Tables2, paste0("output/", strsplit(files100[i], ".", fixed=T)[1][[1]][1], "_annotation.xlsx"))
   
   #Analysis of genes associated to active enhancers and their transcriptomic activity
   #careful! if names changes order may change
