@@ -1,5 +1,5 @@
 # TrackViewer :eyeglasses:
-This is a package with web interface for drawing elegant interactive tracks or lollipop plots to facilitate integrated analysis of multi-omics data. You can visualize mapped reads along with annotation as track layers for different NGS datasets such as ChIP-seq, RNA-seq, miRNA-seq, DNA-seq, SNPs and methylation data.  
+This is a package used for drawing elegant interactive tracks or lollipop plots to facilitate **integrated analysis of multi-omics data**. You can visualize mapped reads along with annotation as track layers for different NGS datasets such as ChIP-seq, RNA-seq, miRNA-seq, DNA-seq, SNPs and methylation data.  
 <br/>
 
 _BEFORE YOU USE THE TOOL..._
@@ -104,7 +104,7 @@ mv your_file.txt your_file.bed
 ## Visualize data with trackViewer: :lollipop:
 Once you have your input files prepared, you can use `trackViewer` to make your plots. Here we explain how to make two types of plots: Chromosome views and Lolliplots.
 
-* **Chromosome views** allows you to represent graphically in the same plot the different genomic and transcriptomic data from the same samples. In this case, _Chromosome_views.R_ is designed to represent data from **RNA-seq, ChIP, ATAC-seq, methylation** and inferred **active enhancers** (see [Active_enhancers_analysis folder](https://github.com/patriciasolesanchez/PSlab/tree/master/Active_enhancers_analysis)) for your genes of interest.  
+* **Chromosome views** allow you to represent graphically in the same plot the different genomic and transcriptomic data from the same samples. In this case, _Chromosome_views.R_ is designed to represent data from **RNA-seq, ChIP, ATAC-seq, methylation** and inferred **active enhancers** (see [Active_enhancers_analysis](https://github.com/patriciasolesanchez/PSlab/tree/master/Active_enhancers_analysis) folder) for your genes of interest.  
 
   You will need the following input files:
   
@@ -115,6 +115,11 @@ Once you have your input files prepared, you can use `trackViewer` to make your 
   * DMR bed
   
 
-* **Lolliplots** are a type of graph which allow you to clearly represent nucleotid-specific characteristics, such as methylation status or SNPs (Single Nucleotide Polymorphisms). _Lolliplots_overlapping.R_ script is prepared to represent the differential methylation between your samples in your genes of interest.  
+* **Lolliplots** are a type of graph used to represent nucleotid-specific characteristics, such as methylation status or SNPs (Single Nucleotide Polymorphisms). _Lolliplots_overlapping.R_ script is prepared to represent the differential methylation between samples in your genes of interest.  
 
-* **(EXTRA)** _Chromosome_views_active_enhancers_guideslines_and_lolliplots.R_ script is thought to visualize the methylation status of a gene-associated active enhancers. It will make a first Chromosome view plot (like in _Chromosome_views.R_), but adding guidelines marking the position of active enhancers. Next, it will draw a lolliplot graph for each active enhancer (plotting the methylation status at the single C level in these active enhancers found 100 kb close to your genes of interest).
+  You will need the following input files:
+  
+  * Single C DMR regions (CG... file?)
+  
+
+* **(EXTRA)** _Chromosome_views_Active_enhancers_lolliplots.R_ script is thought to visualize the methylation status of gene-associated active enhancers. It will make a first Chromosome view plot (like in _Chromosome_views.R_), but adding guidelines marking the position of all active enhancers 100 kb around your gene of interest. Next, it will draw a lolliplot graph for each active enhancer (plotting the methylation status at the single C level in this active enhancer).
