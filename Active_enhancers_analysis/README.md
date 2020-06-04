@@ -1,6 +1,7 @@
 # Active enhancers analysis :signal_strength:
 
-These scripts can be used to infer the localization of active enhancers based on **ChIP** and **ATAC-seq data**. Active regulatory regions can be obtained by overlapping H3K27ac-ChIP and ATACseq data, as active regulatory regions are expected to be both open and histone-acetylated. To obtain active enhancers, promoters are excluded since they share these characteristics with active enhancers. 
+These scripts can be used to infer the localization of active enhancers based on **ChIP** and **ATAC-seq data**. Active regulatory regions can be obtained by overlapping H3K27ac-ChIP and ATACseq data, as active regulatory regions are expected to be both open and histone-acetylated. To obtain active enhancers, promoters are excluded since they share these characteristics with active enhancers.  
+<br/>
 
 You will need the following input data files:
 
