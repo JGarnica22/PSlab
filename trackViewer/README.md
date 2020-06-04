@@ -115,6 +115,11 @@ Once you have your input files prepared, you can use `trackViewer` to make your 
   * DMR bed
   
 
-* **Lolliplots** are a type of graph which allow you to clearly represent nucleotid-specific characteristics, such as methylation status or SNPs (Single Nucleotide Polymorphisms). _Lolliplots_overlapping.R_ script is prepared to represent the differential methylation between your samples in your genes of interest.  
+* **Lolliplots** are a type of graph used to represent nucleotid-specific characteristics, such as methylation status or SNPs (Single Nucleotide Polymorphisms). _Lolliplots_overlapping.R_ script is prepared to represent the differential methylation between samples in your genes of interest.  
 
-* **(EXTRA)** _Chromosome_views_active_enhancers_guideslines_and_lolliplots.R_ script is thought to visualize the methylation status of a gene-associated active enhancers. It will make a first Chromosome view plot (like in _Chromosome_views.R_), but adding guidelines marking the position of active enhancers. Next, it will draw a lolliplot graph for each active enhancer (plotting the methylation status at the single C level in these active enhancers found 100 kb close to your genes of interest).
+  You will need the following input files:
+  
+  * Single C DMR regions (CG... file?)
+  
+
+* **(EXTRA)** _Chromosome_views_active_enhancers_guideslines_and_lolliplots.R_ script is thought to visualize the methylation status of a gene-associated active enhancers. It will make a first Chromosome view plot (like in _Chromosome_views.R_), but adding guidelines marking the position of active enhancers 100 kb around your genes of interest. Next, it will draw a lolliplot graph for each active enhancer (plotting the methylation status at the single C level in this active enhancer).
