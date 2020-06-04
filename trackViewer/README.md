@@ -106,20 +106,20 @@ Once you have your input files prepared, you can use `trackViewer` to make your 
 
 * **Chromosome views** allow you to represent graphically in the same plot the different genomic and transcriptomic data from the same samples. In this case, _Chromosome_views.R_ is designed to represent data from **RNA-seq, ChIP, ATAC-seq, methylation** and inferred **active enhancers** (see [Active_enhancers_analysis](https://github.com/patriciasolesanchez/PSlab/tree/master/Active_enhancers_analysis) folder) for your genes of interest.  
 
-  You will need the following input files:
+  Ideally, input files name should be as following: _sample(#)_analysis.ext_ (i.e. Tet1_RNA.bw) You will need the following input files for each of you samples or populations:
   
-  * RNAseq... bw
-  * ATAC... bw
-  * ChIP... bw
-  * Active enhancers bed
-  * DMR bed
-  
+  * RNAseq sequences as a bigwig file.
+  * ATACseq sequences as a bigwig file.
+  * H3K27ac-ChIP sequences as a bigwig file.
+  * Active enhancers positioning as a bed o txt file.
+  * DMR positioning as a bed or txt file.
+   
 
 * **Lolliplots** are a type of graph used to represent nucleotid-specific characteristics, such as methylation status or SNPs (Single Nucleotide Polymorphisms). _Lolliplots_overlapping.R_ script is prepared to represent the differential methylation between samples in your genes of interest.  
 
-  You will need the following input files:
+  You will need the following input files in addition to the aforementioned:
   
-  * Single C DMR regions (CG... file?)
+ * Single C methylation status per nucleotide as txt file.
   
 
 * **(EXTRA)** _Chromosome_views_Active_enhancers_lolliplots.R_ script is thought to visualize the methylation status of gene-associated active enhancers. It will make a first Chromosome view plot (like in _Chromosome_views.R_), but adding guidelines marking the position of all active enhancers 100 kb around your gene of interest. Next, it will draw a lolliplot graph for each active enhancer (plotting the methylation status at the single C level in this active enhancer).
