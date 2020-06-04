@@ -7,7 +7,7 @@ You will need the following input data files:
 *NOTE: Bear in mind that scripts are prepared to look for these files in your directory (/data), and they should include the name of the technique (ATAC, ChIP...) and the name of the population or sample as filled in the script.*
 - ChIP annotated peaks for each of your samples
 - ATACseq annotated peaks for each of your samples
-- ATACseq shared regions between samples
+- ATACseq shared regions (OCRs) between samples
 - DMR data file (Differentially Methylated regions) comparing your samples
 - DESeq2 comparing your populations, as a data frame detailed in [DE_analysis_RNAseq](https://github.com/patriciasolesanchez/PSlab/blob/master/DE_analysis_RNAseq/DE_analysis_RNAseq_1vs1.R).
 
