@@ -15,7 +15,7 @@ You will need the following input data files:
 
 In this folder you will find the following scripts:
 
-* [Active_enhancers.R](https://github.com/patriciasolesanchez/PSlab/blob/master/Active_enhancers_analysis/Active_enhancers.R) is a comprehensive script overlapping ChIP, ATAC, DMR and DESeq2 data to compare active enhancers between samples, providing outputs files for each analysis and a final **summary table** and **bar chart** quantifying the differences between populations.
+* [Active_enhancers.R](https://github.com/patriciasolesanchez/PSlab/blob/master/Active_enhancers_analysis/Active_enhancers.R) is a comprehensive script overlapping ChIP, ATAC, DMR and DESeq2 data to compare active enhancers between samples, providing outputs files (excel sheets) for each analysis and a final **summary table** and **bar chart** quantifying the differences between populations.
 
   After active enhancers localization, the script predicts possible genes that may be targets of these active enhancers (by proximity): it annotates each enhancer to genes found 100kb around these active enhancers. This step in this script needs to be performed using `beedtools window` tool (in **Terminal**). Running this in Terminal takes only a few seconds, and the code is detailed in the same script. 
 
