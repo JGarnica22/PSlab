@@ -1,5 +1,5 @@
 # TrackViewer :eyeglasses:
-This is a package with web interface for drawing elegant interactive tracks or lollipop plots to facilitate integrated analysis of multi-omics data. You can visualize mapped reads along with annotation as track layers for different NGS datasets such as ChIP-seq, RNA-seq, miRNA-seq, DNA-seq, SNPs and methylation data.  
+This is a package used for drawing elegant interactive tracks or lollipop plots to facilitate integrated analysis of multi-omics data. You can visualize mapped reads along with annotation as track layers for different NGS datasets such as ChIP-seq, RNA-seq, miRNA-seq, DNA-seq, SNPs and methylation data.  
 <br/>
 
 _BEFORE YOU USE THE TOOL..._
