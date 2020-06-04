@@ -104,7 +104,16 @@ mv your_file.txt your_file.bed
 ## Visualize data with trackViewer: :lollipop:
 Once you have your input files prepared, you can use `trackViewer` to make your plots. Here we explain how to make two types of plots: Chromosome views and Lolliplots.
 
-* **Chromosome views** allow you to represent graphically in the same plot the different genomic and transcriptomic data from the same samples. In this case, _Chromosome_views.R_ is designed to represent data from **RNA-seq, ChIP, ATAC-seq, methylation** and inferred **active enhancers** (see [Active_enhancers_analysis folder](https://github.com/patriciasolesanchez/PSlab/tree/master/Active_enhancers_analysis)) for your genes of interest.  
+* **Chromosome views** allows you to represent graphically in the same plot the different genomic and transcriptomic data from the same samples. In this case, _Chromosome_views.R_ is designed to represent data from **RNA-seq, ChIP, ATAC-seq, methylation** and inferred **active enhancers** (see [Active_enhancers_analysis folder](https://github.com/patriciasolesanchez/PSlab/tree/master/Active_enhancers_analysis)) for your genes of interest.  
+
+  You will need the following input files:
+  
+  * RNAseq... bw
+  * ATAC... bw
+  * ChIP... bw
+  * Active enhancers bed
+  * DMR bed
+  
 
 * **Lolliplots** are a type of graph which allow you to clearly represent nucleotid-specific characteristics, such as methylation status or SNPs (Single Nucleotide Polymorphisms). _Lolliplots_overlapping.R_ script is prepared to represent the differential methylation between your samples in your genes of interest.  
 
