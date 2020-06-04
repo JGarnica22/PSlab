@@ -85,7 +85,7 @@ DESeq2 <- read.table (file = paste0("data/", list.files(path= paste0(getwd(), "/
                       sep = "\t", quote = "", dec = ".", header=T, na.strings = "NA")
 
 #Load and prepare shared OCR between two populations:
-socr <- read.table(paste0("data/", list.files(path= paste0(getwd(), "/data"), pattern= "OCR")),
+socr <- read.table(paste0("data/", list.files(path= paste0(getwd(), "/data"), pattern= "Shared")),
                    sep = "\t", dec = ".",header = TRUE, quote = "", stringsAsFactors = F)
 socr <- socr[, "Region.ID", drop = F]
 socr$Chr <- sapply(strsplit(socr$Region.ID, split=':', fixed=TRUE), function(x) (x[1]))
@@ -117,13 +117,13 @@ for (i in c(1:length(pop))) {
                          decreasing = F, na.last = T), ]
       
       gr <- GRanges(seqnames = tble$Chr, 
-                        ranges = paste0(tble$Start,"-",tble$End), 
-                        strand = NULL,
-                        `-log10.pval`= tble$`-log10.pval`,
-                        FoldEnrichment = tble$FoldEnrichment,
-                        Anno.Gene = tble$Anno.Gene,
-                        Peak.location = tble$Gene.section,
-                        Distance.to.TSS = tble$Distance.to.TSS)
+                    ranges = paste0(tble$Start,"-",tble$End), 
+                    strand = NULL,
+                    `-log10.pval`= tble$`-log10.pval`,
+                    FoldEnrichment = tble$FoldEnrichment,
+                    Anno.Gene = tble$Anno.Gene,
+                    Peak.location = tble$Gene.section,
+                    Distance.to.TSS = tble$Distance.to.TSS)
       
       grchip <- GRanges(seqnames = tble$Chr, 
                         ranges = paste0(tble$Start,"-",tble$End), 
@@ -256,19 +256,18 @@ genes$width <- NA
 write.table(genes, "output/genes.bed",
             sep = "\t", dec = ".", quote = F, row.names = F, col.names = F)
 
-#Go to Terminal; install bedtools from Conda if not installed already:
-# Use `windowbed` from `bedtools` to find overlap between
-#A: active enhancers with DMR (bed file "Active_enhancers_with_DMR_Tet.bed")
-#and B: genes (bed file "genes.bed")
-#bedtools window -a Tet_shared_ATAC_H3K27ac_not_promoter_with_DMR.bed -b genes.bed -w 50000 > Tet_shared_ATAC_H3K27ac_not_promoter_with_DMR_100kb.txt
-#bedtools window -a Tconv_shared_ATAC_H3K27ac_not_promoter_with_DMR.bed -b genes.bed -w 50000 > Tconv_shared_ATAC_H3K27ac_not_promoter_with_DMR_100kb.txt
+# Go to Terminal; install bedtools from Conda if not installed already
+# Use `windowbed` from `bedtools` to find overlap between:
+# A: data you want to annotate (e.g. active enhancers with DMR - bed file "Active_enhancers_with_DMR_Tet.bed")
+# and B: genes (bed file "genes.bed")
 #Use -w to set the window. Indicates number of bp added to each side of the region in A:
 #REMEMBER that bed file must not have col.names
+
 #Terminal loop:
 # cd GenomicRanges_Active_enhancers
 # for f in $(find . -name "*not_promoter_with_DMR.bed" -exec basename {} \;)
 # do
-# bedtools window -a output/$f -b output/genes.bed -w 50000 > output/$(cut -d'.' -f1 <<< $f)_100kb.txt 
+# bedtools window -a output/$f -b output/genes.bed -w 50000 > output/$(cut -d'.' -f1 <<< $f)_100kb.txt
 # done
 
 #List the files genereated from bedtools window which should contain *_100kb*
