@@ -9,7 +9,8 @@ You will need the following input data files:
 - ATACseq annotated peaks for each of your samples
 - ATACseq shared regions (OCRs) between samples
 - DMR data file (Differentially Methylated regions) comparing your samples
-- DESeq2 comparing your populations, as a data frame detailed in [DE_analysis_RNAseq](https://github.com/patriciasolesanchez/PSlab/blob/master/DE_analysis_RNAseq/DE_analysis_RNAseq_1vs1.R).
+- DESeq2 comparing your populations, as a data frame detailed in [DE_analysis_RNAseq](https://github.com/patriciasolesanchez/PSlab/blob/master/DE_analysis_RNAseq/DE_analysis_RNAseq_1vs1.R).  
+<br/>
 
 In this folder you will find the following scripts:
 
