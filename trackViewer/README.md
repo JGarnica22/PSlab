@@ -122,4 +122,4 @@ Once you have your input files prepared, you can use `trackViewer` to make your 
   * Single C DMR regions (CG... file?)
   
 
-* **(EXTRA)** _Chromosome_views_active_enhancers_guideslines_and_lolliplots.R_ script is thought to visualize the methylation status of a gene-associated active enhancers. It will make a first Chromosome view plot (like in _Chromosome_views.R_), but adding guidelines marking the position of active enhancers 100 kb around your genes of interest. Next, it will draw a lolliplot graph for each active enhancer (plotting the methylation status at the single C level in this active enhancer).
+* **(EXTRA)** _Chromosome_views_Active_enhancers_lolliplots.R_ script is thought to visualize the methylation status of a gene-associated active enhancers. It will make a first Chromosome view plot (like in _Chromosome_views.R_), but adding guidelines marking the position of active enhancers 100 kb around your genes of interest. Next, it will draw a lolliplot graph for each active enhancer (plotting the methylation status at the single C level in this active enhancer).
