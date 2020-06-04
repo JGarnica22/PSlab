@@ -17,7 +17,7 @@ In this folder you will find the following scripts:
 
 * [Active_enhancers_all.R](https://github.com/patriciasolesanchez/PSlab/blob/master/Active_enhancers_analysis/Active_enhancers_all.R) is a comprehensive script overlapping ChIP, ATAC, DMR and DESeq2 data to compare active enhancers between samples, providing outputs files for each analysis and a final **summary table** and **bar chart** quantifying the differences between populations.
 
-After active enhancers localization, the script predicts possible genes that may be targets of these active enhancers: it annotates each enhancer to genes found 100 Kb around these active enhancers. This step in this script needs to be performed using **Terminal** `beedtools window` tool taking few seconds, as it is detailed in the same script. 
+  After active enhancers localization, the script predicts possible genes that may be targets of these active enhancers: it annotates each enhancer to genes found 100 Kb around these active enhancers. This step in this script needs to be performed using **Terminal** `beedtools window` tool taking few seconds, as it is detailed in the same script. 
 
 * Alternatively, if you can <ins>only work with R</ins> (can't use Terminal), see [`Active_enhancers_all_R.R`](https://github.com/patriciasolesanchez/PSlab/blob/master/Active_enhancers_analysis/Active_enhancers_all_R.R). This script performs this same annotation step (search for genes around active enhancers) without using Terminal, as a step integrated in the whole R loop. However, **it takes several minutes to complete**.
 
