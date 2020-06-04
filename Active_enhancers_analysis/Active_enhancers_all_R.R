@@ -250,70 +250,9 @@ for (i in c(1:length(pop))) {
     }
   }
   
-  # #This time we have a set of genes and we want to look for active enhancers around 100kb from these genes.
-  # #Set the genes to study or import file
-  # genes <- c("Il10", "Il21")
-  # 
-  # # Loop to find all active enhancers (100-kb window) for genes of interest:
-  # # Create a empty list:
-  # Act.enh.gene <- vector(mode = "list",length = length(genes))
-  # # Set the names of the gene sets in the list:
-  # names(Act.enh.gene) <- genes
-  # 
-  # for(g in names(Act.enh.gene)) {
-  #   enhancers <- vector()
-  #   id <- get(g, org.SYMBOL2EG)
-  #   gr <- genes(TxDb)[id]
-  #   gr100kb <- resize(gr, width(gr)+100000, fix = "center")
-  #   act.enhan <- subsetByOverlaps(eval(as.symbol(grep(paste0("ChIP.",pop[i]), names(.GlobalEnv),value=TRUE))), 
-  #                                 eval(as.symbol(grep(paste0("ATAC.",pop[i]), names(.GlobalEnv),value=TRUE))))
-  #   #Filter overlapping peaks in promoters:
-  #   act.enhan <- act.enhan[-c(unique(queryHits(findOverlaps(act.enhan, prom))))]
-  #   act.enh.by.gene <- subsetByOverlaps(act.enhan, gr100kb)
-  #   if (length(act.enh.by.gene)>0){
-  #     df <- data.frame(gene = rep(g, length(act.enh.by.gene)),
-  #                      location = paste0(seqnames(act.enh.by.gene),":", ranges(act.enh.by.gene)))
-  #     df <- df[order(df$location),]
-  #     df <- ddply(df, .(gene), summarize, 
-  #                 gene=paste(unique(gene),collapse=","),
-  #                 location=paste(unique(location),collapse=","))
-  #     enhancers <- df[,"location"]
-  #     Act.enhancers[[g]] <- enhancers
-  #   }
-  # }
-  # if (file.exists("Act.enhancers")){
-  # trial <-as.data.frame(unlist(Act.enhancers))
-  # write.table(trial, paste0("output/", pop[i], "_act_enh_not_promoters_around_genes.txt"),
-  #             sep = "\t", row.names = T, col.names = F, quote = F)
-  # rm(Act.enhancers)
-  # }
+#Look for genes 100 kb around active enhancers with or without DMR using this loop
+#Call files containing these regions from environtment as they have been previously created
 
-
-########################################################################
-#Annotate regions to genes -> Look for all the genes at 100 kb around the inferred active enhancers
-# genes <- data.frame(genes(TxDb))
-# genes <- genes[, c(1:3, 6, 4, 5)]
-# genes$width <- NA
-# 
-# write.table(genes, "output/genes.bed",
-#             sep = "\t", dec = ".", quote = F, row.names = F, col.names = F)
-
-#Go to Terminal; install bedtools from Conda if not installed already:
-#REMEMBER that bed file must not have col.names
-#Terminal loop:
-  # cd GenomicRanges_Active_enhancers
-  # for f in $(find . -name "*not_promoter_with_DMR.bed" -exec basename {} \;)
-  # do
-  # bedtools window -a output/$f -b output/genes.bed -w 50000 > output/$(cut -d'.' -f1 <<< $f)_100kb.txt
-  # done
-##########################################################################################################################
-
-
-##########################################################################################################################
-#Alternative `bedtools window` using only R (it may take much longer!)
-#Try to look for genes 100 kb around active enhancers with DMR using this loop
-#files containing these regions, import them or use if in environtment
-#aedmr <- list.files(path=paste0(getwd(),"/output"), pattern= "*not_promoter_with_DMR.bed")
 aedmr <- grep("\\.DMR_", names(.GlobalEnv),value=TRUE)
 mapped_genes <- mappedkeys(org.SYMBOL2EG)
 xx <- as.list(org.SYMBOL2EG[mapped_genes])
@@ -387,9 +326,9 @@ for (ae in 1:length(aedmr)){
 
 #Complete Overall_summary table
 Overall_summary[4,1] <- paste("genes with log2FC>=2", pop[2], "vs", pop[1])
-Overall_summary[5,1] <- paste("genes with log2FC<=2", pop[2], "vs", pop[1])
+Overall_summary[5,1] <- paste("genes with log2FC<=-2", pop[2], "vs", pop[1])
 Overall_summary[11,1] <- paste("s genes with log2FC>=2", pop[2], "vs", pop[1])
-Overall_summary[12,1] <- paste("s genes with log2FC<=2", pop[2], "vs", pop[1])
+Overall_summary[12,1] <- paste("s genes with log2FC<=-2", pop[2], "vs", pop[1])
 
 write_xlsx(Overall_summary, "output/Overall_summary_active_enhancers.xlsx")
 
