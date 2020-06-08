@@ -68,6 +68,7 @@ if (species == "mouse"){
 }
 BM <- getBM (attributes=c("entrezgene_id", "external_gene_name"),
              mart = ensembl, verbose = T)
+BM <- rbind(BM, c("No genes found","No genes found"))
 
 #Load all files needed
 #Load DMR file between two samples:
@@ -83,6 +84,8 @@ DMR <- DMR[order(as.numeric(gsub("chr", "", DMR$Chr)),
 
 DESeq2 <- read.table (file = paste0("data/", list.files(path= paste0(getwd(), "/data"), pattern= "DESeq2_")),
                       sep = "\t", quote = "", dec = ".", header=T, na.strings = "NA")
+names(DESeq2)[1] <- "external_gene_name"
+
 
 #Load and prepare shared OCR between two populations:
 socr <- read.table(paste0("data/", list.files(path= paste0(getwd(), "/data"), pattern= "Shared")),
@@ -158,8 +161,8 @@ for (i in c(1:length(pop))) {
   gr3 <- GRanges(seqnames = olpeaks$Chr, 
                  ranges = paste0(olpeaks$Start,"-",olpeaks$End), 
                  strand = NULL)
-  write.table(olpeaks, file = paste0("output/", pop[i], "_ATAC_Overlapping_peaks_with_H3K27ac_ChIP.txt"),
-              sep = "\t", quote = F, dec = ".", row.names = F, col.names = T)
+  #write.table(olpeaks, file = paste0("output/", pop[i], "_ATAC_Overlapping_peaks_with_H3K27ac_ChIP.txt"),
+              #sep = "\t", quote = F, dec = ".", row.names = F, col.names = T)
   Overall_summary[1,1] <- "ATAC_Overlapping_peaks_with_H3K27ac_ChIP"
   Overall_summary[1,4-i] <- nrow(olpeaks)
   
@@ -167,13 +170,15 @@ for (i in c(1:length(pop))) {
   prom <- promoters(TxDb)
   inpromoters <- findOverlaps(prom, gr3)
   act.enh <- olpeaks[-c(unique(subjectHits(inpromoters))), 1:3]
-  Overall_summary[2,1] <- "Active_enhancers"
+  Overall_summary[2,1] <- "Active_enhancers_without_promoters"
   Overall_summary[2,4-i] <- nrow(act.enh)
   
   #Export files in desired formats
-  for (o in c(".txt", ".bed")){
-    write.table(act.enh, file = paste0("output/", pop[i] ,"_Active_enhancers", o),
-                sep = "\t", quote = F, dec = ".", row.names = F, col.names = T)
+  formats <- c(".txt", ".bed")
+  col_names <- c(T,F)
+  for (o in 1:length(formats)){
+    write.table(act.enh, file = paste0("output/", pop[i] ,"_Active_enhancers1", formats[o]),
+                sep = "\t", quote = F, dec = ".", row.names = F, col.names = col_names[o])
     
     #Methylation in active enhancers
     gr4 <- GRanges(seqnames = act.enh$Chr, 
@@ -186,16 +191,16 @@ for (i in c(1:length(pop))) {
                    Met.ctl = DMR[,pop[1]])
     overlap <- findOverlaps(gr5, gr4)
     act.enh.DMR <- act.enh[unique(subjectHits(overlap)),]
-    write.table(act.enh.DMR, file = paste0("output/", pop[i] ,"_Active_enhancers_not_promoter_with_DMR", o),
-                sep = "\t", quote = F, dec = ".", row.names = F, col.names = F)
+    write.table(act.enh.DMR, file = paste0("output/", pop[i] ,"_Active_enhancers_with_DMR", formats[o]),
+                sep = "\t", quote = F, dec = ".", row.names = F, col.names = col_names[o])
     Overall_summary[3,1] <- "Active_enhancers_with_DMR"
     Overall_summary[3,4-i] <- nrow(act.enh.DMR)
     
     #do the overlap in the other direction
     overlap2 <- findOverlaps(gr4, gr5)
     DMR.act.enh <- DMR[unique(subjectHits(overlap2)),]
-    write.table(DMR.act.enh, paste0("output/", pop[i] ,"_DMR_Overlapping_Active_enhancers", o),
-                sep = "\t", dec = ".", quote = F, row.names = F, col.names = T)
+    write.table(DMR.act.enh, paste0("output/", pop[i] ,"_DMR_Overlapping_Active_enhancers", formats[o]),
+                sep = "\t", dec = ".", quote = F, row.names = F, col.names = col_names[o])
     Overall_summary[6,1] <- "DMR_Overlapping_Active_enhancers"
     Overall_summary[6,4-i] <- nrow(DMR.act.enh)
     Overall_summary[7,1] <- "of_which_hypomethylated"
@@ -205,8 +210,8 @@ for (i in c(1:length(pop))) {
       Overall_summary[7,4-i] <- nrow(DMR.act.enh[which(DMR.act.enh[,pop[2]]<DMR.act.enh[,pop[1]]),])
     }
     
- # Methylation in H3k27ac
- # Find overlapping peaks (population-specific H3K27ac mark + open region)
+    # Methylation in H3k27ac
+    # Find overlapping peaks (population-specific H3K27ac mark + open region)
     overlap3 <- findOverlaps(grchip, grocr)
     openH3K27ac <- socr[unique(subjectHits(overlap3)),]
     grH3 <- GRanges(seqnames = openH3K27ac$Chr, 
@@ -214,149 +219,159 @@ for (i in c(1:length(pop))) {
                     strand = NULL)
     openH3K27ac <- separate(openH3K27ac, col = "ranges", into = c("Start", "End"), sep = "-", remove = T)
     openH3K27ac <- openH3K27ac[, c("Chr", "Start", "End")]
-    write.table(openH3K27ac, file = paste0("output/", pop[i] ,"_shared_ATAC_H3K27ac", o),
-                sep = "\t", dec = ".", quote = F, row.names = F, col.names = T)
-    Overall_summary[8,1] <- "Shared_ATAC_H3K27ac"
+    # write.table(openH3K27ac, file = paste0("output/", pop[i] ,"_shared_ATAC_H3K27ac", formats[o]),
+    #             sep = "\t", dec = ".", quote = F, row.names = F, col.names = col_names[o])
+    Overall_summary[8,1] <- "Shared_ATAC_H3K27ac_with_promoters"
     Overall_summary[8,4-i] <- nrow(openH3K27ac)
     
     #Obtain active enhancers by filtering overlapping peaks in promoters:
     inpromoters <- findOverlaps(prom, grH3)
     openH3K27acp <- openH3K27ac[-c(unique(subjectHits(inpromoters))), 1:3]
-    write.table(openH3K27acp, file = paste0("output/", pop[i] ,"_shared_ATAC_H3K27ac_not_promoter", o),
-                sep = "\t", quote = F, dec = ".", row.names = F, col.names = T)
+    write.table(openH3K27acp, file = paste0("output/", pop[i] ,"_shared_ATAC_H3K27ac_not_promoter", formats[o]),
+                sep = "\t", quote = F, dec = ".", row.names = F, col.names = col_names[o])
     Overall_summary[9,1] <- "Shared_ATAC_H3K27ac_not_promoter"
     Overall_summary[9,4-i] <- nrow(openH3K27acp)
     
     overlap5 <- findOverlaps(gr5, grH3)
     H3K27open.DMR <- openH3K27ac[unique(subjectHits(overlap5)),]
     H3K27open.DMR <- H3K27open.DMR[which(H3K27open.DMR$Chr!="NA"),]
-    write.table(H3K27open.DMR, file = paste0("output/", pop[i] ,"_shared_ATAC_H3K27ac_not_promoter_with_DMR", o),
-                sep = "\t", dec = ".", quote = F, row.names = F, col.names = F)
+    write.table(H3K27open.DMR, file = paste0("output/", pop[i] ,"_shared_ATAC_H3K27ac_not_promoter_with_DMR", formats[o]),
+                sep = "\t", dec = ".", quote = F, row.names = F, col.names = col_names[o])
     Overall_summary[10,1] <- "Shared_ATAC_H3K27ac_not_promoter_with_DMR"
     Overall_summary[10,4-i] <- nrow(H3K27open.DMR)
     
     overlap6 <- findOverlaps(grH3, gr5)
     DMR.H3K27open <- DMR[unique(subjectHits(overlap6)),]
-    write.table(DMR.H3K27open, file = paste0("output/", pop[i] ,"_DMR_Overlapping_shared_ATAC_H3K27ac_not_promoter", o),
-                sep = "\t", dec = ".", quote = F, row.names = F, col.names = T)
+    write.table(DMR.H3K27open, file = paste0("output/", pop[i] ,"_DMR_Overlapping_shared_ATAC_H3K27ac_not_promoter", formats[o]),
+                sep = "\t", dec = ".", quote = F, row.names = F, col.names = col_names[o])
     Overall_summary[13,1] <- "DMR_Overlapping_shared_ATAC_H3K27ac_not_promoter"
     Overall_summary[13,4-i] <- nrow(DMR.H3K27open)
-      Overall_summary[14,1] <- "s of_which_hypomethylated"
-  if (i == 1){
-    Overall_summary[14,4-i] <- nrow(DMR.act.enh[which(DMR.H3K27open[,pop[2]]>DMR.H3K27open[,pop[1]]),])
-  } else {
-    Overall_summary[14,4-i] <- nrow(DMR.act.enh[which(DMR.H3K27open[,pop[2]]<DMR.H3K27open[,pop[1]]),])
+    Overall_summary[14,1] <- "s of_which_hypomethylated"
+    if (i == 1){
+      Overall_summary[14,4-i] <- nrow(DMR.act.enh[which(DMR.H3K27open[,pop[2]]>DMR.H3K27open[,pop[1]]),])
+    } else {
+      Overall_summary[14,4-i] <- nrow(DMR.act.enh[which(DMR.H3K27open[,pop[2]]<DMR.H3K27open[,pop[1]]),])
     }
   }
-
-# Annotate regions to genes -> Look for all the genes at 100 kb around the inferred active enhancers
-genes <- data.frame(genes(TxDb))
-genes <- genes[, c(1:3, 6, 4, 5)]
-genes$width <- NA
-
-write.table(genes, "output/genes.bed",
-            sep = "\t", dec = ".", quote = F, row.names = F, col.names = F)
-
-# Go to Terminal; install bedtools from Conda if not installed already
-# Use `windowbed` from `bedtools` to find overlap between:
-# A: data you want to annotate (e.g. active enhancers with DMR - bed file "Active_enhancers_with_DMR_Tet.bed")
-# and B: genes (bed file "genes.bed")
-#Use -w to set the window. Indicates number of bp added to each side of the region in A:
-#REMEMBER that bed file must not have col.names
-
-#Terminal loop:
-# cd GenomicRanges_Active_enhancers
-# for f in $(find . -name "*not_promoter_with_DMR.bed" -exec basename {} \;)
-# do
-# bedtools window -a output/$f -b output/genes.bed -w 50000 > output/$(cut -d'.' -f1 <<< $f)_100kb.txt
-# done
-
-#List the files genereated from bedtools window which should contain *_100kb*
-files100 <- list.files(path= paste0(getwd(), "/output"), pattern= "*_100kb*")
-#Read all of them
-for (u in files100) {
-  az <- read.table(paste0("output/", u))
-  assign(paste(strsplit(u, ".", fixed=T)[1][[1]][1]), az)
-}
-
-# Complete Overall_summary table
-Overall_summary[4,1] <- paste("genes with log2FC>=2", pop[2], "vs", pop[1])
-Overall_summary[5,1] <- paste("genes with log2FC<=-2", pop[2], "vs", pop[1])
-Overall_summary[11,1] <- paste("s genes with log2FC>=2", pop[2], "vs", pop[1])
-Overall_summary[12,1] <- paste("s genes with log2FC<=-2", pop[2], "vs", pop[1])
-
-for (i in 1:length(grep("not_promoter_with_DMR", names(.GlobalEnv),value=TRUE))) {
-  Tables <- eval(as.symbol(grep("not_promoter_with_DMR", names(.GlobalEnv),value=TRUE)[i]))[, c(1:3, 9,7)]
-  names(Tables) <- c("Chr", "Start", "End", "Strand", "EntrezID")
-  Tables <- merge(Tables, BM, by.x = "EntrezID", by.y = "entrezgene_id")
-  Tables <- Tables[, c(-1)]
-  names(Tables) <- c("Chr", "Start", "End", "Strand", "Gene")
-  write.table(Tables, paste0("output/", strsplit(files100[i], ".", fixed=T)[1][[1]][1], "_annotation_more_rows.txt"),
-              sep = "\t", dec = ".", quote = F, row.names = F, col.names = T)
+} 
+  # Annotate regions to genes -> Look for all the genes at 100 kb around the inferred active enhancers
+  genes <- data.frame(genes(TxDb))[, c(1:3, 6, 4, 5)]
+  genes$width <- NA
+  write.table(genes, "data/genes.bed",
+              sep = "\t", dec = ".", quote = F, row.names = F, col.names = F)
   
-  Tables2 <- ddply(Tables, .(Start), summarize,
-                   Chr = paste(unique(Chr),collapse=","),
-                   Start =  paste(unique(Start),collapse=","),
-                   End = paste(unique(End),collapse=","),
-                   Strand = paste(unique(Strand),collapse=","),
-                   Gene= paste(unique(Gene),collapse=","))
-  Tables2 <- Tables2[order(as.numeric(gsub("chr", "", Tables2$Chr)), 
-                           as.numeric(Tables2$Start),
-                           decreasing = F, na.last = T), ]
-  write.table(Tables2, paste0("output/", strsplit(files100[i], ".", fixed=T)[1][[1]][1], "_annotation.txt"),
-              sep = "\t", dec = ".", quote = F, row.names = F, col.names = T)
-  #generate also excel file
-  write_xlsx(Tables2, paste0("output/", strsplit(files100[i], ".", fixed=T)[1][[1]][1], "_annotation.xlsx"))
+  # Go to Terminal; install bedtools from Conda if not installed already
+  # Use `windowbed` from `bedtools` to find overlap between:
+  # A: data you want to annotate (e.g. active enhancers with DMR - bed file "Active_enhancers_with_DMR_Tet.bed")
+  # and B: genes (bed file "genes.bed")
+  #Use -w to set the window. Indicates number of bp added to each side of the region in A:
+  #REMEMBER that bed file must not have col.names
   
-  #Analysis of genes associated to active enhancers and their transcriptomic activity
-  #careful! if names changes order may change
-  trans_DMR <- merge(DESeq2, Tables, by.y = "Gene", all.x = F)
-  trans_DMR <- unique(trans_DMR[,c(1:8)])
-  
-  if (str_detect(aedmr[ae], "H3K27open.")){
-    n <- 11 } else {
-      n <- 4
-    }
-  if (str_detect(grep("not_promoter_with_DMR", names(.GlobalEnv),value=TRUE)[i], pop[1])){
-    Overall_summary[n,3] <- nrow(subset(trans_DMR, trans_DMR$log2FoldChange>0 & trans_DMR$padj<=0.01))
-    Overall_summary[n+1,3] <- nrow(subset(trans_DMR, trans_DMR$log2FoldChange>=2 & trans_DMR$padj<=0.01))
-    Overall_summary[n+2,3] <- nrow(subset(trans_DMR, trans_DMR$log2FoldChange<0 & trans_DMR$padj<=0.01))
-    Overall_summary[n+3,3] <- nrow(subset(trans_DMR, trans_DMR$log2FoldChange<=-2 & trans_DMR$padj<=0.01))
-  } else {
-    Overall_summary[n,2] <- nrow(subset(trans_DMR, trans_DMR$log2FoldChange>0 & trans_DMR$padj<=0.01))
-    Overall_summary[n+1,2] <- nrow(subset(trans_DMR, trans_DMR$log2FoldChange>=2 & trans_DMR$padj<=0.01))
-    Overall_summary[n+2,2] <- nrow(subset(trans_DMR, trans_DMR$log2FoldChange<0 & trans_DMR$padj<=0.01))
-    Overall_summary[n+3,2] <- nrow(subset(trans_DMR, trans_DMR$log2FoldChange<=-2 & trans_DMR$padj<=0.01))
+  # Terminal loop:
+  # cd GenomicRanges_Active_enhancers
+  # mkdir output/window
+  # for f in $(find . -name "*a*.bed" -exec basename {} \;)
+  # do
+  # bedtools window -a output/$f -b data/genes.bed -w 50000 > output/window/$(cut -d'.' -f1 <<< $f)_100kb.txt
+  # done
+
+  #List the files genereated from bedtools window which should contain *_100kb*
+  files100 <- list.files(path= paste0(getwd(), "/output/window"), pattern= "*_100kb*")
+  files <- list.files(path= paste0(getwd(), "/output"), pattern= "*.txt")
+  #Read all of them
+  for (u in files100) {
+    az <- read.table(paste0("output/window/", u))
+    assign(paste(strsplit(u, ".", fixed=T)[1][[1]][1]), az)
   }
-}
-
-write_xlsx(Overall_summary, "output/Overall_summary_active_enhancers.xlsx")
-
-
-#Do graph bar plots for summary
-dfplot <- data.frame(matrix(ncol = 1, nrow= nrow(Overall_summary)*2))
-orderlist <- Overall_summary$Analysis
-dfplot$analysis <- Overall_summary$Analysis
-dfplot$analysis <- as.character(dfplot$analysis)
-dfplot[c(1:nrow(Overall_summary)),1] <- Overall_summary[,pop[2]]
-dfplot[c(1:nrow(Overall_summary)),3] <- pop[2]
-dfplot[c((nrow(Overall_summary)+1):(nrow(Overall_summary)*2)),1] <- Overall_summary[,pop[1]]
-dfplot[c((nrow(Overall_summary)+1):(nrow(Overall_summary)*2)),3] <- pop[1]
-names(dfplot) <- c("Hits","analysis","type")
-
-hitsbar <- ggplot(dfplot, aes(x=analysis, y=Hits, fill=type)) + geom_bar(stat="identity", position=position_dodge())+
-  geom_text(aes(label=Hits), vjust=1.6, color="black",
-            position = position_dodge(0.9), size=3.5)+
-  xlab("Type of analysis") + ylab("Num of hits(log10)")+ scale_y_log10()+
-  theme(axis.text.x = element_text(angle = 60, size = 10, hjust =1, face="bold"))+
-  scale_x_discrete(limits = Overall_summary$Analysis)+
-  theme(panel.background = element_rect(fill = "white",
-                                        colour = "grey",
-                                        size = 0.3, linetype = "solid"),
-        panel.grid.major = element_line(size = 0.05, linetype = 'solid',
-                                        colour = "grey"))
-#Export pdf with table and bar graph
-pdf(file = "figs/Overall_summary.pdf", width = 10, height = 6)
-print(hitsbar)
-dev.off()
+  for (x in files) {
+    az <- read.table(paste0("output/", x))
+    assign(paste(strsplit(x, ".", fixed=T)[1][[1]][1]), az)
+  }
+  
+  # Complete Overall_summary table
+  Overall_summary[4,1] <- paste("genes with log2FC>=2", pop[2], "vs", pop[1])
+  Overall_summary[5,1] <- paste("genes with log2FC<=-2", pop[2], "vs", pop[1])
+  Overall_summary[11,1] <- paste("s genes with log2FC>=2", pop[2], "vs", pop[1])
+  Overall_summary[12,1] <- paste("s genes with log2FC<=-2", pop[2], "vs", pop[1])
+  
+  for (pu in files){
+    x1 <- eval(as.symbol(paste0(strsplit(pu, ".", fixed=T)[1][[1]][1],"_100kb")))[, c(1:3, 9,7)]
+    names(x1) <- c("Chr", "Start", "End", "Strand", "EntrezID")
+    x2 <- eval(as.symbol(strsplit(pu, ".", fixed=T)[1][[1]][1]))[-1,]
+    if (str_detect(pu, "_DMR_")){
+      names(x2) <- names(DMR.H3K27open)
+    } else {names(x2) <- c("Chr","Start","End")}
+    Tablesp <- merge(x1, x2, all.y = T)
+    Tablesp$EntrezID <- ifelse(is.na(Tablesp$EntrezID), 
+                                 "No genes found", Tablesp$EntrezID)
+    Tables <- merge(Tablesp, BM, by.x = "EntrezID", by.y = "entrezgene_id", all.x = T, all.y = F)
+    Tables <- Tables[, c(-1)]
+    Tables <- Tables[order(as.numeric(gsub("chr", "", Tables$Chr)), 
+                     as.numeric(Tables$Start),
+                     decreasing = F, na.last = T), ]
+    write.table(Tables, paste0("output/annotation/", strsplit(pu, ".", fixed=T)[1][[1]][1], "_annotation_more_rows.txt"),
+                sep = "\t", dec = ".", quote = F, row.names = F, col.names = T)
+    
+    Tables2 <- ddply(Tables, .(Start), summarize,
+                     Chr = paste(unique(Chr),collapse=","),
+                     Start =  paste(unique(Start),collapse=","),
+                     End = paste(unique(End),collapse=","),
+                     Strand = paste(unique(Strand),collapse=","),
+                     Gene= paste(unique(external_gene_name),collapse=","))
+    Tables2 <- Tables2[order(as.numeric(gsub("chr", "", Tables2$Chr)), 
+                             as.numeric(Tables2$Start),
+                             decreasing = F, na.last = T), ]
+    write.table(Tables2, paste0("output/annotation/", strsplit(pu, ".", fixed=T)[1][[1]][1], "_annotation.txt"),
+                sep = "\t", dec = ".", quote = F, row.names = F, col.names = T)
+    #generate also excel file
+    write_xlsx(Tables2, paste0("output/annotation/", strsplit(pu, ".", fixed=T)[1][[1]][1], "_annotation.xlsx"))
+    
+    #assign "_with_DMR" file to fill overallsummary table
+    
+    if (str_detect(pu, "_with_DMR")) {
+      Tables3 <- subset(Tables, Tables$external_gene_name != "No genes found")
+      trans_DMR <- merge(DESeq2, Tables3, by.y = "external_gene_name", all.x = F)
+      trans_DMR <- unique(trans_DMR[,c(1:8)])
+      if (str_detect(pu, "_H3K27ac_")){
+        n <- 11 } else {
+          n <- 4
+        }
+      if (str_detect(pu, pop[2])){
+        p <- 2 
+      } else { p <- 1}
+      Overall_summary[n,4-p] <- nrow(subset(trans_DMR, trans_DMR$log2FoldChange>=2 & trans_DMR$padj<=0.01))
+      Overall_summary[n+1,4-p] <- nrow(subset(trans_DMR, trans_DMR$log2FoldChange<=-2 & trans_DMR$padj<=0.01))
+      }
+    }
+  
+  
+  write_xlsx(Overall_summary, "output/Overall_summary_active_enhancers.xlsx")
+  
+  
+  #Do graph bar plots for summary
+  dfplot <- data.frame(matrix(ncol = 1, nrow= nrow(Overall_summary)*2))
+  orderlist <- Overall_summary$Analysis
+  dfplot$analysis <- Overall_summary$Analysis
+  dfplot$analysis <- as.character(dfplot$analysis)
+  dfplot[c(1:nrow(Overall_summary)),1] <- Overall_summary[,pop[2]]
+  dfplot[c(1:nrow(Overall_summary)),3] <- pop[2]
+  dfplot[c((nrow(Overall_summary)+1):(nrow(Overall_summary)*2)),1] <- Overall_summary[,pop[1]]
+  dfplot[c((nrow(Overall_summary)+1):(nrow(Overall_summary)*2)),3] <- pop[1]
+  names(dfplot) <- c("Hits","analysis","type")
+  
+  hitsbar <- ggplot(dfplot, aes(x=analysis, y=Hits, fill=type)) + geom_bar(stat="identity", position=position_dodge())+
+    geom_text(aes(label=Hits), vjust=1.6, color="black",
+              position = position_dodge(0.9), size=3.5)+
+    xlab("Type of analysis") + ylab("Num of hits(log10)")+ scale_y_log10()+
+    theme(axis.text.x = element_text(angle = 60, size = 10, hjust =1, face="bold"))+
+    scale_x_discrete(limits = Overall_summary$Analysis)+
+    theme(panel.background = element_rect(fill = "white",
+                                          colour = "grey",
+                                          size = 0.3, linetype = "solid"),
+          panel.grid.major = element_line(size = 0.05, linetype = 'solid',
+                                          colour = "grey"))
+  #Export pdf with table and bar graph
+  pdf(file = "figs/Overall_summary.pdf", width = 10, height = 6)
+  print(hitsbar)
+  dev.off()
 
