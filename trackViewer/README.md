@@ -112,8 +112,8 @@ Once you have your input files prepared, you can use `trackViewer` to make your 
   * RNAseq sequences as bigwig files.
   * ATACseq sequences as bigwig files.
   * H3K27ac-ChIP sequences as bigwig files.
-  * Active enhancers positioning as bed o txt files.
-  * DMR positioning as bed or txt files.
+  * Active enhancers positioning as a bed o txt file.
+  * DMR positioning as a bed or txt file.
    
 
 * **Lolliplots** are a type of graph used to represent nucleotid-specific characteristics, such as methylation status or SNPs (Single Nucleotide Polymorphisms). _Lolliplots_overlapping.R_ script is prepared to represent the differential methylation between samples in your genes of interest.  
