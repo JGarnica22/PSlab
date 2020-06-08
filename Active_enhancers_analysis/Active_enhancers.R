@@ -196,17 +196,17 @@ for (i in c(1:length(pop))) {
     DMR.act.enh <- DMR[unique(subjectHits(overlap2)),]
     write.table(DMR.act.enh, paste0("output/", pop[i] ,"_DMR_Overlapping_Active_enhancers", o),
                 sep = "\t", dec = ".", quote = F, row.names = F, col.names = T)
-    Overall_summary[8,1] <- "DMR_Overlapping_Active_enhancers"
-    Overall_summary[8,4-i] <- nrow(DMR.act.enh)
-    Overall_summary[9,1] <- "of_which_hypomethylated"
+    Overall_summary[6,1] <- "DMR_Overlapping_Active_enhancers"
+    Overall_summary[6,4-i] <- nrow(DMR.act.enh)
+    Overall_summary[7,1] <- "of_which_hypomethylated"
     if (i == 1){
-      Overall_summary[9,4-i] <- nrow(DMR.act.enh[which(DMR.act.enh[,pop[2]]>DMR.act.enh[,pop[1]]),])
+      Overall_summary[7,4-i] <- nrow(DMR.act.enh[which(DMR.act.enh[,pop[2]]>DMR.act.enh[,pop[1]]),])
     } else {
-      Overall_summary[9,4-i] <- nrow(DMR.act.enh[which(DMR.act.enh[,pop[2]]<DMR.act.enh[,pop[1]]),])
+      Overall_summary[7,4-i] <- nrow(DMR.act.enh[which(DMR.act.enh[,pop[2]]<DMR.act.enh[,pop[1]]),])
     }
     
-    #Methylation in H3k27ac
-    #Find overlapping peaks (population-specific H3K27ac mark + open region)
+ # Methylation in H3k27ac
+ # Find overlapping peaks (population-specific H3K27ac mark + open region)
     overlap3 <- findOverlaps(grchip, grocr)
     openH3K27ac <- socr[unique(subjectHits(overlap3)),]
     grH3 <- GRanges(seqnames = openH3K27ac$Chr, 
@@ -216,39 +216,40 @@ for (i in c(1:length(pop))) {
     openH3K27ac <- openH3K27ac[, c("Chr", "Start", "End")]
     write.table(openH3K27ac, file = paste0("output/", pop[i] ,"_shared_ATAC_H3K27ac", o),
                 sep = "\t", dec = ".", quote = F, row.names = F, col.names = T)
-    Overall_summary[10,1] <- "Shared_ATAC_H3K27ac"
-    Overall_summary[10,4-i] <- nrow(openH3K27ac)
+    Overall_summary[8,1] <- "Shared_ATAC_H3K27ac"
+    Overall_summary[8,4-i] <- nrow(openH3K27ac)
     
     #Obtain active enhancers by filtering overlapping peaks in promoters:
     inpromoters <- findOverlaps(prom, grH3)
     openH3K27acp <- openH3K27ac[-c(unique(subjectHits(inpromoters))), 1:3]
     write.table(openH3K27acp, file = paste0("output/", pop[i] ,"_shared_ATAC_H3K27ac_not_promoter", o),
                 sep = "\t", quote = F, dec = ".", row.names = F, col.names = T)
-    Overall_summary[11,1] <- "Shared_ATAC_H3K27ac_not_promoter"
-    Overall_summary[11,4-i] <- nrow(openH3K27acp)
+    Overall_summary[9,1] <- "Shared_ATAC_H3K27ac_not_promoter"
+    Overall_summary[9,4-i] <- nrow(openH3K27acp)
     
     overlap5 <- findOverlaps(gr5, grH3)
     H3K27open.DMR <- openH3K27ac[unique(subjectHits(overlap5)),]
     H3K27open.DMR <- H3K27open.DMR[which(H3K27open.DMR$Chr!="NA"),]
     write.table(H3K27open.DMR, file = paste0("output/", pop[i] ,"_shared_ATAC_H3K27ac_not_promoter_with_DMR", o),
                 sep = "\t", dec = ".", quote = F, row.names = F, col.names = F)
-    Overall_summary[12,1] <- "Shared_ATAC_H3K27ac_not_promoter_with_DMR"
-    Overall_summary[12,4-i] <- nrow(H3K27open.DMR)
-    
-    #!!! for bed file do not include col.names????
+    Overall_summary[10,1] <- "Shared_ATAC_H3K27ac_not_promoter_with_DMR"
+    Overall_summary[10,4-i] <- nrow(H3K27open.DMR)
     
     overlap6 <- findOverlaps(grH3, gr5)
     DMR.H3K27open <- DMR[unique(subjectHits(overlap6)),]
     write.table(DMR.H3K27open, file = paste0("output/", pop[i] ,"_DMR_Overlapping_shared_ATAC_H3K27ac_not_promoter", o),
                 sep = "\t", dec = ".", quote = F, row.names = F, col.names = T)
-    Overall_summary[17,1] <- "DMR_Overlapping_shared_ATAC_H3K27ac_not_promoter"
-    Overall_summary[17,4-i] <- nrow(DMR.H3K27open)
+    Overall_summary[13,1] <- "DMR_Overlapping_shared_ATAC_H3K27ac_not_promoter"
+    Overall_summary[13,4-i] <- nrow(DMR.H3K27open)
+      Overall_summary[14,1] <- "s of_which_hypomethylated"
+  if (i == 1){
+    Overall_summary[14,4-i] <- nrow(DMR.act.enh[which(DMR.H3K27open[,pop[2]]>DMR.H3K27open[,pop[1]]),])
+  } else {
+    Overall_summary[14,4-i] <- nrow(DMR.act.enh[which(DMR.H3K27open[,pop[2]]<DMR.H3K27open[,pop[1]]),])
+    }
   }
-  
-}
 
-########################################################################
-#Annotate regions to genes -> Look for all the genes at 100 kb around the inferred active enhancers
+# Annotate regions to genes -> Look for all the genes at 100 kb around the inferred active enhancers
 genes <- data.frame(genes(TxDb))
 genes <- genes[, c(1:3, 6, 4, 5)]
 genes$width <- NA
@@ -278,15 +279,11 @@ for (u in files100) {
   assign(paste(strsplit(u, ".", fixed=T)[1][[1]][1]), az)
 }
 
-#Complete Overall_summary table
-Overall_summary[4,1] <- paste("upregulated genes(FC>0, FDR<=0.01)")
-Overall_summary[5,1] <- paste("upregulated genes(FC>2, FDR<=0.01)")
-Overall_summary[6,1] <- paste("downregulated genes(FC<0, FDR<=0.01)")
-Overall_summary[7,1] <- paste("downregulated genes(FC<-2, FDR<=0.01)")
-Overall_summary[13,1] <- paste("s upregulated genes(FC>0, FDR<=0.01)")
-Overall_summary[14,1] <- paste("s upregulated genes(FC>2, FDR<=0.01)")
-Overall_summary[15,1] <- paste("s downregulated genes(FC<0, FDR<=0.01)")
-Overall_summary[16,1] <- paste("s downregulated genes(FC<-2, FDR<=0.01)")
+# Complete Overall_summary table
+Overall_summary[4,1] <- paste("genes with log2FC>=2", pop[2], "vs", pop[1])
+Overall_summary[5,1] <- paste("genes with log2FC<=-2", pop[2], "vs", pop[1])
+Overall_summary[11,1] <- paste("s genes with log2FC>=2", pop[2], "vs", pop[1])
+Overall_summary[12,1] <- paste("s genes with log2FC<=-2", pop[2], "vs", pop[1])
 
 for (i in 1:length(grep("not_promoter_with_DMR", names(.GlobalEnv),value=TRUE))) {
   Tables <- eval(as.symbol(grep("not_promoter_with_DMR", names(.GlobalEnv),value=TRUE)[i]))[, c(1:3, 9,7)]
@@ -316,8 +313,8 @@ for (i in 1:length(grep("not_promoter_with_DMR", names(.GlobalEnv),value=TRUE)))
   trans_DMR <- merge(DESeq2, Tables, by.y = "Gene", all.x = F)
   trans_DMR <- unique(trans_DMR[,c(1:8)])
   
-  if (str_detect(grep("not_promoter_with_DMR", names(.GlobalEnv),value=TRUE)[i], "shared_ATAC_H3K27ac")){
-    n <- 13 } else {
+  if (str_detect(aedmr[ae], "H3K27open.")){
+    n <- 11 } else {
       n <- 4
     }
   if (str_detect(grep("not_promoter_with_DMR", names(.GlobalEnv),value=TRUE)[i], pop[1])){
