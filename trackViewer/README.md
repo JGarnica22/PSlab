@@ -106,7 +106,7 @@ Once you have your input files prepared, you can use `trackViewer` to make your 
 
 * **Chromosome views** allow you to represent graphically in the same plot the different genomic and transcriptomic data from the same samples. In this case, _Chromosome_views.R_ is designed to represent data from **RNA-seq, ChIP, ATAC-seq, methylation** and inferred **active enhancers** (see [Active_enhancers_analysis](https://github.com/patriciasolesanchez/PSlab/tree/master/Active_enhancers_analysis) folder) for your genes of interest.  
 
-  **IMPORTANT!! Rename your input files name to be as following: _sample(#)_analysis.ext_ (e.g. Tet1_RNA.bw)**
+  **IMPORTANT!! Rename your input files name to be as following: _sample(#)_analysis.ext_ (e.g. Tet1_RNA.bw)**  
   You will need the following input files for each of your samples or populations:
   
   * RNAseq sequences as bigwig files.
