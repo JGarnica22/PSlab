@@ -306,7 +306,7 @@ for (i in c(1:length(pop))) {
     overlap5 <- findOverlaps(gr5, grH3wop)
     H3K27open.DMR <- H3_g_around[unique(subjectHits(overlap5)),]
     H3K27open.DMR.mr <- merge(H3K27open.DMR, H3_g_around_more_rows, all.y = T)
-    write.table(H3K27open.DMR, file = paste0("output/annotation", pop[i] ,"_shared_ATAC_H3K27ac_not_promoter_with_DMR_annotated",
+    write.table(H3K27open.DMR, file = paste0("output/annotation/", pop[i] ,"_shared_ATAC_H3K27ac_not_promoter_with_DMR_annotated",
                                              ".txt"), sep = "\t", dec = ".", quote = F, row.names = F, col.names = T)
     Overall_summary[10,1] <- "Shared_ATAC_H3K27ac_not_promoter_with_DMR"
     Overall_summary[10,4-i] <- nrow(H3K27open.DMR)
@@ -321,7 +321,7 @@ for (i in c(1:length(pop))) {
     dmrH3_g_around <- as.data.frame(g_r[2])
     dmrH3_g_aroundc <- merge(dmrH3_g_around, DMR.H3K27open)
     
-    write.table(DMR.H3K27open, file = paste0("output/annotation", pop[i] ,"_DMR_Overlapping_shared_ATAC_H3K27ac_not_promoter_annotated",".txt"),
+    write.table(DMR.H3K27open, file = paste0("output/annotation/", pop[i] ,"_DMR_Overlapping_shared_ATAC_H3K27ac_not_promoter_annotated",".txt"),
                 sep = "\t", dec = ".", quote = F, row.names = F, col.names = T)
     
     Overall_summary[13,1] <- "DMR_Overlapping_shared_ATAC_H3K27ac_not_promoter"
