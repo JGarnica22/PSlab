@@ -251,7 +251,8 @@ More chunk options in: https://rstudio.com/resources/cheatsheets/
 <br/>
 
 **B) Inline code:**  
-Place code in a sentence with \`r _followed by your code_\`. R markdown will replace the code with its results.
+Code results can be inserted directly into the text of a .Rmd file by enclosing the code with \`r _followed by your code_\`.
+R markdown will directly replace the code with its results.
 ````
 Today is `r Sys.date()`
 ````
