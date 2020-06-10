@@ -319,9 +319,9 @@ for (i in c(1:length(pop))) {
     g_r <- look.around(grdmrH3)
     dmrH3_g_around_more_rows <- as.data.frame(g_r[1])
     dmrH3_g_around <- as.data.frame(g_r[2])
-    dmrH3_g_aroundc <- merge(dmrH3_g_around, DMR.H3K27open)
+    dmrH3_g_aroundc <- merge(dmrH3_g_around, DMR.H3K27open) # if willing to include all rows, just merge with *_more_rows (all.y = T)
     
-    write.table(DMR.H3K27open, file = paste0("output/annotation/", pop[i] ,"_DMR_Overlapping_shared_ATAC_H3K27ac_not_promoter_annotated",".txt"),
+    write.table(dmrH3_g_aroundc, file = paste0("output/annotation/", pop[i] ,"_DMR_Overlapping_shared_ATAC_H3K27ac_not_promoter_annotated",".txt"),
                 sep = "\t", dec = ".", quote = F, row.names = F, col.names = T)
     
     Overall_summary[13,1] <- "DMR_Overlapping_shared_ATAC_H3K27ac_not_promoter"
@@ -361,7 +361,7 @@ Overall_summary[5,1] <- paste("genes with log2FC<=-2", pop[2], "vs", pop[1])
 Overall_summary[11,1] <- paste("s genes with log2FC>=2", pop[2], "vs", pop[1])
 Overall_summary[12,1] <- paste("s genes with log2FC<=-2", pop[2], "vs", pop[1])
 
-write_xlsx(Overall_summary, "output/Overall_summary_active_enhancers.xlsx")
+write_xlsx(Overall_summary, "output/Overall_summary_active_enhancers_all_R.xlsx")
 
 
 #Do graph bar plots for summary
