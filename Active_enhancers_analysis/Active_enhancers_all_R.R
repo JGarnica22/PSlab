@@ -204,7 +204,6 @@ for (i in c(1:length(pop))) {
     assign(paste0(m,".", pop[i], ".gr"), gr)
   }
   
-  
   # Find overlapping peaks
   # CAREFUL: order of objects in `findOverlaps` matters!
   overlap <- findOverlaps(eval(as.symbol(grep(paste0("ChIP.",pop[i]), names(.GlobalEnv),value=TRUE))), 
@@ -215,7 +214,6 @@ for (i in c(1:length(pop))) {
                  strand = NULL)
   Overall_summary[1,1] <- "ATAC_Overlapping_peaks_with_H3K27ac_ChIP"
   Overall_summary[1,4-i] <- nrow(olpeaks)
-  
   
   # Obtain active enhancers by filtering overlapping peaks in promoters:
   inpromoters <- findOverlaps(prom, gr3)
@@ -232,7 +230,6 @@ for (i in c(1:length(pop))) {
   g_around <- as.data.frame(g_r[2])
   
   # Export files in .txt format as bed will not be needed in this script
-  
   write.table(g_around, 
               file = paste0("output/annotation/", pop[i] ,"_Active_enhancers_annotated", ".txt"),
               sep = "\t", quote = F, dec = ".", row.names = F, col.names = T)
