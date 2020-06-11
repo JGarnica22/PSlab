@@ -48,13 +48,10 @@ library(gridExtra)
 setwd("/home/jgarnica/R/GenomicRanges_Active_enhancers")
 setwd("/Users/patri/Documents/LAB/TESIS DOCTORAL 2015-2020/INTERNSHIP/7_GenomicRanges")
 
-# Indicate populations to work with
-pop <- c("Tconv", "TR1")
-
 # Indicate species working with (mouse or human)
 species <- "mouse"
 
-#Generate database for species to be studied
+# Generate database for species to be studied
 if (species == "mouse"){
   TxDb <- TxDb.Mmusculus.UCSC.mm10.knownGene
   org.SYMBOL2EG <- org.Mm.egSYMBOL2EG
@@ -69,42 +66,51 @@ if (species == "mouse"){
 #Set the genes to study or import file:
 genes <- c("Il10", "Il21")
 
-# Create a empty list:
-Act.enh.gene <- vector(mode = "list",length = length(genes))
-# Set the names of the gene sets in the list:
-names(Act.enh.gene) <- genes
+# Set the width of your search in base pairs
+wi <- 100000 
 
-for (g in names(Act.enh.gene)) {
-  enhancers <- vector()
+
+# Call files containing the elements you want to look for (around genes) in .txt format
+file.ele <- "TR1_Active_enhancers1"
+
+tble <- read.table(paste0("output/", file.ele, ".txt"),sep = "\t", quote = "",
+                   dec = ".", header = T, na.strings = T)
+# Convert table into GRanges object
+chr.loc <- GRanges(seqnames = tble$Chr, 
+                   ranges = paste0(tble$Start,"-",tble$End), 
+                   strand = NULL)
+
+# Create a empty dataframes:
+df_mr <- data.frame(matrix(ncol = 2, nrow = 0))
+names(df_mr) <- c("gene","location")
+df_su <- data.frame(matrix(ncol = 2, nrow = 0))
+names(df_su) <- c("gene","location")
+
+for (g in genes) {
   id <- get(g, org.SYMBOL2EG)
   gr <- genes(TxDb)[id]
   #set the window width of your search, as a defect is set at 100.000 bp
-  gr100kb <- resize(gr, width(gr)+100000, fix = "center")
-  
-  #Introduce here your gr file (or generated such as the example for active enhancers
-  #overlaping ATAC and ChIP) annotating the position of the elements you want to search around your genes
-  #act.enhan <- file_of_reference
-  #subsetByOverlaps(eval(as.symbol(grep(paste0("ChIP.",pop[i]), names(.GlobalEnv),value=TRUE))), 
-  #eval(as.symbol(grep(paste0("ATAC.",pop[i]), names(.GlobalEnv),value=TRUE))))
-  #Filter overlapping peaks in promoters:
-  #prom <- promoters(TxDb)
-  #act.enhan <- act.enhan[-c(unique(queryHits(findOverlaps(act.enhan, prom))))]
-  act.enh.by.gene <- subsetByOverlaps(act.enhan, gr100kb)
-  if (length(act.enh.by.gene)>0){
-    df <- data.frame(gene = rep(g, length(act.enh.by.gene)),
-                     location = paste0(seqnames(act.enh.by.gene),":", ranges(act.enh.by.gene)))
+  gr100kb <- resize(gr, width(gr)+wi, fix = "center")
+  chr.loc.by.gene <- subsetByOverlaps(chr.loc, gr100kb)
+  if (length(chr.loc.by.gene)>0){
+    df <- data.frame(gene = rep(g, length(chr.loc.by.gene)),
+                     location = paste0(seqnames(chr.loc.by.gene),":", ranges(chr.loc.by.gene)))
     df <- df[order(df$location),]
-    df <- ddply(df, .(gene), summarize, 
-                gene=paste(unique(gene),collapse=","),
-                location=paste(unique(location),collapse=","))
-    enhancers <- df[,"location"]
-    Act.enh.gene[[g]] <- enhancers
+    df2 <- ddply(df, .(gene), summarize, 
+                 gene=paste(unique(gene),collapse=","),
+                 location=paste(unique(location),collapse=","))
+  } else {
+    df <- data.frame(gene = g, location = paste0("No elements found ", wi, " bp around"))
+    df2 <- data.frame(gene = g, location = paste0("No elements found ", wi, " bp around"))
   }
+  # data frame including one row per each element found
+  df_mr <- rbind(df_mr, df)
+  # data frame with one row per gene and all elements listed in the same cell
+  df_su <- rbind(df_su, df2)
   
-  if (file.exists("Act.enh.gene")){
-    trial <-as.data.frame(unlist(Act.enh.gene))
-    write.table(trial, paste0("output/", "your_element" ,"_around_genes.txt"),
-                sep = "\t", row.names = T, col.names = F, quote = F)
-    #rm(Act.enhancers)
-  }
 }
+
+write.table(df_mr, paste0("output/", file.ele ,"_around_genes_more_rows.txt"),
+            sep = "\t", row.names = T, col.names = F, quote = F)
+write.table(df_su, paste0("output/", file.ele ,"_around_genes_collapsed.txt"),
+            sep = "\t", row.names = T, col.names = F, quote = F)
