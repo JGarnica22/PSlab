@@ -70,15 +70,15 @@ genes <- c("Il10", "Il21")
 wi <- 100000 
 
 
-# Call files elements to look for genes around in .txt format
+# Call files containing the elements you want to look for (around genes) in .txt format
 file.ele <- "TR1_Active_enhancers1"
 
 tble <- read.table(paste0("output/", file.ele, ".txt"),sep = "\t", quote = "",
                    dec = ".", header = T, na.strings = T)
 # Convert table into GRanges object
-act.enhan <- GRanges(seqnames = tble$Chr, 
-        ranges = paste0(tble$Start,"-",tble$End), 
-        strand = NULL)
+chr.loc <- GRanges(seqnames = tble$Chr, 
+                   ranges = paste0(tble$Start,"-",tble$End), 
+                   strand = NULL)
 
 # Create a empty dataframes:
 df_mr <- data.frame(matrix(ncol = 2, nrow = 0))
@@ -91,10 +91,10 @@ for (g in genes) {
   gr <- genes(TxDb)[id]
   #set the window width of your search, as a defect is set at 100.000 bp
   gr100kb <- resize(gr, width(gr)+wi, fix = "center")
-  act.enh.by.gene <- subsetByOverlaps(act.enhan, gr100kb)
-  if (length(act.enh.by.gene)>0){
-    df <- data.frame(gene = rep(g, length(act.enh.by.gene)),
-                     location = paste0(seqnames(act.enh.by.gene),":", ranges(act.enh.by.gene)))
+  chr.loc.by.gene <- subsetByOverlaps(chr.loc, gr100kb)
+  if (length(chr.loc.by.gene)>0){
+    df <- data.frame(gene = rep(g, length(chr.loc.by.gene)),
+                     location = paste0(seqnames(chr.loc.by.gene),":", ranges(chr.loc.by.gene)))
     df <- df[order(df$location),]
     df2 <- ddply(df, .(gene), summarize, 
                  gene=paste(unique(gene),collapse=","),
