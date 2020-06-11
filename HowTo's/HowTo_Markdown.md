@@ -39,7 +39,7 @@ To create a line break, end a line with two or more spaces, and then type \<br/>
 #### Bold
 To bold text, add two asterisks or underscores before and after a word or phrase. To bold the middle of a word for emphasis, add two asterisks without spaces around the letters. 
 
-**example**
+   **example**
 ````
 **example**
 __example__
@@ -48,7 +48,7 @@ __example__
 #### Italic
 To italicize text, add one single asterisk or underscore before and after a word or phrase. To italicize the middle of a word for emphasis, add one asterisk without spaces around the letters.
 
-*example*
+   *example*
 ````
 *example*
 _example_
@@ -57,7 +57,7 @@ _example_
 #### Bold and Italic
 To emphasize text with bold and italics at the same time, add three asterisks or underscores before and after a word or phrase. To bold and italicize the middle of a word for emphasis, add three asterisks without spaces around the letters.
 
-***example***
+   ***example***
 ````
 ***example***
 ___example___
@@ -84,58 +84,65 @@ To create an ordered list, add line items with numbers followed by periods. The 
 2. Example 2
 ````
 
-#### Special characters without effect
-To produce a literal character (an asterisk or underscore for example) at a position where it would otherwise be used as an emphasis delimiter, you can backslash escape it.
-`Example`
+### Special characters without effect
+To produce a literal character (an asterisk or underscore, for example) at a position where it would otherwise be used as a formatting character, you can backslash escape it.  
 
 \*this text is surrounded by literal asterisks\*
 ````
 \*this text is surrounded by literal asterisks\*
 ````
 
-#### Naming tools with backticks
+
+### Naming tools with backticks
 The backtick (also known as the grave accent or backquote) is used to mention a tool or package. Include a backtick after and before the world that you want to highlight.<br/>
+
 `Example`
+````
+`Example`
+````
+
+
+### Introduce chunks of code
+To insert chunks of code into your file type 4 grave accents \`\`\`\` before and after the code. In a conventional .md file (to read in GitHub or export to html or PDF), the code chunks will appear within a blue background.<br/>
 
 \`\`\`\`<br/>
-\`Example\`
+Code Example <br/>
 \`\`\`\`<br/>
 
-#### Introduce chunks of code
-To insert chunks of code into your file with type 4 grave accents \`\`\`\` before and after the code. When you render your .Rmd file, R Markdown will run each code chunk and embed the results beneath the code chunk in your final report (unless you use special chunk options described below).<br/>
-\`\`\`\`<br/>
-Code Example<br/><br/>
-\`\`\`\`<br/>
+````
+Code Example
+````
 
-#### Add links
+
+### Add links
 To embed links into a topic you can either add the link (will be seen as the whole link text) or use the markdown syntax as below where the word "link" will be converted to a clickable link (use [ ] around the linkable word, followed without space for the link in brackets.
 ````
 Go to this [link](https://write_here_your_link.com)
 ````
 
-#### Embed images
+### Embed images
 To create an inline image link, enter an exclamation point ( ! ), wrap the alt text in brackets ( [ ] ), and then wrap the link in parenthesis ( ( ) ). (\*_Alt text_ is a phrase or sentence that describes the image.)
 ````
 ![Alt Text](url)
 ````
 
-#### Embed emojis :blush:
-You can also add emojis to your text or report copying its code (\:emojiX\:). You can find the code for different emojis in multiple web pages, for example this one: https://gist.github.com/rxaviers/7360908
+### Embed emojis :blush:
+You can also add emojis to your text or report copying its code (\:emojiX\:). You can find the code for different emojis in multiple web pages, for example this one: https://gist.github.com/rxaviers/7360908  
+<br/>
 
-
-For more information you can visit these web pages: 
-- https://www.markdownguide.org/basic-syntax/
-- https://rstudio.com/resources/cheatsheets/
-- https://rstudio.com/resources/webinars/getting-started-with-r-markdown/
+For more information on Markdown you can visit these web pages:<br/>
+- https://www.markdownguide.org/basic-syntax/  
+- https://rstudio.com/resources/cheatsheets/  
+- https://rstudio.com/resources/webinars/getting-started-with-r-markdown/  
 <br/>
 
 ## How to use R Markdown
 R Markdown provides an authoring framework for data science. You can use a single R Markdown file to both:
 
-- save and execute code.
-- generate high quality reports that can be shared with an audience.
+- Save and execute code.
+- Generate high quality reports that can be shared with an audience.
 
-R Markdown documents are fully reproducible and support dozens of static and dynamic output formats (more info: https://rmarkdown.rstudio.com/).
+R Markdown documents are fully reproducible and support dozens of static and dynamic output formats ([more info](https://rmarkdown.rstudio.com/)).
 
 ### Install and open Markdown
 You can install it directly from RStudio:  
@@ -144,28 +151,30 @@ Tools > Install Packages <br/>
 Choose "Repository CRAN" and write "Markdown" in "Packages (separate multiple with space or comma:)"
 
 To open a new file, click File > New File > R Markdown in the RStudio menu bar. 
-A window will pop up where you can name the project an the author ("Title" and "Author") and select the specific type of output that you wish to build (HTML, PDF or Word). Remember that you can switch to the other output formats anytime.
+A window will pop up where you can name the project an the author ("Title" and "Author") and select the specific type of output that you wish to build (HTML, PDF or Word). Remember that you can switch to the other output formats anytime.  
 
-A template will be opened to generate your Markdown report. Here you have a summary of the template in order of appearance:
 
-**1. Important information of your document such as the title, author, date (will apear in the final document) and output format (you can change it at any moment):**
+A template will be opened to generate your Markdown report. The Markdown template contains:
+
+**1. A description of your document:**
+It includes info on the title, author, date and output format. This description will apear in the final document; you can change it at any moment.
 
 ````
 title: "Test"
 author: "Mireia"
 date: "11/05/2020"
 output: pdf_document
-````
+````  
 
-**2. An R code in a grey square that you should leave by default:**
+**2. A first R code chunk that you should leave by default:**
 
 ````
 {r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-````
+````  
 
-**3. Text about Markdown. Note that this is for you to edit with info about your specific project. After the two hash symbols you can write the title of the project that you want to show. In the paragraph write the description of the project, what you are going to show or the results of your analysis (or everything).
-You can use this paragraph with different information in multiple ocasions during the report.**
+**3. Text.** 
+You can add text along your file to describe your project or explain each code chunk or results. Use Markdown syntax as explained above.
 
 ````
 ## R Markdown
@@ -174,37 +183,48 @@ This is an R Markdown document. Markdown is a simple formatting syntax for autho
 
 When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
 
-````
-**4. R code that you want to show. Note that you can run that code directly from that window and you can see the progress in the "Console" window of R Studio.**
+````  
+
+**4. R code chunks.** 
+When you render your .Rmd file, R Markdown will run each code chunk and embed the results beneath the code chunk in your final report (unless you use special chunk options described below). Note that you can run that code directly from that window and you can see the progress in the "Console" window of R Studio.  
+<br/>
 
 There are two ways to include code to the document:
 
-**1. Embeded code:** Insert a chunck of code as the example below. When you compile, R markdown will run the code and include its results. R markdown will also remove the ```{r} and ```. You can hide the code by clicking the triangle botton found at the end of each line.
+**A) Embeded code:**  
+Similarly to what was explained above for conventional markdown, you can add chunks of code in R Markdown by using 3 backticks before the code \`\`\` followed by {r _info to contextualize this chunk_ and _code chunk options_}. Close the chunk by using again 3 backticks after code \`\`\`. When you compile, R markdown will run the code and by default include the code and its results in the output. R markdown will remove the first \`\`\`{r} and last \`\`\` lines.  
+
 ````
 ```{r}
-# some code
+Some code
 ```
 ````
 
 Options in the brackets after {r}:
 
-* echo = FALSE --> hides the code (useful if you want to show only a plot).
-* eval = FALSE --> prevent the code from being run. As a result, no results will be displayed with the code.
+* echo = FALSE --> hides the code (useful if you want to show only the results/plot).
+* eval = FALSE --> prevents the code from being run. As a result, no results will be displayed with the code.
 * message = FALSE --> supresses messages from appearing in the output, for example warnings.
-* engine = 'python' --> to embed non R code, set the engine option to the language you want to embed. 
+* engine = 'python' --> to embed non R code, set the engine option to the language you want to embed.  
+
+See examples below:
 
 ````
 ```{r echo = FALSE}
-# some code
+Some code
 ```
 ````
 
 ![](https://github.com/patriciasolesanchez/PSlab/blob/master/HowTo's/Screenshots/echo_example.png) 
-![](https://github.com/patriciasolesanchez/PSlab/blob/master/HowTo's/Screenshots/echo_plot.png) 
+
+I WOULD SHOW ONE IMAGE WITH echo=FALSE AND ONE WITH echo=TRUE SO THAT THE DIFFERENCE IS CLEAR. SAME FOR THE OTHER OPTIONS!!
+
+ALTERNATIVELY, SHOW A FIRST IMAGE (AS A REFERENCE) WITH NO OPTIONS, SO THAT THE OPTIONS BELOW ARE COMPARED TO THIS ONE. BUT THEN ALL EXAMPLES OF CODE WOULD NEED TO BE THE SAME... I THINK THE FIRST OPTION MIGHT BE EASIER :)
+
 
 ````
 ```{r eval = FALSE}
-# some code
+Some code
 ```
 ````
 
@@ -212,7 +232,7 @@ Options in the brackets after {r}:
 
 ````
 ```{r message = FALSE}
-# some code
+Some code
 ```
 ````
 
@@ -220,26 +240,29 @@ Options in the brackets after {r}:
 
 ````
 ```{r engine = 'python'}
-# some code
+Some code
 ```
 ````
 
 ![](https://github.com/patriciasolesanchez/PSlab/blob/master/HowTo's/Screenshots/engine_example.png) 
 
 
-More chunk options in: https://rstudio.com/resources/cheatsheets/
+More chunk options in: https://rstudio.com/resources/cheatsheets/  
+<br/>
 
-**2. Inline code:** Place code in a sentence with `r #code`. R markdown will replace the code with its results.
+**B) Inline code:**  
+Code results can be inserted directly into the text of a .Rmd file by enclosing the code with \`r _followed by your code_\`.
+R markdown will directly replace the code with its results.
 ````
-Today is `r Sys.date()` --> Today is 2020-05-20
+Today is `r Sys.date()`
 ````
+_Today is 2020-05-20_
+<br/>
 
-**5. A place to embed your plots with echo = FALSE to avoid showing the code:**
-```{r name of the plot, echo=FALSE}
-plot(name of the plot)
-```
+I DONT' UNDERSTAND WELL HOW THIS INLINE CODE WORKS. I TRIED IN A MARKDOWN AND RESULTS APPEAR WEIRD. LET'S DISCUSS.  
+<br/>
 
-Finally, to get your repot you can click on "Knit" botton and choose your favourite format: HTML, PDF or Word.
+Finally, to get your report you can click on "Knit" botton and choose your favourite format: HTML, PDF or Word.
 
 I strongly recommend you this webinar to start using R Markdown:
 https://rstudio.com/resources/webinars/getting-started-with-r-markdown/
