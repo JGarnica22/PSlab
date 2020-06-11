@@ -158,8 +158,7 @@ for (i in c(1:length(pop))) {
       
       gr <- GRanges(seqnames = atac$Chr, 
                     ranges = paste0(atac$Start,"-",atac$End), 
-                    strand = NULL,
-                    Anno.Gene = atac$Anno.Gene)
+                    strand = NULL)
     }
     assign(paste0(m,".", pop[i], ".gr"), gr)
   }
