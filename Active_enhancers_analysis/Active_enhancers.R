@@ -66,15 +66,36 @@ if (species == "mouse"){
   org.SYMBOL <- org.Hs.egSYMBOL
   ensembl <- useMart("ENSEMBL_MART_ENSEMBL", dataset="hsapiens_gene_ensembl")
 }
-BM <- getBM (attributes=c("entrezgene_id", "external_gene_name"),
+BM <- getBM (attributes=c("entrezgene_id", "chromosome_name", "start_position", "end_position" , "ensembl_gene_id", "external_gene_name", "strand"),
              mart = ensembl, verbose = T)
-BM <- rbind(BM, c("No genes found","No genes found"))
+
+
+#do Granges object from BM database
+#Take out mithocondrial and weird chromosome annotations
+BMgr <- subset(BM, as.numeric(chromosome_name)>= 1 & as.numeric(chromosome_name) <=50 | chromosome_name == "X" | chromosome_name == "Y")
+#Nomenclature for chrosome should be "chrX"
+BMgr$chromosome_name <- sapply(BMgr$chromosome_name, function(x) {paste0("chr",x)})
+BMgr$strand <- sapply(BMgr$strand, function(x){if (x ==1){print("+")} else {print("-")}})
+#GRanges generated just in case, but not actually needed as we need bed file for bedtools window tool.
+grBM <- GRanges(seqnames = BMgr$chromosome_name, 
+                ranges = paste0(BMgr$start_position,"-",BMgr$end_position), 
+                strand = BMgr$strand,
+                gene_name = BMgr$external_gene_name)
+
+BMgenes <- BMgr[,c(2,3,4,6,7)]
+BMgenes$width <- NA
+BMgenes <- BMgenes[,c(1:4, 6,5)]
+write.table(BMgenes, "data/BMgenes.bed",
+            sep = "\t", dec = ".", quote = F, row.names = F, col.names = F)
 
 #Load all files needed
 #Load DMR file between two samples:
 DMR <- read.table("data/DMR.txt",
                   sep = "\t", quote = "",
                   dec = ".", header = T, na.strings = T)
+#Fix problem with chrchr19, usual issue?
+DMR$Chr <- sapply(strsplit(as.character(DMR$Chr), split="chr", fixed=TRUE), function(x){print(x[2])})
+DMR$Chr <- sapply(DMR$Chr, function(x){if (x == ""){print("chr9")} else {paste0("chr", x)}})
 names(DMR) <- c("Chr", "Start", "End", pop[1], pop[2])
 DMR <- DMR[order(as.numeric(gsub("chr", "", DMR$Chr)), 
                  as.numeric(DMR$Start),
@@ -84,7 +105,7 @@ DMR <- DMR[order(as.numeric(gsub("chr", "", DMR$Chr)),
 
 DESeq2 <- read.table (file = paste0("data/", list.files(path= paste0(getwd(), "/data"), pattern= "DESeq2_")),
                       sep = "\t", quote = "", dec = ".", header=T, na.strings = "NA")
-names(DESeq2)[1] <- "external_gene_name"
+names(DESeq2)[1] <- "gene_name"
 
 
 #Load and prepare shared OCR between two populations:
@@ -177,7 +198,7 @@ for (i in c(1:length(pop))) {
   formats <- c(".txt", ".bed")
   col_names <- c(T,F)
   for (o in 1:length(formats)){
-    write.table(act.enh, file = paste0("output/", pop[i] ,"_Active_enhancers1", formats[o]),
+    write.table(act.enh, file = paste0("output/", pop[i] ,"_Active_enhancers", formats[o]),
                 sep = "\t", quote = F, dec = ".", row.names = F, col.names = col_names[o])
     
     #Methylation in active enhancers
@@ -233,7 +254,7 @@ for (i in c(1:length(pop))) {
     Overall_summary[9,4-i] <- nrow(openH3K27acp)
     
     overlap5 <- findOverlaps(gr5, grH3)
-    H3K27open.DMR <- openH3K27ac[unique(subjectHits(overlap5)),]
+    H3K27open.DMR <- openH3K27acp[unique(subjectHits(overlap5)),]
     H3K27open.DMR <- H3K27open.DMR[which(H3K27open.DMR$Chr!="NA"),]
     write.table(H3K27open.DMR, file = paste0("output/", pop[i] ,"_shared_ATAC_H3K27ac_not_promoter_with_DMR", formats[o]),
                 sep = "\t", dec = ".", quote = F, row.names = F, col.names = col_names[o])
@@ -255,10 +276,10 @@ for (i in c(1:length(pop))) {
   }
 } 
   # Annotate regions to genes -> Look for all the genes at 100 kb around the inferred active enhancers
-  genes <- data.frame(genes(TxDb))[, c(1:3, 6, 4, 5)]
-  genes$width <- NA
-  write.table(genes, "data/genes.bed",
-              sep = "\t", dec = ".", quote = F, row.names = F, col.names = F)
+  # genes <- data.frame(genes(TxDb))[, c(1:3, 6, 4, 5)]
+  # genes$width <- NA
+  # write.table(genes, "data/genes.bed",
+  #             sep = "\t", dec = ".", quote = F, row.names = F, col.names = F)
   
   # Go to Terminal; install bedtools from Conda if not installed already
   # Use `windowbed` from `bedtools` to find overlap between:
@@ -272,7 +293,7 @@ for (i in c(1:length(pop))) {
   # mkdir output/window
   # for f in $(find . -name "*a*.bed" -exec basename {} \;)
   # do
-  # bedtools window -a output/$f -b data/genes.bed -w 50000 > output/window/$(cut -d'.' -f1 <<< $f)_100kb.txt
+  # bedtools window -a output/$f -b data/BMgenes.bed -w 50000 > output/window/$(cut -d'.' -f1 <<< $f)_100kb.txt
   # done
 
   #List the files genereated from bedtools window which should contain *_100kb*
@@ -295,29 +316,40 @@ for (i in c(1:length(pop))) {
   Overall_summary[12,1] <- paste("s genes with log2FC<=-2", pop[2], "vs", pop[1])
   
   for (pu in files){
-    x1 <- eval(as.symbol(paste0(strsplit(pu, ".", fixed=T)[1][[1]][1],"_100kb")))[, c(1:3, 9,7)]
-    names(x1) <- c("Chr", "Start", "End", "Strand", "EntrezID")
-    x2 <- eval(as.symbol(strsplit(pu, ".", fixed=T)[1][[1]][1]))[-1,]
     if (str_detect(pu, "_DMR_")){
-      names(x2) <- names(DMR.H3K27open)
-    } else {names(x2) <- c("Chr","Start","End")}
+    x1 <- eval(as.symbol(paste0(strsplit(pu, ".", fixed=T)[1][[1]][1],"_100kb")))[, c(1:3, 11,9)]
+    names(x1) <- c("Chr", "Start", "End", "Strand", "gene_name")
+    x2 <- eval(as.symbol(strsplit(pu, ".", fixed=T)[1][[1]][1]))[-1,]
+    names(x2) <- names(DMR.H3K27open)
+    } else {
+      x1 <- eval(as.symbol(paste0(strsplit(pu, ".", fixed=T)[1][[1]][1],"_100kb")))[, c(1:3, 9,7)]
+      names(x1) <- c("Chr", "Start", "End", "Strand", "gene_name")
+      x2 <- eval(as.symbol(strsplit(pu, ".", fixed=T)[1][[1]][1]))[-1,]
+      names(x2) <- c("Chr","Start","End")}
     Tablesp <- merge(x1, x2, all.y = T)
-    Tablesp$EntrezID <- ifelse(is.na(Tablesp$EntrezID), 
-                                 "No genes found", Tablesp$EntrezID)
-    Tables <- merge(Tablesp, BM, by.x = "EntrezID", by.y = "entrezgene_id", all.x = T, all.y = F)
-    Tables <- Tables[, c(-1)]
-    Tables <- Tables[order(as.numeric(gsub("chr", "", Tables$Chr)), 
-                     as.numeric(Tables$Start),
+    Tablesp$gene_name <-sapply(Tablesp$gene_name, function(x){if (is.na(x)){print("No genes found")} else {print(as.character(x))}})
+    Tables <- Tablesp[order(as.numeric(gsub("chr", "", Tablesp$Chr)), 
+                     as.numeric(Tablesp$Start),
                      decreasing = F, na.last = T), ]
+    
     write.table(Tables, paste0("output/annotation/", strsplit(pu, ".", fixed=T)[1][[1]][1], "_annotation_more_rows.txt"),
                 sep = "\t", dec = ".", quote = F, row.names = F, col.names = T)
     
+    if (str_detect(pu, "_DMR_")){
     Tables2 <- ddply(Tables, .(Start), summarize,
                      Chr = paste(unique(Chr),collapse=","),
                      Start =  paste(unique(Start),collapse=","),
                      End = paste(unique(End),collapse=","),
-                     Strand = paste(unique(Strand),collapse=","),
-                     Gene= paste(unique(external_gene_name),collapse=","))
+                     Strand = paste(Strand,collapse=","),
+                     Gene= paste(unique(gene_name),collapse=","),
+                     Tconv = paste(unique(Tconv),collapse=","),
+                     TR1 = paste(unique(TR1),collapse=","))
+    } else {Tables2 <- ddply(Tables, .(Start), summarize,
+                             Chr = paste(unique(Chr),collapse=","),
+                             Start =  paste(unique(Start),collapse=","),
+                             End = paste(unique(End),collapse=","),
+                             Strand = paste(Strand,collapse=","),
+                             Gene= paste(unique(gene_name),collapse=","))}
     Tables2 <- Tables2[order(as.numeric(gsub("chr", "", Tables2$Chr)), 
                              as.numeric(Tables2$Start),
                              decreasing = F, na.last = T), ]
@@ -326,11 +358,10 @@ for (i in c(1:length(pop))) {
     #generate also excel file
     write_xlsx(Tables2, paste0("output/annotation/", strsplit(pu, ".", fixed=T)[1][[1]][1], "_annotation.xlsx"))
     
-    #assign "_with_DMR" file to fill overallsummary table
     
     if (str_detect(pu, "_with_DMR")) {
-      Tables3 <- subset(Tables, Tables$external_gene_name != "No genes found")
-      trans_DMR <- merge(DESeq2, Tables3, by.y = "external_gene_name", all.x = F)
+      Tables3 <- subset(Tables, Tables$gene_name != "No genes found")
+      trans_DMR <- merge(DESeq2, Tables3, by.y = "gene_name", all.x = F)
       trans_DMR <- unique(trans_DMR[,c(1:8)])
       if (str_detect(pu, "_H3K27ac_")){
         n <- 11 } else {
@@ -359,19 +390,22 @@ for (i in c(1:length(pop))) {
   dfplot[c((nrow(Overall_summary)+1):(nrow(Overall_summary)*2)),3] <- pop[1]
   names(dfplot) <- c("Hits","analysis","type")
   
-  hitsbar <- ggplot(dfplot, aes(x=analysis, y=Hits, fill=type)) + geom_bar(stat="identity", position=position_dodge())+
-    geom_text(aes(label=Hits), vjust=1.6, color="black",
+  hitsbar <- ggplot(dfplot, aes(y=analysis, x=Hits, fill=type)) + geom_bar(stat="identity", position=position_dodge())+
+    geom_text(aes(label=Hits), vjust=0.5, hjust=-0.1, color="black",
               position = position_dodge(0.9), size=3.5)+
-    xlab("Type of analysis") + ylab("Num of hits(log10)")+ scale_y_log10()+
-    theme(axis.text.x = element_text(angle = 60, size = 10, hjust =1, face="bold"))+
-    scale_x_discrete(limits = Overall_summary$Analysis)+
+    ylab("Type of analysis") + xlab("Num of hits(log10)")+ scale_x_log10(expand = expansion(add= c(0 , 1)))+
+    # theme(axis.text.x = element_text(angle = 60, size = 10, hjust =1, face="bold"))+
+    scale_y_discrete(limits = rev(Overall_summary$Analysis))+
+    #scale_fill_manual(values = c("firebrick","gray"))+
     theme(panel.background = element_rect(fill = "white",
                                           colour = "grey",
                                           size = 0.3, linetype = "solid"),
           panel.grid.major = element_line(size = 0.05, linetype = 'solid',
                                           colour = "grey"))
+  
+  
+  
   #Export pdf with table and bar graph
   pdf(file = "figs/Overall_summary.pdf", width = 10, height = 6)
   print(hitsbar)
   dev.off()
-
