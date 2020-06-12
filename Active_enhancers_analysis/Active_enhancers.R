@@ -45,6 +45,7 @@ library(gridExtra)
 
 # Set your working directory (the project you are working in):
 setwd("/home/jgarnica/R/GenomicRanges_Active_enhancers")
+setwd("/Users/patri/Desktop/R class/Active_enhancers")
 
 ## NOTE: CHANGE NAMES OF THE FILES TO AVOID CONFUSIONS, IN THE DATA FILES SHOULD APPEAR THE NAME OF THE TECHNIQUE AND ONLY THE POPULATION STUDIED
 
@@ -73,18 +74,18 @@ BM <- getBM (attributes=c("entrezgene_id", "chromosome_name", "start_position", 
 # Take out mithocondrial and weird chromosome annotations
 BMgr <- subset(BM, as.numeric(chromosome_name)>= 1 & as.numeric(chromosome_name) <=50 | chromosome_name == "X" | chromosome_name == "Y")
 # Nomenclature for chromosome should be "chrX"
-BMgr$chromosome_name <- sapply(BMgr$chromosome_name, function(x) {paste0("chr",x)})
+BMgr$chromosome_name <- sapply (BMgr$chromosome_name, function(x) {paste0("chr",x)})
 BMgr$strand <- sapply(BMgr$strand, function(x){if (x ==1){print("+")} else {print("-")}})
 # GRanges generated just in case, but not actually needed as we need bed file for bedtools window tool.
 grBM <- GRanges(seqnames = BMgr$chromosome_name, 
-                ranges = paste0(BMgr$start_position,"-",BMgr$end_position), 
+                ranges = paste0 (BMgr$start_position,"-", BMgr$end_position), 
                 strand = BMgr$strand,
                 gene_name = BMgr$external_gene_name)
 
-BMgenes <- BMgr[,c(2,3,4,6,7)]
+BMgenes <- BMgr[, c(2,3,4,6,7)]
 BMgenes$width <- NA
-BMgenes <- BMgenes[,c(1:4, 6,5)]
-write.table(BMgenes, "data/BMgenes.bed",
+BMgenes <- BMgenes[, c(1:4, 6,5)]
+write.table (BMgenes, "data/BMgenes.bed",
             sep = "\t", dec = ".", quote = F, row.names = F, col.names = F)
 
 # Load all files needed
@@ -93,7 +94,7 @@ DMR <- read.table("data/DMR.txt",
                   sep = "\t", quote = "",
                   dec = ".", header = T, na.strings = T)
 
-# Fix problem with chrchr19, usual issue?
+# Fix problem with chrchr9, usual issue?
 DMR$Chr <- sapply(strsplit(as.character(DMR$Chr), split="chr", fixed=TRUE), function(x){print(x[2])})
 DMR$Chr <- sapply(DMR$Chr, function(x){if (x == ""){print("chr9")} else {paste0("chr", x)}})
 names(DMR) <- c("Chr", "Start", "End", pop[1], pop[2])
@@ -102,13 +103,15 @@ DMR <- DMR[order(as.numeric(gsub("chr", "", DMR$Chr)),
                  decreasing = F, na.last = T), ]
 
 # Read DESeq2 file comparing you samples to analyse
-DESeq2 <- read.table (file = paste0("data/", list.files(path= paste0(getwd(), "/data"), pattern= "DESeq2_")),
+DESeq2 <- read.table (file = paste0("data/", list.files(path= paste0(getwd(), "/data"),
+                                                        pattern= "DESeq2", ignore.case = T)),
                       sep = "\t", quote = "", dec = ".", header=T, na.strings = "NA")
 names(DESeq2)[1] <- "gene_name"
 
 # Load and prepare shared OCR between two populations:
-socr <- read.table(paste0("data/", list.files(path= paste0(getwd(), "/data"), pattern= "shared", ignore.case = T)),
-                   sep = "\t", dec = ".",header = TRUE, quote = "", stringsAsFactors = F)
+socr <- read.table(paste0("data/", list.files(path= paste0(getwd(), "/data"), 
+                                              pattern= "shared", ignore.case = T)),
+                   sep = "\t", dec = ".", header = TRUE, quote = "", stringsAsFactors = F)
 socr <- socr[, "Region.ID", drop = F]
 socr$Chr <- sapply(strsplit(socr$Region.ID, split=':', fixed=TRUE), function(x) (x[1]))
 socr$ranges <- sapply(strsplit(socr$Region.ID, split=':', fixed=TRUE), function(x) (x[2]))
@@ -118,7 +121,7 @@ grocr <- GRanges(seqnames = socr$Chr,
 
 # Create an empty dataframe to be filled with data over the loop
 Overall_summary <- data.frame(matrix(ncol=3))
-names(Overall_summary) <- c("Analysis",pop[2],pop[1])
+names(Overall_summary) <- c("Analysis", pop[2], pop[1])
 
 for (i in c(1:length(pop))) {
   for (m in c("ChIP", "ATAC")){
@@ -140,11 +143,11 @@ for (i in c(1:length(pop))) {
                          decreasing = F, na.last = T), ]
       
       gr <- GRanges(seqnames = chip$Chr, 
-                    ranges = paste0(chip$Start,"-",chip$End), 
+                    ranges = paste0(chip$Start, "-", chip$End), 
                     strand = chip$Strand)
       
       grchip <- GRanges(seqnames = chip$Chr, 
-                        ranges = paste0(chip$Start,"-",chip$End),  
+                        ranges = paste0(chip$Start, "-", chip$End),  
                         strand = chip$Strand)
       
     } else {
@@ -157,7 +160,7 @@ for (i in c(1:length(pop))) {
                          decreasing = F, na.last = T), ]
       
       gr <- GRanges(seqnames = atac$Chr, 
-                    ranges = paste0(atac$Start,"-",atac$End), 
+                    ranges = paste0(atac$Start, "-", atac$End), 
                     strand = NULL)
     }
     assign(paste0(m,".", pop[i], ".gr"), gr)
@@ -322,19 +325,19 @@ for (pu in files){
   
   if (str_detect(pu, "_DMR_")){
     Tables2 <- ddply(Tables, .(Start), summarize,
-                     Chr = paste(unique(Chr),collapse=","),
-                     Start =  paste(unique(Start),collapse=","),
-                     End = paste(unique(End),collapse=","),
-                     Strand = paste(Strand,collapse=","),
-                     Gene= paste(unique(gene_name),collapse=","),
-                     Tconv = paste(unique(Tconv),collapse=","),
-                     TR1 = paste(unique(TR1),collapse=","))
+                     Chr = paste(unique(Chr), collapse=","),
+                     Start =  paste(unique(Start), collapse=","),
+                     End = paste(unique(End), collapse=","),
+                     Strand = paste(Strand, collapse=","),
+                     Gene= paste(unique(gene_name), collapse=","),
+                     Tconv = paste(unique(Tconv), collapse=","),
+                     TR1 = paste(unique(TR1), collapse=","))
   } else {Tables2 <- ddply(Tables, .(Start), summarize,
-                           Chr = paste(unique(Chr),collapse=","),
-                           Start =  paste(unique(Start),collapse=","),
-                           End = paste(unique(End),collapse=","),
-                           Strand = paste(Strand,collapse=","),
-                           Gene= paste(unique(gene_name),collapse=","))}
+                           Chr = paste(unique(Chr), collapse=","),
+                           Start =  paste(unique(Start), collapse=","),
+                           End = paste(unique(End), collapse=","),
+                           Strand = paste(Strand, collapse=","),
+                           Gene= paste(unique(gene_name), collapse=","))}
   Tables2 <- Tables2[order(as.numeric(gsub("chr", "", Tables2$Chr)), 
                            as.numeric(Tables2$Start),
                            decreasing = F, na.last = T), ]
@@ -392,5 +395,6 @@ hitsbar <- ggplot(dfplot, aes(y=analysis, x=Hits, fill=type)) +
 
 # Export pdf with table and bar graph
 pdf(file = "figs/Overall_summary.pdf", width = 10, height = 6)
+grid.table(Overall_summary, rows = NULL)
 print(hitsbar)
 dev.off()
