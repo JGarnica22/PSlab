@@ -78,10 +78,10 @@ BMgr$chromosome_name <- sapply(BMgr$chromosome_name, function(x) {paste0("chr",x
 BMgr$strand <- sapply(BMgr$strand, function(x){if (x ==1){print("+")} else {print("-")}})
 # GRanges generated just in case, but not actually needed as we need bed file for bedtools window tool.
 grBM <- GRanges(seqnames = BMgr$chromosome_name, 
-                ranges = paste0(BMgr$start_position,"-",BMgr$end_position), 
+                ranges = paste0 (BMgr$start_position, "-", BMgr$end_position), 
                 strand = BMgr$strand,
                 gene_name = BMgr$external_gene_name)
-BMgenes <- BMgr[,c(2,3,4,6,7)]
+BMgenes <- BMgr[, c(2,3,4,6,7)]
 names(BMgenes)[c(1:4)] <- c("Chr", "Start", "End", "gene_name")
 
 # Load all files needed
@@ -89,23 +89,23 @@ names(BMgenes)[c(1:4)] <- c("Chr", "Start", "End", "gene_name")
 DMR <- read.table("data/DMR.txt",
                   sep = "\t", quote = "",
                   dec = ".", header = T, na.strings = T)
-# Fix problem with chrchr19, usual issue?
+# Fix problem with chrchr9, usual issue?
 DMR$Chr <- sapply(strsplit(as.character(DMR$Chr), split="chr", fixed=TRUE), function(x){print(x[2])})
-DMR$Chr <- sapply(DMR$Chr, function(x){if (x == ""){print("chr9")} else {paste0("chr", x)}})
+DMR$Chr <- sapply(DMR$Chr, function(x){if (x == "") {print("chr9")} else {paste0("chr", x)}})
 names(DMR) <- c("Chr", "Start", "End", pop[1], pop[2])
 DMR <- DMR[order(as.numeric(gsub("chr", "", DMR$Chr)), 
                  as.numeric(DMR$Start),
                  decreasing = F, na.last = T), ]
 
 # Add to your data directory the DESeq2 file comparing your samples to analyse
-DESeq2 <- read.table (file = paste0("data/", list.files(path=paste0(getwd(),"/data"), pattern= "DESeq2_")),
+DESeq2 <- read.table (file = paste0("data/", list.files(path=paste0(getwd(),"/data"),
+                                                        pattern= "DESeq2", ignore.case = T)),
                       sep = "\t", quote = "", dec = ".", header=T)
 names(DESeq2)[1] <- "gene_name"
 
-
 # Load and prepare shared OCR between two populations:
 socr <- read.table(paste0("data/", list.files(path=paste0(getwd(),"/data"), pattern= "Shared", ignore.case = T)),
-                   sep = "\t", dec = ".",header = TRUE, quote = "", stringsAsFactors = F)
+                   sep = "\t", dec = ".", header = TRUE, quote = "", stringsAsFactors = F)
 socr <- socr[, "Region.ID", drop = F]
 socr$Chr <- sapply(strsplit(socr$Region.ID, split=':', fixed=TRUE), function(x) (x[1]))
 socr$ranges <- sapply(strsplit(socr$Region.ID, split=':', fixed=TRUE), function(x) (x[2]))
@@ -128,17 +128,17 @@ look.around <- function(x){
     if (length(gene.by.act.enh)>0){
       df1 <- data.frame(element = rep(a, length(gene.by.act.enh)),
                         Chr = rep(seqnames(x[a]), length(gene.by.act.enh)),
-                        Start = rep(start(ranges(x[a])),length(gene.by.act.enh)),
-                        End = rep(end(ranges(x[a])),length(gene.by.act.enh)),
+                        Start = rep(start(ranges(x[a])), length(gene.by.act.enh)),
+                        End = rep(end(ranges(x[a])), length(gene.by.act.enh)),
                         gene_strand = strand(gene.by.act.enh),
                         gene_name = mcols(gene.by.act.enh))
       df2 <- ddply(df1, .(element), summarize, 
-                   element=paste(unique(element),collapse=","),
-                   Chr = paste(unique(Chr),collapse=","),
-                   Start = paste(unique(Start),collapse=","),
-                   End = paste(unique(End),collapse=","),
-                   gene_strand = paste(gene_strand,collapse=","),
-                   gene_name = paste(unique(gene_name),collapse=","))
+                   element=paste(unique(element), collapse=","),
+                   Chr = paste(unique(Chr), collapse=","),
+                   Start = paste(unique(Start), collapse=","),
+                   End = paste(unique(End), collapse=","),
+                   gene_strand = paste(gene_strand, collapse=","),
+                   gene_name = paste(unique(gene_name), collapse=","))
     } else {
       df1 <-data.frame(element = a,
                        Chr = seqnames(x[a]),
@@ -158,7 +158,7 @@ for (i in c(1:length(pop))) {
   for (m in c("ChIP", "ATAC")){
     file_list <- list.files(path=paste0(getwd(),"/data"), pattern= m)
     # Read file tables
-    tble <- read.table(paste0("data/", grep(pop[i], file_list, value = T)),sep = "\t", quote = "",
+    tble <- read.table(paste0("data/", grep(pop[i], file_list, value = T)), sep = "\t", quote = "",
                        dec = ".", header = T, na.strings = T)
     if (m == "ChIP"){
       tble[, c("Sample.name", "Absolute.summit", "Pileup", "X.log10.qvalue.",
@@ -171,9 +171,8 @@ for (i in c(1:length(pop))) {
       tble <- tble[order(as.numeric(gsub("chr", "", tble$Chr)), 
                          as.numeric(tble$Start),
                          decreasing = F, na.last = T), ]
-      
       gr <- GRanges(seqnames = tble$Chr, 
-                    ranges = paste0(tble$Start,"-",tble$End), 
+                    ranges = paste0(tble$Start, "-", tble$End), 
                     strand = NULL,
                     `-log10.pval`= tble$`-log10.pval`,
                     FoldEnrichment = tble$FoldEnrichment,
@@ -181,7 +180,7 @@ for (i in c(1:length(pop))) {
                     Peak.location = tble$Gene.section,
                     Distance.to.TSS = tble$Distance.to.TSS)
       grchip <- GRanges(seqnames = tble$Chr, 
-                        ranges = paste0(tble$Start,"-",tble$End), 
+                        ranges = paste0(tble$Start, "-", tble$End), 
                         strand = NULL,
                         `-log10.pval`= tble$`-log10.pval`,
                         FoldEnrichment = tble$FoldEnrichment,
@@ -194,23 +193,21 @@ for (i in c(1:length(pop))) {
       atac <- tble[order(as.numeric(gsub("chr", "", tble$Chr)), 
                          as.numeric(tble$Start),
                          decreasing = F, na.last = T), ]
-      
       gr <- GRanges(seqnames = atac$Chr, 
-                    ranges = paste0(atac$Start,"-",atac$End), 
+                    ranges = paste0(atac$Start, "-", atac$End), 
                     strand = NULL,
                     Anno.Gene = atac$Anno.Gene)
     }
-    
     assign(paste0(m,".", pop[i], ".gr"), gr)
   }
   
   # Find overlapping peaks
   # CAREFUL: order of objects in `findOverlaps` matters!
-  overlap <- findOverlaps(eval(as.symbol(grep(paste0("ChIP.",pop[i]), names(.GlobalEnv),value=TRUE))), 
-                          eval(as.symbol(grep(paste0("ATAC.",pop[i]), names(.GlobalEnv),value=TRUE))))
+  overlap <- findOverlaps(eval(as.symbol(grep(paste0("ChIP.", pop[i]), names(.GlobalEnv), value=TRUE))), 
+                          eval(as.symbol(grep(paste0("ATAC.", pop[i]), names(.GlobalEnv), value=TRUE))))
   olpeaks <- atac[unique(subjectHits(overlap)),]
   gr3 <- GRanges(seqnames = olpeaks$Chr, 
-                 ranges = paste0(olpeaks$Start,"-",olpeaks$End), 
+                 ranges = paste0(olpeaks$Start, "-", olpeaks$End), 
                  strand = NULL)
   Overall_summary[1,1] <- "ATAC_Overlapping_peaks_with_H3K27ac_ChIP"
   Overall_summary[1,4-i] <- nrow(olpeaks)
@@ -223,7 +220,7 @@ for (i in c(1:length(pop))) {
   
   # Annotate already in GRanges objects with active enhancers (without promoters):
   gr4 <- GRanges(seqnames = act.enh$Chr, 
-                 ranges = paste0(act.enh$Start,"-",act.enh$End), 
+                 ranges = paste0(act.enh$Start, "-", act.enh$End), 
                  strand = NULL)
   g_r <- look.around(gr4)
   g_around_more_rows <- as.data.frame(g_r[1]) 
@@ -231,19 +228,19 @@ for (i in c(1:length(pop))) {
   
   # Export files in .txt format as bed will not be needed in this script
   write.table(g_around, 
-              file = paste0("output/annotation/", pop[i] ,"_Active_enhancers_annotated", ".txt"),
+              file = paste0("output/", pop[i] ,"_Active_enhancers_annotated", ".txt"),
               sep = "\t", quote = F, dec = ".", row.names = F, col.names = T)
   
   # Methylation in active enhancers
   gr5 <- GRanges(seqnames = DMR$Chr, 
-                 ranges = paste0(DMR$Start,"-",DMR$End), 
+                 ranges = paste0(DMR$Start, "-", DMR$End), 
                  strand = NULL,
                  Met.smp = DMR[,pop[2]],
                  Met.ctl = DMR[,pop[1]])
   overlap <- findOverlaps(gr5, gr4)
   act.enh.DMR <- g_around[unique(subjectHits(overlap)),]
   act.enh.DMR.mr <- merge(act.enh.DMR, g_around_more_rows, all.y = T)
-  write.table(act.enh.DMR, file = paste0("output/annotation/", pop[i] ,"_Active_enhancers_with_DMR_annotated", ".txt"),
+  write.table(act.enh.DMR, file = paste0("output/", pop[i] ,"_Active_enhancers_with_DMR_annotated", ".txt"),
               sep = "\t", quote = F, dec = ".", row.names = F, col.names = T)
   Overall_summary[3,1] <- "Active_enhancers_with_DMR"
   Overall_summary[3,4-i] <- nrow(act.enh.DMR)
@@ -252,14 +249,14 @@ for (i in c(1:length(pop))) {
   overlap2 <- findOverlaps(gr4, gr5)
   DMR.act.enh <- DMR[unique(subjectHits(overlap2)),]
   grdmr <- GRanges(seqnames = DMR.act.enh$Chr, 
-                   ranges = paste0(DMR.act.enh$Start,"-",DMR.act.enh$End), 
+                   ranges = paste0(DMR.act.enh$Start, "-", DMR.act.enh$End), 
                    strand = NULL)
   g_r <- look.around(grdmr)
   dmr_g_around_more_rows <- as.data.frame(g_r[1])
   dmr_g_around <- as.data.frame(g_r[2])
   dmr_g_aroundc <- merge(dmr_g_around, DMR.act.enh)
   
-  write.table(dmr_g_aroundc, paste0("output/annotation/", pop[i] ,"_DMR_Overlapping_Active_enhancers_annotated",".txt"),
+  write.table(dmr_g_aroundc, paste0("output/", pop[i] ,"_DMR_Overlapping_Active_enhancers_annotated",".txt"),
               sep = "\t", dec = ".", quote = F, row.names = F, col.names = T)
   Overall_summary[6,1] <- "DMR_Overlapping_Active_enhancers"
   Overall_summary[6,4-i] <- nrow(DMR.act.enh)
@@ -290,7 +287,7 @@ for (i in c(1:length(pop))) {
   H3_g_around_more_rows <- as.data.frame(g_r[1])
   H3_g_around <- as.data.frame(g_r[2])
   
-  write.table(H3_g_around, file = paste0("output/annotation/", pop[i] ,"_shared_ATAC_H3K27ac_not_promoter_annotated", ".txt"),
+  write.table(H3_g_around, file = paste0("output/", pop[i] ,"_shared_ATAC_H3K27ac_not_promoter_annotated", ".txt"),
               sep = "\t", quote = F, dec = ".", row.names = F, col.names = T)
   Overall_summary[9,1] <- "Shared_ATAC_H3K27ac_not_promoter"
   Overall_summary[9,4-i] <- nrow(openH3K27acp)
@@ -298,22 +295,23 @@ for (i in c(1:length(pop))) {
   overlap5 <- findOverlaps(gr5, grH3wop)
   H3K27open.DMR <- H3_g_around[unique(subjectHits(overlap5)),]
   H3K27open.DMR.mr <- merge(H3K27open.DMR, H3_g_around_more_rows, all.y = T)
-  write.table(H3K27open.DMR, file = paste0("output/annotation/", pop[i] ,"_shared_ATAC_H3K27ac_not_promoter_with_DMR_annotated",
-                                           ".txt"), sep = "\t", dec = ".", quote = F, row.names = F, col.names = T)
+  write.table(H3K27open.DMR, file = paste0("output/annotation/", pop[i],
+                                           "_shared_ATAC_H3K27ac_not_promoter_with_DMR_annotated", ".txt"),
+              sep = "\t", dec = ".", quote = F, row.names = F, col.names = T)
   Overall_summary[10,1] <- "Shared_ATAC_H3K27ac_not_promoter_with_DMR"
   Overall_summary[10,4-i] <- nrow(H3K27open.DMR)
   
   overlap6 <- findOverlaps(grH3wop, gr5)
   DMR.H3K27open <- DMR[unique(subjectHits(overlap6)),]
   grdmrH3 <- GRanges(seqnames = DMR.H3K27open$Chr, 
-                     ranges = paste0(DMR.H3K27open$Start,"-",DMR.H3K27open$End), 
+                     ranges = paste0(DMR.H3K27open$Start, "-", DMR.H3K27open$End), 
                      strand = NULL)
   g_r <- look.around(grdmrH3)
   dmrH3_g_around_more_rows <- as.data.frame(g_r[1])
   dmrH3_g_around <- as.data.frame(g_r[2])
   dmrH3_g_aroundc <- merge(dmrH3_g_around, DMR.H3K27open) # if willing to include all rows, just merge with *_more_rows (all.y = T)
   
-  write.table(dmrH3_g_aroundc, file = paste0("output/annotation/", pop[i] ,"_DMR_Overlapping_shared_ATAC_H3K27ac_not_promoter_annotated",".txt"),
+  write.table(dmrH3_g_aroundc, file = paste0("output/", pop[i] ,"_DMR_Overlapping_shared_ATAC_H3K27ac_not_promoter_annotated",".txt"),
               sep = "\t", dec = ".", quote = F, row.names = F, col.names = T)
   
   Overall_summary[13,1] <- "DMR_Overlapping_shared_ATAC_H3K27ac_not_promoter"
@@ -325,15 +323,14 @@ for (i in c(1:length(pop))) {
     Overall_summary[14,4-i] <- nrow(DMR.act.enh[which(DMR.H3K27open[,pop[2]]<DMR.H3K27open[,pop[1]]),])
   }
   
-  
   # Analysis of genes associated to active enhancers and their transcriptomic activity
   # CAREFUL! If names change, order may change
   
-  for (mr in 1:length(grep("\\.mr", names(.GlobalEnv),value=TRUE))){
-    trans_DMR <- merge(DESeq2, eval(as.symbol(grep("\\.mr", names(.GlobalEnv),value=TRUE)[mr])), by.y = "gene_name", all.x = F)
+  for (mr in 1:length(grep("\\.mr", names(.GlobalEnv), value=TRUE))){
+    trans_DMR <- merge(DESeq2, eval(as.symbol(grep("\\.mr", names(.GlobalEnv), value=TRUE)[mr])), by.y = "gene_name", all.x = F)
     trans_DMR <- unique(trans_DMR[,c(1:8)])
     
-    if (str_detect(grep("\\.mr", names(.GlobalEnv),value=TRUE)[mr], "H3K27open.")){
+    if (str_detect(grep("\\.mr", names(.GlobalEnv), value=TRUE)[mr], "H3K27open.")){
       n <- 11 } else {
         n <- 4
       }
@@ -370,7 +367,8 @@ hitsbar <- ggplot(dfplot, aes(y=analysis, x=Hits, fill=type)) +
   geom_bar(stat="identity", position=position_dodge()) +
   geom_text(aes(label=Hits), vjust=0.5, hjust=-0.1, color="black",
             position = position_dodge(0.9), size=3.5) +
-  ylab("Type of analysis") + xlab("Num of hits(log10)")+ scale_x_log10(expand = expansion(add= c(0 , 1))) +
+  ylab("Type of analysis") + xlab("Num of hits(log10)") + 
+  scale_x_log10(expand = expansion(add= c(0 , 1))) +
   # theme(axis.text.x = element_text(angle = 60, size = 10, hjust =1, face="bold")) +
   scale_y_discrete(limits = rev(Overall_summary$Analysis)) +
   # scale_fill_manual(values = c("firebrick","gray")) +
