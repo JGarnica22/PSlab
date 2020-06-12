@@ -295,7 +295,7 @@ for (i in c(1:length(pop))) {
   overlap5 <- findOverlaps(gr5, grH3wop)
   H3K27open.DMR <- H3_g_around[unique(subjectHits(overlap5)),]
   H3K27open.DMR.mr <- merge(H3K27open.DMR, H3_g_around_more_rows, all.y = T)
-  write.table(H3K27open.DMR, file = paste0("output/annotation/", pop[i],
+  write.table(H3K27open.DMR, file = paste0("output/", pop[i],
                                            "_shared_ATAC_H3K27ac_not_promoter_with_DMR_annotated", ".txt"),
               sep = "\t", dec = ".", quote = F, row.names = F, col.names = T)
   Overall_summary[10,1] <- "Shared_ATAC_H3K27ac_not_promoter_with_DMR"
