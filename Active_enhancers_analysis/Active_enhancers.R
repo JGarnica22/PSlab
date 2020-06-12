@@ -45,7 +45,6 @@ library(gridExtra)
 
 # Set your working directory (the project you are working in):
 setwd("/home/jgarnica/R/GenomicRanges_Active_enhancers")
-setwd("/Users/patri/Desktop/R class/Active_enhancers")
 
 ## NOTE: CHANGE NAMES OF THE FILES TO AVOID CONFUSIONS, IN THE DATA FILES SHOULD APPEAR THE NAME OF THE TECHNIQUE AND ONLY THE POPULATION STUDIED
 
