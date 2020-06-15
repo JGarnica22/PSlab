@@ -28,6 +28,8 @@ To sum up, it's a very simple language used to create beautiful and presentable 
 ### Headings
 To create a heading, add a hash symbol (#) in front of a word or phrase. The number of hash symbols you use should correspond to the heading level. For each extra (#) that you use your heading will be smaller.<br/>
 
+![](https://github.com/patriciasolesanchez/PSlab/blob/master/HowTo's/Screenshots/Headings.png) 
+
 ### Paragraphs
 To create paragraphs, use a blank line to separate one or more lines of text.<br/>
 
@@ -121,7 +123,7 @@ Go to this [link](https://write_here_your_link.com)
 ````
 
 ### Embed images
-To create an inline image link, enter an exclamation point ( ! ), wrap the alt text in brackets ( [ ] ), and then wrap the link in parenthesis ( ( ) ). (\*_Alt text_ is a phrase or sentence that describes the image.)
+To create an inline image link, enter an exclamation point ( ! ), wrap the alt text in brackets ( [ ] ), and then wrap the link in parenthesis ( ( ) ). (\*_Alt text_ is a phrase or sentence that describes your image.)
 ````
 ![Alt Text](url)
 ````
@@ -151,8 +153,7 @@ Tools > Install Packages <br/>
 Choose "Repository CRAN" and write "Markdown" in "Packages (separate multiple with space or comma:)"
 
 To open a new file, click File > New File > R Markdown in the RStudio menu bar. 
-A window will pop up where you can name the project an the author ("Title" and "Author") and select the specific type of output that you wish to build (HTML, PDF or Word). Remember that you can switch to the other output formats anytime.  
-
+A window will pop up where you can name the project and the author ("Title" and "Author") and select the specific type of output that you wish to build (HTML, PDF or Word). Remember that you can switch to the other output formats anytime.  
 
 A template will be opened to generate your Markdown report. The Markdown template contains:
 
