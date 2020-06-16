@@ -89,7 +89,8 @@ names(BMgenes)[c(1:4)] <- c("Chr", "Start", "End", "gene_name")
 DMR <- read.table("data/DMR.txt",
                   sep = "\t", quote = "",
                   dec = ".", header = T, na.strings = T)
-# Fix problem with chrchr9, usual issue?
+
+# Fix problem with chrchr9 (error in DMR file!)
 DMR$Chr <- sapply(strsplit(as.character(DMR$Chr), split="chr", fixed=TRUE), function(x){print(x[2])})
 DMR$Chr <- sapply(DMR$Chr, function(x){if (x == "") {print("chr9")} else {paste0("chr", x)}})
 names(DMR) <- c("Chr", "Start", "End", pop[1], pop[2])
