@@ -85,7 +85,7 @@ BMgenes <- BMgr[, c(2,3,4,6,7)]
 BMgenes$width <- NA
 BMgenes <- BMgenes[, c(1:4, 6,5)]
 write.table (BMgenes, "data/BMgenes.bed",
-            sep = "\t", dec = ".", quote = F, row.names = F, col.names = F)
+             sep = "\t", dec = ".", quote = F, row.names = F, col.names = F)
 
 # Load all files needed
 # Load DMR file between two samples:
@@ -93,7 +93,7 @@ DMR <- read.table("data/DMR.txt",
                   sep = "\t", quote = "",
                   dec = ".", header = T, na.strings = T)
 
-# Fix problem with chrchr9, usual issue?
+# Fix problem with chrchr9 (error in DMR file!)
 DMR$Chr <- sapply(strsplit(as.character(DMR$Chr), split="chr", fixed=TRUE), function(x){print(x[2])})
 DMR$Chr <- sapply(DMR$Chr, function(x){if (x == ""){print("chr9")} else {paste0("chr", x)}})
 names(DMR) <- c("Chr", "Start", "End", pop[1], pop[2])
@@ -136,7 +136,7 @@ for (i in c(1:length(pop))) {
       tble <- tble[order(as.numeric(gsub("chr", "", tble$Chr)), 
                          as.numeric(tble$Start),
                          decreasing = F, na.last = T), ]
-      tble$Strand <- gsub(".", "*", tble$Strand, fixed = TRUE, )
+      tble$Strand <- gsub(".", "*", tble$Strand, fixed = TRUE)
       chip <- tble[order(as.numeric(gsub("chr", "", tble$Chr)), 
                          as.numeric(tble$Start),
                          decreasing = F, na.last = T), ]
@@ -227,11 +227,11 @@ for (i in c(1:length(pop))) {
     # Find overlapping peaks (population-specific H3K27ac mark + open region)
     overlap3 <- findOverlaps(grchip, grocr)
     openH3K27ac <- socr[unique(subjectHits(overlap3)),]
-    grH3 <- GRanges(seqnames = openH3K27ac$Chr, 
-                    ranges = openH3K27ac$ranges, 
-                    strand = NULL)
     openH3K27ac <- separate(openH3K27ac, col = "ranges", into = c("Start", "End"), sep = "-", remove = T)
     openH3K27ac <- openH3K27ac[, c("Chr", "Start", "End")]
+    grH3 <- GRanges(seqnames = openH3K27ac$Chr,
+                    ranges = paste0(openH3K27ac$Start,"-",openH3K27ac$End),
+                    strand = NULL)
     # write.table(openH3K27ac, file = paste0("output/", pop[i] ,"_shared_ATAC_H3K27ac", formats[o]),
     #             sep = "\t", dec = ".", quote = F, row.names = F, col.names = col_names[o])
     Overall_summary[8,1] <- "Shared_ATAC_H3K27ac_with_promoters"
@@ -240,20 +240,22 @@ for (i in c(1:length(pop))) {
     #Obtain active enhancers by filtering overlapping peaks in promoters:
     inpromoters <- findOverlaps(prom, grH3)
     openH3K27acp <- openH3K27ac[-c(unique(subjectHits(inpromoters))), 1:3]
+    grH3p <- GRanges(seqnames = openH3K27acp$Chr,
+                     ranges = paste0(openH3K27acp$Start,"-",openH3K27acp$End),
+                     strand = NULL)
     write.table(openH3K27acp, file = paste0("output/", pop[i] ,"_shared_ATAC_H3K27ac_not_promoter", formats[o]),
                 sep = "\t", quote = F, dec = ".", row.names = F, col.names = col_names[o])
     Overall_summary[9,1] <- "Shared_ATAC_H3K27ac_not_promoter"
     Overall_summary[9,4-i] <- nrow(openH3K27acp)
     
-    overlap5 <- findOverlaps(gr5, grH3)
+    overlap5 <- findOverlaps(gr5, grH3p)
     H3K27open.DMR <- openH3K27acp[unique(subjectHits(overlap5)),]
-    H3K27open.DMR <- H3K27open.DMR[which(H3K27open.DMR$Chr!="NA"),]
     write.table(H3K27open.DMR, file = paste0("output/", pop[i] ,"_shared_ATAC_H3K27ac_not_promoter_with_DMR", formats[o]),
                 sep = "\t", dec = ".", quote = F, row.names = F, col.names = col_names[o])
     Overall_summary[10,1] <- "Shared_ATAC_H3K27ac_not_promoter_with_DMR"
     Overall_summary[10,4-i] <- nrow(H3K27open.DMR)
     
-    overlap6 <- findOverlaps(grH3, gr5)
+    overlap6 <- findOverlaps(grH3p, gr5)
     DMR.H3K27open <- DMR[unique(subjectHits(overlap6)),]
     write.table(DMR.H3K27open, file = paste0("output/", pop[i] ,"_DMR_Overlapping_shared_ATAC_H3K27ac_not_promoter", formats[o]),
                 sep = "\t", dec = ".", quote = F, row.names = F, col.names = col_names[o])
@@ -363,7 +365,6 @@ for (pu in files){
 }
 
 write_xlsx(Overall_summary, "output/Overall_summary_active_enhancers.xlsx")
-
 
 # Make graph (bar plot) for summary
 dfplot <- data.frame(matrix(ncol = 1, nrow= nrow(Overall_summary)*2))
