@@ -89,7 +89,8 @@ names(BMgenes)[c(1:4)] <- c("Chr", "Start", "End", "gene_name")
 DMR <- read.table("data/DMR.txt",
                   sep = "\t", quote = "",
                   dec = ".", header = T, na.strings = T)
-# Fix problem with chrchr9, usual issue?
+
+# Fix problem with chrchr9 (error in DMR file!)
 DMR$Chr <- sapply(strsplit(as.character(DMR$Chr), split="chr", fixed=TRUE), function(x){print(x[2])})
 DMR$Chr <- sapply(DMR$Chr, function(x){if (x == "") {print("chr9")} else {paste0("chr", x)}})
 names(DMR) <- c("Chr", "Start", "End", pop[1], pop[2])
@@ -230,6 +231,11 @@ for (i in c(1:length(pop))) {
   write.table(g_around, 
               file = paste0("output/", pop[i] ,"_Active_enhancers_annotated", ".txt"),
               sep = "\t", quote = F, dec = ".", row.names = F, col.names = T)
+  write_xlsx(g_around, paste0("output/", pop[i] ,"_Active_enhancers_annotated", ".xlsx"))
+  write.table(g_around_more_rows, 
+              file = paste0("output/", pop[i] ,"_Active_enhancers_annotated_more_rows", ".txt"),
+              sep = "\t", quote = F, dec = ".", row.names = F, col.names = T)
+  write_xlsx(g_around_more_rows, paste0("output/", pop[i] ,"_Active_enhancers_annotated_more_rows", ".xlsx"))
   
   # Methylation in active enhancers
   gr5 <- GRanges(seqnames = DMR$Chr, 
@@ -239,9 +245,15 @@ for (i in c(1:length(pop))) {
                  Met.ctl = DMR[,pop[1]])
   overlap <- findOverlaps(gr5, gr4)
   act.enh.DMR <- g_around[unique(subjectHits(overlap)),]
-  act.enh.DMR.mr <- merge(act.enh.DMR, g_around_more_rows, all.y = T)
+  act.enh.DMR.mr <- merge(act.enh.DMR, g_around_more_rows, by =c("Chr", "Start", "End"))
+  act.enh.DMR.mr <- act.enh.DMR.mr[,c(4,1:3,8,9)]
+  names(act.enh.DMR.mr) <- names(act.enh.DMR)
   write.table(act.enh.DMR, file = paste0("output/", pop[i] ,"_Active_enhancers_with_DMR_annotated", ".txt"),
               sep = "\t", quote = F, dec = ".", row.names = F, col.names = T)
+  write_xlsx(act.enh.DMR, paste0("output/", pop[i] ,"_Active_enhancers_with_DMR_annotated", ".xlsx"))
+  write.table(act.enh.DMR.mr, file = paste0("output/", pop[i] ,"_Active_enhancers_with_DMR_annotated_more_rows", ".txt"),
+              sep = "\t", quote = F, dec = ".", row.names = F, col.names = T)
+  write_xlsx(act.enh.DMR.mr, paste0("output/", pop[i] ,"_Active_enhancers_with_DMR_annotated_more_rows", ".xlsx"))
   Overall_summary[3,1] <- "Active_enhancers_with_DMR"
   Overall_summary[3,4-i] <- nrow(act.enh.DMR)
   
@@ -255,9 +267,14 @@ for (i in c(1:length(pop))) {
   dmr_g_around_more_rows <- as.data.frame(g_r[1])
   dmr_g_around <- as.data.frame(g_r[2])
   dmr_g_aroundc <- merge(dmr_g_around, DMR.act.enh)
+  dmr_g_around_more_rowsc <- merge(dmr_g_around_more_rows, DMR.act.enh)
   
   write.table(dmr_g_aroundc, paste0("output/", pop[i] ,"_DMR_Overlapping_Active_enhancers_annotated",".txt"),
               sep = "\t", dec = ".", quote = F, row.names = F, col.names = T)
+  write_xlsx(dmr_g_aroundc, paste0("output/", pop[i] ,"_DMR_Overlapping_Active_enhancers_annotated", ".xlsx"))
+  write.table(dmr_g_around_more_rowsc, file = paste0("output/", pop[i] ,"_DMR_Overlapping_Active_enhancers_annotated_more_rows", ".txt"),
+              sep = "\t", quote = F, dec = ".", row.names = F, col.names = T)
+  write_xlsx(dmr_g_around_more_rowsc, paste0("output/", pop[i] ,"_DMR_Overlapping_Active_enhancers_annotated_more_rows", ".xlsx"))
   Overall_summary[6,1] <- "DMR_Overlapping_Active_enhancers"
   Overall_summary[6,4-i] <- nrow(DMR.act.enh)
   Overall_summary[7,1] <- "of_which_hypomethylated"
@@ -289,15 +306,25 @@ for (i in c(1:length(pop))) {
   
   write.table(H3_g_around, file = paste0("output/", pop[i] ,"_shared_ATAC_H3K27ac_not_promoter_annotated", ".txt"),
               sep = "\t", quote = F, dec = ".", row.names = F, col.names = T)
+  write_xlsx(H3_g_around, paste0("output/", pop[i] ,"_shared_ATAC_H3K27ac_not_promoter_annotated", ".xlsx"))
+  write.table(H3_g_around_more_rows, file = paste0("output/", pop[i] ,"_shared_ATAC_H3K27ac_not_promoter_annotated_more_rows", ".txt"),
+              sep = "\t", quote = F, dec = ".", row.names = F, col.names = T)
+  write_xlsx(H3_g_around_more_rows, paste0("output/", pop[i] ,"_shared_ATAC_H3K27ac_not_promoter_annotated_more_rows", ".xlsx"))
   Overall_summary[9,1] <- "Shared_ATAC_H3K27ac_not_promoter"
   Overall_summary[9,4-i] <- nrow(openH3K27acp)
   
   overlap5 <- findOverlaps(gr5, grH3wop)
   H3K27open.DMR <- H3_g_around[unique(subjectHits(overlap5)),]
-  H3K27open.DMR.mr <- merge(H3K27open.DMR, H3_g_around_more_rows, all.y = T)
+  H3K27open.DMR.mr <- merge(H3K27open.DMR, H3_g_around_more_rows, by =c("Chr", "Start", "End"))
+  H3K27open.DMR.mr <- H3K27open.DMR.mr[,c(4,1:3,8,9)]
+  names(H3K27open.DMR.mr) <- names(H3K27open.DMR)
   write.table(H3K27open.DMR, file = paste0("output/", pop[i],
                                            "_shared_ATAC_H3K27ac_not_promoter_with_DMR_annotated", ".txt"),
               sep = "\t", dec = ".", quote = F, row.names = F, col.names = T)
+  write_xlsx(H3K27open.DMR, paste0("output/", pop[i] ,"_shared_ATAC_H3K27ac_not_promoter_with_DMR_annotated", ".xlsx"))
+  write.table(H3K27open.DMR.mr, file = paste0("output/", pop[i] ,"_shared_ATAC_H3K27ac_not_promoter_with_DMR_annotated_more_rows", ".txt"),
+              sep = "\t", quote = F, dec = ".", row.names = F, col.names = T)
+  write_xlsx(H3K27open.DMR.mr, paste0("output/", pop[i] ,"_shared_ATAC_H3K27ac_not_promoter_with_DMR_annotated_more_rows", ".xlsx"))
   Overall_summary[10,1] <- "Shared_ATAC_H3K27ac_not_promoter_with_DMR"
   Overall_summary[10,4-i] <- nrow(H3K27open.DMR)
   
@@ -310,9 +337,13 @@ for (i in c(1:length(pop))) {
   dmrH3_g_around_more_rows <- as.data.frame(g_r[1])
   dmrH3_g_around <- as.data.frame(g_r[2])
   dmrH3_g_aroundc <- merge(dmrH3_g_around, DMR.H3K27open) # if willing to include all rows, just merge with *_more_rows (all.y = T)
-  
+  dmrH3_g_around_more_rowsc <- merge(dmrH3_g_around_more_rows, DMR.H3K27open)
   write.table(dmrH3_g_aroundc, file = paste0("output/", pop[i] ,"_DMR_Overlapping_shared_ATAC_H3K27ac_not_promoter_annotated",".txt"),
               sep = "\t", dec = ".", quote = F, row.names = F, col.names = T)
+  write_xlsx(dmrH3_g_aroundc, paste0("output/", pop[i] ,"_DMR_Overlapping_shared_ATAC_H3K27ac_not_promoter_annotated", ".xlsx"))
+  write.table(dmrH3_g_around_more_rowsc, file = paste0("output/", pop[i] ,"_DMR_Overlapping_shared_ATAC_H3K27ac_not_promoter_annotated_more_rows", ".txt"),
+              sep = "\t", quote = F, dec = ".", row.names = F, col.names = T)
+  write_xlsx(dmrH3_g_around_more_rowsc, paste0("output/", pop[i] ,"_DMR_Overlapping_shared_ATAC_H3K27ac_not_promoter_annotated_more_rows", ".xlsx"))
   
   Overall_summary[13,1] <- "DMR_Overlapping_shared_ATAC_H3K27ac_not_promoter"
   Overall_summary[13,4-i] <- nrow(DMR.H3K27open)
@@ -327,7 +358,9 @@ for (i in c(1:length(pop))) {
   # CAREFUL! If names change, order may change
   
   for (mr in 1:length(grep("\\.mr", names(.GlobalEnv), value=TRUE))){
-    trans_DMR <- merge(DESeq2, eval(as.symbol(grep("\\.mr", names(.GlobalEnv), value=TRUE)[mr])), by.y = "gene_name", all.x = F)
+    Tables3 <- eval(as.symbol(grep("\\.mr", names(.GlobalEnv), value=TRUE)[mr]))
+    Tables3 <- subset(Tables3, Tables3$gene_name != "No genes found")
+    trans_DMR <- merge(DESeq2, Tables3, by.y = "gene_name")
     trans_DMR <- unique(trans_DMR[,c(1:8)])
     
     if (str_detect(grep("\\.mr", names(.GlobalEnv), value=TRUE)[mr], "H3K27open.")){
