@@ -93,7 +93,7 @@ DMR <- read.table("data/DMR.txt",
                   sep = "\t", quote = "",
                   dec = ".", header = T, na.strings = T)
 
-# Fix problem with chrchr9, usual issue?
+# Fix problem with chrchr9 (error in DMR file!)
 DMR$Chr <- sapply(strsplit(as.character(DMR$Chr), split="chr", fixed=TRUE), function(x){print(x[2])})
 DMR$Chr <- sapply(DMR$Chr, function(x){if (x == ""){print("chr9")} else {paste0("chr", x)}})
 names(DMR) <- c("Chr", "Start", "End", pop[1], pop[2])
@@ -241,8 +241,8 @@ for (i in c(1:length(pop))) {
     inpromoters <- findOverlaps(prom, grH3)
     openH3K27acp <- openH3K27ac[-c(unique(subjectHits(inpromoters))), 1:3]
     grH3p <- GRanges(seqnames = openH3K27acp$Chr,
-                    ranges = paste0(openH3K27acp$Start,"-",openH3K27acp$End),
-                    strand = NULL)
+                     ranges = paste0(openH3K27acp$Start,"-",openH3K27acp$End),
+                     strand = NULL)
     write.table(openH3K27acp, file = paste0("output/", pop[i] ,"_shared_ATAC_H3K27ac_not_promoter", formats[o]),
                 sep = "\t", quote = F, dec = ".", row.names = F, col.names = col_names[o])
     Overall_summary[9,1] <- "Shared_ATAC_H3K27ac_not_promoter"
@@ -365,7 +365,6 @@ for (pu in files){
 }
 
 write_xlsx(Overall_summary, "output/Overall_summary_active_enhancers.xlsx")
-
 
 # Make graph (bar plot) for summary
 dfplot <- data.frame(matrix(ncol = 1, nrow= nrow(Overall_summary)*2))
