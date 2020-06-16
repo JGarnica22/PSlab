@@ -23,4 +23,4 @@ In this folder you will find the following scripts:
 
 * Finally, _Genomic_screening_around_gene.R_ is useful to associate data to a particular gene (or set of genes). It allows you to look for certain genomic elements (e.g. ATAC OCRs, ChIP peaks, active enhancers, etc.) around a certain gene. Basically, it creates a loop iterating all the genes of interest and looks for elements around these genes by overlapping with `GRanges` objects. Finally, it returns a data frame for all the localizations of elements regions close to the gene.  
 
-**IMPORTANT!** Some output files (_.xlsx_) contain data of several different genes and in one row, separeted by coma. If you want to arrange this, converting commas to newlines (in the same cell), see [HowTo_Replace_Commas_with_Newlines_Excel.md]().
+**IMPORTANT!** Some output files (_.xlsx_) contain data of several different genes and in one row, separeted by commas. If you want to arrange this data, converting the commas to newlines (in the same cell), see [HowTo_Replace_Commas_with_Newlines_Excel.md]().
