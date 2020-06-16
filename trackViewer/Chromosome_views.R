@@ -87,9 +87,9 @@ for (xy in plots) {
   #Import results files from the different analysis to be included and for each replicate:
   #List all the files in you data directory and import them depending on their format
   #IMPORTANT: name files always as type_of_sample(Tet, Tconv, TFH...)+number of replicate_tecnique (ATAC, RNA...), e.g. Tet3_ATAC, Tet1_RNA...
-  file_list_bed <- list.files(path="/home/jgarnica/R/trackviewer/data",
+  file_list_bed <- list.files(path= paste0(getwd(), "/data"),
                               pattern= "*.bed")
-  file_list_bw <- list.files(path="/home/jgarnica/R/trackviewer/data",
+  file_list_bw <- list.files(path= paste0(getwd(), "/data"),
                              pattern= "*.bw")
   
   for (file in c(file_list_bed)){
