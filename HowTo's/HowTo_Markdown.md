@@ -215,10 +215,12 @@ See examples below:
 Some code
 ```
 ````
+Observe these examples:
 
-![](https://github.com/patriciasolesanchez/PSlab/blob/master/HowTo's/Screenshots/echo_example.png) 
-
-
+![](https://github.com/patriciasolesanchez/PSlab/blob/master/HowTo's/Screenshots/Example_echo_true.png) 
+![](https://github.com/patriciasolesanchez/PSlab/blob/master/HowTo's/Screenshots/Example_echo_true2.png) 
+![](https://github.com/patriciasolesanchez/PSlab/blob/master/HowTo's/Screenshots/Example_echo_false.png) 
+![](https://github.com/patriciasolesanchez/PSlab/blob/master/HowTo's/Screenshots/Example_echo_false2.png) 
 ````
 ```{r eval = FALSE}
 Some code
