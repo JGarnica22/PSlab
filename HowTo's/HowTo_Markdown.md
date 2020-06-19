@@ -233,7 +233,7 @@ Some code
 
 ![](https://github.com/patriciasolesanchez/PSlab/blob/master/HowTo's/Screenshots/eval_example.png) 
 
-Without eval=FALSE it will print the resluts of the code that is:<br/>
+Without eval=FALSE it will print the results of the code, that is:<br/>
 
 ![](https://github.com/patriciasolesanchez/PSlab/blob/master/HowTo's/Screenshots/eval.png) 
 
