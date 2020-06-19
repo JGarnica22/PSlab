@@ -208,17 +208,20 @@ Options in the brackets after {r}:
 * message = FALSE --> supresses messages from appearing in the output, for example warnings.
 * engine = 'python' --> to embed non R code, set the engine option to the language you want to embed.  
 
-See examples below:
+Observe the examples below:
 
 ````
 ```{r echo = FALSE}
 Some code
 ```
 ````
-Observe these examples:
+
+Without echo=False:
 
 ![](https://github.com/patriciasolesanchez/PSlab/blob/master/HowTo's/Screenshots/Example_echo_true.png) 
 ![](https://github.com/patriciasolesanchez/PSlab/blob/master/HowTo's/Screenshots/Example_echo_true2.png) 
+
+With echo=False:
 ![](https://github.com/patriciasolesanchez/PSlab/blob/master/HowTo's/Screenshots/Example_echo_false.png) 
 ![](https://github.com/patriciasolesanchez/PSlab/blob/master/HowTo's/Screenshots/Example_echo_false2.png) 
 ````
@@ -228,6 +231,9 @@ Some code
 ````
 
 ![](https://github.com/patriciasolesanchez/PSlab/blob/master/HowTo's/Screenshots/eval_example.png) 
+
+Without eval=FALSE it will print the resluts of the code that is:
+![](https://github.com/patriciasolesanchez/PSlab/blob/master/HowTo's/Screenshots/eval.png) 
 
 ````
 ```{r message = FALSE}
@@ -256,9 +262,6 @@ R markdown will directly replace the code with its results.
 Today is `r Sys.date()`
 ````
 _Today is 2020-05-20_
-<br/>
-
-I DONT' UNDERSTAND WELL HOW THIS INLINE CODE WORKS. I TRIED IN A MARKDOWN AND RESULTS APPEAR WEIRD. LET'S DISCUSS.  
 <br/>
 
 Finally, to get your report you can click on "Knit" botton and choose your favourite format: HTML, PDF or Word.
