@@ -208,7 +208,7 @@ Options in the brackets after {r}:
 * message = FALSE --> supresses messages from appearing in the output, for example warnings.
 * engine = 'python' --> to embed non R code, set the engine option to the language you want to embed.  
 
-Observe the examples below:
+Observe the examples below:<br/>
 
 ````
 ```{r echo = FALSE}
@@ -216,12 +216,13 @@ Some code
 ```
 ````
 
-Without echo=False:
+Without echo=False:<br/>
 
 ![](https://github.com/patriciasolesanchez/PSlab/blob/master/HowTo's/Screenshots/Example_echo_true.png) 
 ![](https://github.com/patriciasolesanchez/PSlab/blob/master/HowTo's/Screenshots/Example_echo_true2.png) 
 
-With echo=False:
+With echo=False:<br/>
+
 ![](https://github.com/patriciasolesanchez/PSlab/blob/master/HowTo's/Screenshots/Example_echo_false.png) 
 ![](https://github.com/patriciasolesanchez/PSlab/blob/master/HowTo's/Screenshots/Example_echo_false2.png) 
 ````
@@ -232,7 +233,8 @@ Some code
 
 ![](https://github.com/patriciasolesanchez/PSlab/blob/master/HowTo's/Screenshots/eval_example.png) 
 
-Without eval=FALSE it will print the resluts of the code that is:
+Without eval=FALSE it will print the resluts of the code that is:<br/>
+
 ![](https://github.com/patriciasolesanchez/PSlab/blob/master/HowTo's/Screenshots/eval.png) 
 
 ````
