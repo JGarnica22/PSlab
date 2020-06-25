@@ -4,7 +4,7 @@ This tutorial will show you how to replace commas within a list of elements in a
 
 ![](https://cdn.extendoffice.com/images/stories/doc-excel/dc-replace-commas-to-newline/doc-replace-commas-to-newline-1.png)
 
-This can be achieved either by using **replace function** or **VBA coding**
+This can be achieved either by using **replace function** or **VBA coding**. * In Mac, only the VBA option works!
 
 ## Replace function
 
