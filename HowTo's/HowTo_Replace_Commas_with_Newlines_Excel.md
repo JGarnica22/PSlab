@@ -42,4 +42,4 @@ End Sub
 Press the **F5** key or click the **Run** button to run the code.
 
 
-This tutorial was extracted from this [website.](https://www.extendoffice.com/documents/excel/4859-excel-replace-comma-with-newline-alt-enter.html)
+This tutorial was extracted from this [website](https://www.extendoffice.com/documents/excel/4859-excel-replace-comma-with-newline-alt-enter.html).
