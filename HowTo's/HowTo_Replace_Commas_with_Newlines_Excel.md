@@ -1,6 +1,6 @@
 # How to replace commas with newlines in Excel: :bar_chart:
 
-This tutorial show you how to replace commas within a list of element in an excel cell by newlines, as represented in the image:
+This tutorial will show you how to replace commas within a list of elements in a single Excel cell by newlines, as represented in the image:
 
 ![](https://cdn.extendoffice.com/images/stories/doc-excel/dc-replace-commas-to-newline/doc-replace-commas-to-newline-1.png)
 
