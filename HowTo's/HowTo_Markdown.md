@@ -231,23 +231,6 @@ In this example you can see that we avoid running the code of `plot(pressure)` w
 ![](https://github.com/patriciasolesanchez/PSlab/blob/master/HowTo's/Screenshots/Test%20markown%20printscreen%20R_arrows_eval_FALSE.png) 
 
 
-````
-```{r message = FALSE}
-Some code
-```
-````
-
-![](https://github.com/patriciasolesanchez/PSlab/blob/master/HowTo's/Screenshots/message_example.png) 
-
-````
-```{r engine = 'python'}
-Some code
-```
-````
-
-![](https://github.com/patriciasolesanchez/PSlab/blob/master/HowTo's/Screenshots/engine_example.png) 
-
-
 More chunk options in: https://rstudio.com/resources/cheatsheets/  
 <br/>
 
