@@ -215,27 +215,21 @@ Observe the examples below:<br/>
 Some code
 ```
 ````
+In this example you can see that the chunk of code `summary(cars)` with echo=TRUE (as default if you don't write anything) appears in the final report (right) within a blue background. On the contrary, in the  `plot(pressure)` below, the code don't appear in the final report thanks to the echo=FALSE. <br/>
+.
+![](https://github.com/patriciasolesanchez/PSlab/blob/master/HowTo's/Screenshots/Test%20markown%20printscreen%20R_arrows_FALSE.png) 
 
-Without echo=False:<br/>
 
-![](https://github.com/patriciasolesanchez/PSlab/blob/master/HowTo's/Screenshots/Example_echo_true.png) 
-![](https://github.com/patriciasolesanchez/PSlab/blob/master/HowTo's/Screenshots/Example_echo_true2.png) 
 
-With echo=False:<br/>
-
-![](https://github.com/patriciasolesanchez/PSlab/blob/master/HowTo's/Screenshots/Example_echo_false.png) 
-![](https://github.com/patriciasolesanchez/PSlab/blob/master/HowTo's/Screenshots/Example_echo_false2.png) 
 ````
 ```{r eval = FALSE}
 Some code
 ```
 ````
+In this example you can see that we avoid running the code of `plot(pressure)` with eval=FALSE. <br/>
 
-![](https://github.com/patriciasolesanchez/PSlab/blob/master/HowTo's/Screenshots/eval_example.png) 
+![](https://github.com/patriciasolesanchez/PSlab/blob/master/HowTo's/Screenshots/Test%20markown%20printscreen%20R_arrows_eval_FALSE.png) 
 
-Without eval=FALSE it will print the results of the code, that is:<br/>
-
-![](https://github.com/patriciasolesanchez/PSlab/blob/master/HowTo's/Screenshots/eval.png) 
 
 ````
 ```{r message = FALSE}
