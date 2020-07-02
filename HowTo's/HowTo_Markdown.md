@@ -107,14 +107,12 @@ The backtick (also known as the grave accent or backquote) is used to mention a 
 ### Introduce chunks of code
 To insert chunks of code into your file type 4 grave accents \`\`\`\` before and after the code. In a conventional .md file (to read in GitHub or export to html or PDF), the code chunks will appear within a blue background.<br/>
 
-\`\`\`\`<br/>
-Code Example <br/>
-\`\`\`\`<br/>
-
 ````
 Code Example
 ````
-
+\`\`\`\`<br/>
+Code Example <br/>
+\`\`\`\`<br/>
 
 ### Add links
 To embed links into a topic you can either add the link (will be seen as the whole link text) or use the markdown syntax as below where the word "link" will be converted to a clickable link (use [ ] around the linkable word, followed without space for the link in brackets.
@@ -208,15 +206,15 @@ Options in the brackets after {r}:
 * message = FALSE --> supresses messages from appearing in the output, for example warnings.
 * engine = 'python' --> to embed non R code, set the engine option to the language you want to embed.  
 
-Observe the examples below:<br/>
+See the examples below:<br/>
 
 ````
 ```{r echo = FALSE}
 Some code
 ```
 ````
-In this example you can see that the chunk of code `summary(cars)` with echo=TRUE (as default if you don't write anything) appears in the final report (right) within a blue background. On the contrary, in the  `plot(pressure)` below, the code don't appear in the final report thanks to the echo=FALSE. <br/>
-.
+In this example you can see that the chunk of code `summary(cars)` with echo=TRUE (as default if you don't write anything) appears in the final report (right) within a blue background. On the contrary, in the `plot(pressure)` below, the code doesn't appear in the final report thanks to the echo=FALSE. <br/>
+<br/>
 ![](https://github.com/patriciasolesanchez/PSlab/blob/master/HowTo's/Screenshots/Test%20markown%20printscreen%20R_arrows_FALSE.png) 
 
 
@@ -226,7 +224,7 @@ In this example you can see that the chunk of code `summary(cars)` with echo=TRU
 Some code
 ```
 ````
-In this example you can see that we avoid running the code of `plot(pressure)` with eval=FALSE. <br/>
+In this example you can see that we avoid running the code of `plot(pressure)` with eval=FALSE (no results appear). <br/>
 
 ![](https://github.com/patriciasolesanchez/PSlab/blob/master/HowTo's/Screenshots/Test%20markown%20printscreen%20R_arrows_eval_FALSE.png) 
 
