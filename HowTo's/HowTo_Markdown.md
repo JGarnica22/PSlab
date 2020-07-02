@@ -28,6 +28,8 @@ To sum up, it's a very simple language used to create beautiful and presentable 
 ### Headings
 To create a heading, add a hash symbol (#) in front of a word or phrase. The number of hash symbols you use should correspond to the heading level. For each extra (#) that you use your heading will be smaller.<br/>
 
+![](https://github.com/patriciasolesanchez/PSlab/blob/master/HowTo's/Screenshots/Headings.png) 
+
 ### Paragraphs
 To create paragraphs, use a blank line to separate one or more lines of text.<br/>
 
@@ -121,7 +123,7 @@ Go to this [link](https://write_here_your_link.com)
 ````
 
 ### Embed images
-To create an inline image link, enter an exclamation point ( ! ), wrap the alt text in brackets ( [ ] ), and then wrap the link in parenthesis ( ( ) ). (\*_Alt text_ is a phrase or sentence that describes the image.)
+To create an inline image link, enter an exclamation point ( ! ), wrap the alt text in brackets ( [ ] ), and then wrap the link in parenthesis ( ( ) ). (\*_Alt text_ is a phrase or sentence that describes your image.)
 ````
 ![Alt Text](url)
 ````
@@ -151,8 +153,7 @@ Tools > Install Packages <br/>
 Choose "Repository CRAN" and write "Markdown" in "Packages (separate multiple with space or comma:)"
 
 To open a new file, click File > New File > R Markdown in the RStudio menu bar. 
-A window will pop up where you can name the project an the author ("Title" and "Author") and select the specific type of output that you wish to build (HTML, PDF or Word). Remember that you can switch to the other output formats anytime.  
-
+A window will pop up where you can name the project and the author ("Title" and "Author") and select the specific type of output that you wish to build (HTML, PDF or Word). Remember that you can switch to the other output formats anytime.  
 
 A template will be opened to generate your Markdown report. The Markdown template contains:
 
@@ -207,19 +208,17 @@ Options in the brackets after {r}:
 * message = FALSE --> supresses messages from appearing in the output, for example warnings.
 * engine = 'python' --> to embed non R code, set the engine option to the language you want to embed.  
 
-See examples below:
+Observe the examples below:<br/>
 
 ````
 ```{r echo = FALSE}
 Some code
 ```
 ````
+In this example you can see that the chunk of code `summary(cars)` with echo=TRUE (as default if you don't write anything) appears in the final report (right) within a blue background. On the contrary, in the  `plot(pressure)` below, the code don't appear in the final report thanks to the echo=FALSE. <br/>
+.
+![](https://github.com/patriciasolesanchez/PSlab/blob/master/HowTo's/Screenshots/Test%20markown%20printscreen%20R_arrows_FALSE.png) 
 
-![](https://github.com/patriciasolesanchez/PSlab/blob/master/HowTo's/Screenshots/echo_example.png) 
-
-I WOULD SHOW ONE IMAGE WITH echo=FALSE AND ONE WITH echo=TRUE SO THAT THE DIFFERENCE IS CLEAR. SAME FOR THE OTHER OPTIONS!!
-
-ALTERNATIVELY, SHOW A FIRST IMAGE (AS A REFERENCE) WITH NO OPTIONS, SO THAT THE OPTIONS BELOW ARE COMPARED TO THIS ONE. BUT THEN ALL EXAMPLES OF CODE WOULD NEED TO BE THE SAME... I THINK THE FIRST OPTION MIGHT BE EASIER :)
 
 
 ````
@@ -227,24 +226,9 @@ ALTERNATIVELY, SHOW A FIRST IMAGE (AS A REFERENCE) WITH NO OPTIONS, SO THAT THE 
 Some code
 ```
 ````
+In this example you can see that we avoid running the code of `plot(pressure)` with eval=FALSE. <br/>
 
-![](https://github.com/patriciasolesanchez/PSlab/blob/master/HowTo's/Screenshots/eval_example.png) 
-
-````
-```{r message = FALSE}
-Some code
-```
-````
-
-![](https://github.com/patriciasolesanchez/PSlab/blob/master/HowTo's/Screenshots/message_example.png) 
-
-````
-```{r engine = 'python'}
-Some code
-```
-````
-
-![](https://github.com/patriciasolesanchez/PSlab/blob/master/HowTo's/Screenshots/engine_example.png) 
+![](https://github.com/patriciasolesanchez/PSlab/blob/master/HowTo's/Screenshots/Test%20markown%20printscreen%20R_arrows_eval_FALSE.png) 
 
 
 More chunk options in: https://rstudio.com/resources/cheatsheets/  
@@ -257,9 +241,6 @@ R markdown will directly replace the code with its results.
 Today is `r Sys.date()`
 ````
 _Today is 2020-05-20_
-<br/>
-
-I DONT' UNDERSTAND WELL HOW THIS INLINE CODE WORKS. I TRIED IN A MARKDOWN AND RESULTS APPEAR WEIRD. LET'S DISCUSS.  
 <br/>
 
 Finally, to get your report you can click on "Knit" botton and choose your favourite format: HTML, PDF or Word.
