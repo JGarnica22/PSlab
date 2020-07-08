@@ -1,4 +1,4 @@
-# How to use Cluster :video_game:
+# How to use Cluster NordIII :video_game:
 
 This protocol describes how to use and create jobs on **Nord III cluster** supercomputer processors. These are based on Intel SandyBridge processors, iDataPlex Compute Racks, a Linux Operating System and an Infiniband interconnection. Nord3 is a part of the old MareNostrum3. Nord3 machine is installed at BSC (Barcelona Supercomputing Center) and it presents the following configuration:
 
