@@ -27,7 +27,9 @@ Use the following command and you will be asked to type the password:
 ssh cek26664@nord1.bsc.es
 ````
 
-Once connected to the machine, you will be presented with a UNIX shell prompt and you will normally be in your home ($HOME) directory. The login nodes serve as front ends and are used typically for editing, compiling, preparation and submition of batch executions. It is not permitted the execution of cpu-bound programs on these nodes,  if some execution needs more cputime than the permitted, this needs to be done through the batch queue system (LSF).
+Once connected to the machine, you will be presented with a UNIX shell prompt and you will normally be in your home ($HOME) directory. The login nodes serve as front ends and are used typically for editing, compiling, preparation and submition of batch executions. It is not permitted the execution of cpu-bound programs on these nodes, if some execution needs more cputime than the permitted, this needs to be done through the batch queue system (LSF).
+
+JO POTSER ELIMINARIA TEXT "COMPLEX" PERQUÈ PORTA A CONFUSIÓ...? TROBO QUE UTILITZAR LLENGUATGE MOLT ESPECÍFIC FA QUE GRAN PART DEL TEXT NO ENS APORTI INFORMACIÓ. JO POTSER EXPLICARIA LES COSES D'UNA MANERA MÉS BÀSICA... QUE ALGÚ SENSE GAIRE CONEIXEMENT TAMBÉ PUGUI ENTENDRE
 
 ## 2. Password Management
 In order to change the password, you have to login to a different machine (dt01.bsc.es). This connection must be established from your local machine.
@@ -40,7 +42,7 @@ In order to change the password, you have to login to a different machine (dt01.
     New Password: 
     Reenter New Password: 
     Password changed.
-Mind that that the password change takes about 10 minutes to be effective.
+Mind that the password change takes about 10 minutes to be effective.
 
 ## 3. File transfer
 There are two ways to copy files from/to the Cluster:
@@ -51,14 +53,19 @@ There are two ways to copy files from/to the Cluster:
 We strongly recommend using **[Cyberduck](https://cyberduck.io/download/)** as a data transfer machine.
 
 ### 3.1. How to use Cyberduck
-After having installed Cyberduck start a new conexion, then indicate connexion as SFTP. Indicate one of the blades as server  **{nord1,nord2,nord3}.bsc.es** and finally insert our user name cek26664 and password.
+After having installed Cyberduck, start a new conexion, then indicate connexion as SFTP. Indicate one of the blades as server  **{nord1,nord2,nord3}.bsc.es** and finally insert our user name cek26664 and password.
 
 Once linked you will be able to easily upload, download and modify files and directories in the cluster machine.
 
-## 4. Modules environtment
-The cluster provides a dynamic modification of user's environment via **modulefiles**. Each modulefile contain the information needed to configure the shell for an application or compilation. Typically modulefiles instruct the module command to alter or set shell environment variables such as PATH, MANPATH, etc. The modules needed for a tool or certain job must be loaded beforehand in order to proceed with the job.
+AQUEST SEGÜENT PARÀGRAF DE MÒDULS CREC QUE VE MASSA SOBTAT, S'HAURIA D'INTRODUIR UNA MICA MÉS PER A QUÈ SERVEIXEN ELS MÒDULS/QUÈ SÓN. HE FET UN SKETCH DEL QUE PODRÍEM DIR, NO SÉ SI TOT AQUÍ O NO...
+
+## 4. Modules environment
+External connexions to the web cannot be performed from the cluster. Tools that require internet access cannot be used, neither can tools be installed from the web. BSC support will install any tool or X required, we just need to ask them. Right after you open session in the cluster, no tools are accessible in the current configuration. In order to use different tools, you need to load **modules**. Each module contains the software to access the tool... 
+
+The cluster provides a dynamic modification of user's environment via **modulefiles**. Each modulefile contains the information needed to configure the shell for an application or compilation. Typically modulefiles instruct the module command to alter or set shell environment variables such as PATH, MANPATH, etc. The modules needed for a tool or certain job must be loaded beforehand in order to proceed with the job. POTSER POSAR UN EXEMPLE? (QUE ES VEGI QUE PER ALGUNES TOOLS NOMÉS CAL CARREGAR EL MÒDUL PERTINENT, PERÒ PER ALTRES, TIPUS STAR, TAMBÉ CAL CARREGAR MÒDULS DE GCC COMPILERS O PYTHON O EL QUE SIGUI)  
+
 ### 4.1. Modules tool usage
-In order to check the module available at the moment use:
+In order to check the modules available at the moment use:
 ````
 module av
 module avail
@@ -85,6 +92,8 @@ module switch <oldmodule> <newmodule>
 ````
 Unloads the first module (oldmodule) and loads the second module (newmodule)
 
+
+AQUEST BLOCK 5. JO NO ENTENC RES... PERDÓ
 
 ## 5. GPFS Filesystem storing space
 The IBM General Parallel File System (GPFS) is a high-performance shared-disk file system providing fast, reliable data access from all nodes of the cluster to a global filesystem. GPFS allows parallel applications simultaneous access to a set of files (even a single file) from any node.
