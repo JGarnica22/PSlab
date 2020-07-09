@@ -84,3 +84,23 @@ Removes all environment changes made by module load command
 module switch <oldmodule> <newmodule> 
 ````
 Unloads the first module (oldmodule) and loads the second module (newmodule)
+
+
+## 5. GPFS Filesystem storing space
+The IBM General Parallel File System (GPFS) is a high-performance shared-disk file system providing fast, reliable data access from all nodes of the cluster to a global filesystem. GPFS allows parallel applications simultaneous access to a set of files (even a single file) from any node.
+
+These are the GPFS filesystems available in the machine from all nodes:
+
+/apps: Over this filesystem will reside the applications and libraries that have already been installed on the machine. Take a look at the directories to know the applications available for general use.
+
+* **/gpfs/home:** This filesystem has the home directories of all the users, and when you log in you start in your home directory by default. Every user will have their own home directory to store own developed sources and their personal data. A default quota will be enforced on all users to limit the amount of data stored there. Also, it is highly discouraged to run jobs from this filesystem. Please **run your jobs on your group’s /gpfs/projects or /gpfs/scratch** instead.
+
+* **/gpfs/projects:** In addition to the home directory, there is a directory in /gpfs/projects for each group of users. For instance, the group bsc01 will have a /gpfs/projects/bsc01 directory ready to use. This space is intended to store data that needs to be shared between the users of the same group or project. A quota per group will be enforced depending on the space assigned by Access Committee.  
+* **/gpfs/scratch:** Each user will have a directory over /gpfs/scratch. Its intended use is to store temporary files of your jobs during their execution. A quota per group will be enforced depending on the space assigned.
+
+In order to assess how much space we are provided with in our quota use:
+````
+bsc_quota
+````
+
+**IMPORTANT:** An incremental backup will be performed daily **only for /gpfs/home.**
