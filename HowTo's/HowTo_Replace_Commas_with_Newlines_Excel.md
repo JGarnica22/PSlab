@@ -24,7 +24,7 @@ Then click OK when prompt box pops up and finally close dialog box.
 
 ## VBA Code
 
-Select the cells containing the commas you need to replace with newlines, then press the **Alt + F11** keys simultaneously to open the **Microsoft Visual Basic** for Applications window.
+Select the cells containing the commas you need to replace with newlines, then press the **Alt + F11** keys simultaneously to open the **Microsoft Visual Basic for Applications** window.
 
 **Click Insert > Module.** Then copy and paste VBA code into the Code window.
 
