@@ -1,4 +1,4 @@
-# How to use Cluster NordIII :video_game:
+# How to use Cluster :video_game:
 
 This protocol describes how to use and create jobs on **Nord III cluster** supercomputer processors. These are based on Intel SandyBridge processors, iDataPlex Compute Racks, a Linux Operating System and an Infiniband interconnection. Nord3 is a part of the old MareNostrum3. Nord3 machine is installed at BSC (Barcelona Supercomputing Center) and it presents the following configuration:
 
@@ -104,3 +104,73 @@ bsc_quota
 ````
 
 **IMPORTANT:** An incremental backup will be performed daily **only for /gpfs/home.**
+
+## 6. Submitt a job to the cluster
+### 6.1. Write your bash script
+You can write your code in a .txt file and then upload it to the cluster to execute it. Before coding, make sure that the file is saved as .sh (bash), is executable and in UNIX format.
+
+Command to convert file to executable:
+````
+chmod u+x <scriptname.sh>
+````
+Command to convert file to UNIX:
+````
+sed -i -e 's/\r$//' <scriptname.sh>
+````
+
+After this you can start writing your code. This must always start indicating that is a bash script with **#!/bin/bash**
+
+Then you need to indicate all the parameters and directives of this job in the cluster using **#BSUB**. Here you can see the parameters which must be always included, for more check out [IBM support webpage.](https://www.ibm.com/support/knowledgecenter/SSETD4_9.1.2/lsf_command_ref/bsub.1.html) or read the bsub command’s manual from any of Nord’s terminals by using:
+````
+man bsub
+````
+
+-------------------------------------------------------------
+**Most commond directives to be included at the beginning of the script:**
+
+````
+#BSUB -J job_name
+````
+Specify the name (description) of the job.
+
+    #BSUB -q debug
+Specify the queue for the job to be submitted. The debug queue is only intended for small tests, so there is a limit of 1 job per user, using up to 64 cpus (4 nodes), and one hour of wall clock limit. The queue might be reassigned by LSF internal policy, as with the sequential queue.
+NOTE: to know the queues availables for sending jobs use: `bsc_queues`
+
+    #BSUB -W HH:MM
+Specify how much time the job will be allowed to run. This is a mandatory field. NOTE: take into account that you can not specify the amount of seconds in LSF. You must set it to a value greater than the real execution time for your application and smaller than the time limits granted to the user. Notice that your job will be killed after the elapsed period.
+
+    #BSUB -cwd pathname
+The working directory of your job (i.e. where the job will run).If not specified, it is the current working directory at the time the job was submitted.
+
+    #BSUB -e/-eo file
+The name of the file to collect the stderr output of the job. You can use %J for job_id. -e option will APPEND the file, -eo will REPLACE the file.
+
+    #BSUB -o/-oo file
+The name of the file to collect the standard output (stdout) of the job. -o option will APPEND the file, -oo will REPLACE the file.
+
+    #BSUB -n number
+The number of tasks for the job. In MPI executions corresponds to the number of MPI processes and for sequential executions the number of cores.
+
+    #BSUB -x
+Use the nodes exclusively. This is the default behaviour except for sequential executions.
+
+    #BSUB -M number
+
+
+Then you can start writing your code, remember that if you want to add comments to your code use `# `  with a blank space afterwards.
+
+### 6.2. Submit your job
+Once your script is completed uploaded to your working directory and then just use this command:
+````
+bsub < <scriptname.sh>
+````
+You can also check out the status of your jobs and jobs from your group by using respectively:
+````
+bjobs
+bsc_jobs
+````
+Finally, if you want remove a job from the queue or cancel de process use:
+````
+bkill <job_id>
+````
