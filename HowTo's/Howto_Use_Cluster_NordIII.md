@@ -63,24 +63,28 @@ module avail
 Modules can be invoked in two ways: by name alone or by name and version. Invoking them by name implies loading the default module version. This is usually the most recent version that has been tested to be stable (recommended) or the only version available. To invoke modules use:
 ````
 module load <modulename(version)>
-````
+````  
+
 Other important commands to work with modules include:
 ````
 module list 
 ````
-Shows all the loaded modules
+Shows all the loaded modules  
+
 ````
 module purge
 ````
-Removes all the loaded modules
+Removes all the loaded modules  
+
 ````
 module unload <modulename> 
 ````
-Removes all environment changes made by module load command
+Removes all environment changes made by module load command  
+
 ````
 module switch <oldmodule> <newmodule> 
 ````
-Unloads the first module (oldmodule) and loads the second module (newmodule)
+Unloads the first module (oldmodule) and loads the second module (newmodule)  
 
 
 For instance, these are the commands to be done to use `fastqc` and `STAR 2.4.1c`. First, we remove previously loaded modules by `module purge` in case they might interfere with the current modules. Then we load the needed modules: 
@@ -115,7 +119,8 @@ You can write your code in a .txt file and then upload it to the cluster to exec
 Command to convert any file to executable:
 ````
 chmod u+x <scriptname.sh>
-````
+````  
+
 Command to convert file to UNIX:
 ````
 sed -i -e 's/\r$//' <scriptname.sh>
@@ -134,46 +139,49 @@ man bsub
 ````
 #BSUB -J job_name
 ````
-Specify the name (description) of the job.
+Specify the name (description) of the job.  
+
 
     #BSUB -q debug
-Specify the queue for the job to be submitted. The debug queue is only intended for small tests, so there is a limit of 1 job per user, using up to 64 cpus (4 nodes), and one hour of wall clock limit. The queue might be reassigned by LSF internal policy, as with the sequential queue.
-NOTE: to know the queues availables for sending jobs use: `bsc_queues`
+Specify the queue for the job to be submitted. The _debug_ queue is only intended for small tests, so there is a limit of 1 job per user, using up to 64 cpus (4 nodes), and 1 h of wall clock limit. The queue might be reassigned by LSF internal policy, as with the sequential queue.
+NOTE: to know the queues availables for sending jobs use: `bsc_queues`  
 
     #BSUB -W HH:MM
-Specify how much time the job will be allowed to run. This is a mandatory field. NOTE: take into account that you can not specify the amount of seconds in LSF. You must set it to a value greater than the real execution time for your application and smaller than the time limits granted to the user. Notice that your job will be killed after the elapsed period.
+Specify how much time the job will be allowed to run. This is a mandatory field. NOTE: take into account that you can not specify the amount of seconds in LSF. You must set it to a value greater than the real execution time for your application and smaller than the time limits granted to the user. Notice that your job will be killed after the elapsed period.  
 
     #BSUB -cwd pathname
-The working directory of your job (i.e. where the job will run).If not specified, it is the current working directory at the time the job was submitted.
+The working directory of your job (i.e. where the job will be run). If not specified, it is the current working directory at the time the job was submitted.  
 
     #BSUB -e/-eo file
-The name of the file to collect the stderr output of the job. You can use %J for job_id. -e option will APPEND the file, -eo will REPLACE the file.
+The name of the file to collect the stderr output of the job. You can use %J for job_id. -e option will APPEND the file, -eo will REPLACE the file.  
 
     #BSUB -o/-oo file
-The name of the file to collect the standard output (stdout) of the job. -o option will APPEND the file, -oo will REPLACE the file.
+The name of the file to collect the standard output (stdout) of the job. -o option will APPEND the file, -oo will REPLACE the file.  
 
     #BSUB -n number
-The number of tasks for the job. In MPI executions corresponds to the number of MPI processes and for sequential executions the number of cores.
+The number of tasks for the job. In MPI executions corresponds to the number of MPI processes and for sequential executions the number of cores.  
 
     #BSUB -x
 Use the nodes exclusively. This is the default behaviour except for sequential executions.
 
     #BSUB -M number
-
+?????  
 
 Then you can start writing your code, remember that if you want to add comments to your code use `# `  with a blank space afterwards.
 
 ### 6.2. Submit your job
-Once your script is completed uploaded to your working directory and then just use this command:
+Once your sh script is uploaded to your working directory, use this command to run:
 ````
 bsub < <scriptname.sh>
-````
+```` 
+
 You can also check out the status of your jobs and jobs from your group by using respectively:
 ````
 bjobs
 bsc_jobs
-````
-Finally, if you want remove a job from the queue or cancel de process use:
+````  
+
+Finally, if you want remove a job from the queue or cancel the process use:
 ````
 bkill <job_id>
 ````
