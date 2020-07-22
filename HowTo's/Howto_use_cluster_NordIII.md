@@ -1,11 +1,6 @@
 # How to use Cluster :video_game:
 
-This protocol describes how to use and create jobs on **Nord III cluster** supercomputer processors. These are based on Intel SandyBridge processors, iDataPlex Compute Racks, a Linux Operating System and an Infiniband interconnection. Nord3 is a part of the old MareNostrum3. Nord3 machine is installed at BSC (Barcelona Supercomputing Center) and it presents the following configuration:
-
-* 84 IBM dx360 M4 compute nodes with 128 GB of RAM per node
-* Infiniband FDR10 interconection network
-* SLES 11 SP3
-* GPFS Common Storage (home, projects, scratch)
+This protocol describes how to use and create jobs on **Nord III cluster** supercomputer processors. Nord3 machine is installed at BSC (Barcelona Supercomputing Center).
 
 For more information and details check [**Nord III User's Guide**](https://www.bsc.es/user-support/nord3.php). You can also contact with support@bsc.es for further information.
 
@@ -27,9 +22,7 @@ Use the following command and you will be asked to type the password:
 ssh cek26664@nord1.bsc.es
 ````
 
-Once connected to the machine, you will be presented with a UNIX shell prompt and you will normally be in your home ($HOME) directory. The login nodes serve as front ends and are used typically for editing, compiling, preparation and submition of batch executions. It is not permitted the execution of cpu-bound programs on these nodes, if some execution needs more cputime than the permitted, this needs to be done through the batch queue system (LSF).
-
-JO POTSER ELIMINARIA TEXT "COMPLEX" PERQUÈ PORTA A CONFUSIÓ...? TROBO QUE UTILITZAR LLENGUATGE MOLT ESPECÍFIC FA QUE GRAN PART DEL TEXT NO ENS APORTI INFORMACIÓ. JO POTSER EXPLICARIA LES COSES D'UNA MANERA MÉS BÀSICA... QUE ALGÚ SENSE GAIRE CONEIXEMENT TAMBÉ PUGUI ENTENDRE
+Once connected to the machine, you will be presented with a UNIX shell prompt and you will normally be in your home ($HOME) directory. Here you can upload and prepare your files for a submission of batch executions or jobs. You must not execute cpu-consuming task, these need to be done trough the batch queues system (see below).
 
 ## 2. Password Management
 In order to change the password, you have to login to a different machine (dt01.bsc.es). This connection must be established from your local machine.
@@ -57,12 +50,9 @@ After having installed Cyberduck, start a new conexion, then indicate connexion 
 
 Once linked you will be able to easily upload, download and modify files and directories in the cluster machine.
 
-AQUEST SEGÜENT PARÀGRAF DE MÒDULS CREC QUE VE MASSA SOBTAT, S'HAURIA D'INTRODUIR UNA MICA MÉS PER A QUÈ SERVEIXEN ELS MÒDULS/QUÈ SÓN. HE FET UN SKETCH DEL QUE PODRÍEM DIR, NO SÉ SI TOT AQUÍ O NO...
-
 ## 4. Modules environment
-External connexions to the web cannot be performed from the cluster. Tools that require internet access cannot be used, neither can tools be installed from the web. BSC support will install any tool or X required, we just need to ask them. Right after you open session in the cluster, no tools are accessible in the current configuration. In order to use different tools, you need to load **modules**. Each module contains the software to access the tool... 
+External connexions to the web cannot be performed from the cluster. Tools that require internet access cannot be used, neither can tools be installed from the web. BSC support will install any tool or X required, we just need to ask them. Right after you open session in the cluster, only default tools are accessible in the current configuration. In order to use different tools, you need to load the **modules** requiered for the task to perform, as well as indicate commands to load them in the batch jobs.
 
-The cluster provides a dynamic modification of user's environment via **modulefiles**. Each modulefile contains the information needed to configure the shell for an application or compilation. Typically modulefiles instruct the module command to alter or set shell environment variables such as PATH, MANPATH, etc. The modules needed for a tool or certain job must be loaded beforehand in order to proceed with the job. POTSER POSAR UN EXEMPLE? (QUE ES VEGI QUE PER ALGUNES TOOLS NOMÉS CAL CARREGAR EL MÒDUL PERTINENT, PERÒ PER ALTRES, TIPUS STAR, TAMBÉ CAL CARREGAR MÒDULS DE GCC COMPILERS O PYTHON O EL QUE SIGUI)  
 
 ### 4.1. Modules tool usage
 In order to check the modules available at the moment use:
@@ -93,21 +83,25 @@ module switch <oldmodule> <newmodule>
 Unloads the first module (oldmodule) and loads the second module (newmodule)
 
 
-AQUEST BLOCK 5. JO NO ENTENC RES... PERDÓ
+For instance, these are the commands to be done to use fastqc and STAR 2.4.1c. First, we purge previously loaded modules by `module purge` in case they might interfere with other modules. Then we load the needed modules. 
+
+````
+module purge
+module load java/1.8.0u66 fastqc intel/2017.4 impi/2017.4 mkl/2017.4 gcc/5.3.0 gcc/4.9.1 openssl/1.1.1c python/3.7.4_pip STAR/2.4.1c
+````
+
 
 ## 5. GPFS Filesystem storing space
-The IBM General Parallel File System (GPFS) is a high-performance shared-disk file system providing fast, reliable data access from all nodes of the cluster to a global filesystem. GPFS allows parallel applications simultaneous access to a set of files (even a single file) from any node.
+In the NordIII cluster you can access to different filesystems or directories:
 
-These are the GPFS filesystems available in the machine from all nodes:
+* **/apps**: here your list of available apps is annotated.
 
-/apps: Over this filesystem will reside the applications and libraries that have already been installed on the machine. Take a look at the directories to know the applications available for general use.
+* **/gpfs/home:** This filesystem has the home directories of all the users, and when you log in you start in your home directory by default. Every user will have their own home directory to store own developed sources and their personal data. Also, it is highly discouraged to run jobs from this filesystem. Please **run your jobs on your group’s /gpfs/projects or /gpfs/scratch** instead.
 
-* **/gpfs/home:** This filesystem has the home directories of all the users, and when you log in you start in your home directory by default. Every user will have their own home directory to store own developed sources and their personal data. A default quota will be enforced on all users to limit the amount of data stored there. Also, it is highly discouraged to run jobs from this filesystem. Please **run your jobs on your group’s /gpfs/projects or /gpfs/scratch** instead.
+* **/gpfs/projects:** In addition to the home directory, there is a directory in /gpfs/projects for each group of users. For instance, the group bsc01 will have a /gpfs/projects/bsc01 directory ready to use. This space is intended to store data that needs to be shared between the users of the same group or project. 
+* **/gpfs/scratch:** Each user will have a directory over /gpfs/scratch. Its intended use is to store temporary files of your jobs during their execution. 
 
-* **/gpfs/projects:** In addition to the home directory, there is a directory in /gpfs/projects for each group of users. For instance, the group bsc01 will have a /gpfs/projects/bsc01 directory ready to use. This space is intended to store data that needs to be shared between the users of the same group or project. A quota per group will be enforced depending on the space assigned by Access Committee.  
-* **/gpfs/scratch:** Each user will have a directory over /gpfs/scratch. Its intended use is to store temporary files of your jobs during their execution. A quota per group will be enforced depending on the space assigned.
-
-In order to assess how much space we are provided with in our quota use:
+Each of these directories is provided with a limited space disk assigned by bsc, be careful to assess that you have enough space disk in your working directory for you job outputs. In order to assess how much space we have available  use:
 ````
 bsc_quota
 ````
