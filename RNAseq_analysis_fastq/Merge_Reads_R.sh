@@ -21,3 +21,4 @@ for f in $(find ./fastq_files -name "*.fastq.gz" -exec basename {} \;)
 do
 mkdir alignment_counts/$(cut -d'.' -f1 <<< $f)_Logs 
 mv alignment_counts/$(cut -d'.' -f1 <<< $f)*Log*.out alignment_counts/$(cut -d'.' -f1 <<< $f)_Logs
+done
