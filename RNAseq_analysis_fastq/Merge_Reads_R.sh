@@ -5,7 +5,7 @@
 module purge
 module load gcc/7.2.0 R/3.6.3
 
-# Merge all ReadPerGene dataframe column 3 (stranded or sense aligment) into a unique dataframe for analysis with R, once all jobs are done.
+# Merge all ReadPerGene dataframe column 2 (unstranded) into a unique dataframe for analysis with R, once all jobs are done.
 
 
 R < Merge_Reads.R --save
