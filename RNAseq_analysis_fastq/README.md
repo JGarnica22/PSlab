@@ -109,7 +109,7 @@ To use it, upload all necessary files in the proper directories and send the scr
 
 ### Differential expression analysis
 
-Once finished the alignment before [differential expression analysis](https://github.com/patriciasolesanchez/PSlab/tree/master/DE_analysis_RNAseq) we ought to put together all the date for all our samples in a single data frame. To do so you can use `Merge_Reads_R.sh` script. This script do not need to be sent as a job since is not memory-demanding, you can run it in the Cluster interface just by typing `Merge_Reads_R.sh` or `bash Merge_Reads_R.sh`. This script will run a R script (Merge_Reads.R) which need to be in the same directory and properly organize the output files as well as erase unnecessary files.
+Once finished the alignment before [differential expression analysis](https://github.com/patriciasolesanchez/PSlab/tree/master/DE_analysis_RNAseq) we ought to put together all the data for all our samples in a single data frame. To do so you can use `Merge_Reads_R.sh` script. This script do not need to be sent as a job since is not memory-demanding, you can run it in the Cluster interface just by typing `Merge_Reads_R.sh` or `bash Merge_Reads_R.sh`. This script will run a R script (Merge_Reads.R) which need to be in the same directory and properly organize the output files as well as erase unnecessary files.
 
 `Merge_Reads.R` basically perform a loop to concatenate the unstranded reads per gene (column 2) of each **ReadsPerGene.out.tab** file into a common txt file **All_reads.txt**.
 
