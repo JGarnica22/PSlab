@@ -66,7 +66,7 @@ Also if you genome is is in _.2bit_ format you will need to convert it to _.fa_ 
 ````
 twoBitToFa your_genome.2bit your_genome.fa
 ````
-</br>
+
 
 #### Code
 Finally you can generate your genome index by using:
