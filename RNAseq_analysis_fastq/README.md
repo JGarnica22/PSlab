@@ -52,7 +52,7 @@ The first thing you need for an STAR alignment is creating a STAR index for the 
 ### STAR index Input
 In order to generate the STAR index you will need two files: your genome of reference and its respective GTF annotation (also needed later for counting reads). Ideally, these files should be updated and can be downloaded from GENCODE or Ensembl. To avoid compatibility problems during indexing, make sure that both files come from the same database.
 
-***IMPORTANT** Remember that you cannot download files when in the Cluster, you must download them in your computer and then upload them using SSH (Cyberduck for instance). 
+**_IMPORTANT** Remember that you cannot download files when in the Cluster, you must download them in your computer and then upload them using SSH (Cyberduck for instance)._
 
 Once downloaded, you must decompress the files by:
 ````
@@ -77,7 +77,7 @@ Note that this is action will take a lot of RAM. With `--runThreadN` you can ass
 
 ### STAR index output
 All STAR index files will be stored in the directory you indicated after `--genomeDir` option. All the files will be needed later for the alignment. 
-***IMPORTANT** The file system needs to have at least 100GB of disk space available for a typical mammalian genome.
+***IMPORTANT** The file system needs to have at least 100GB of disk space available for a typical mammalian genome.*
 </br>
 
 ### Alignment :train:
