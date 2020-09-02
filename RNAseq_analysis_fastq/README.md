@@ -54,7 +54,7 @@ The first thing you need for an STAR alignment is creating a STAR index for the 
 #### STAR indexing Input
 In order to generate the STAR index you will need two files: your genome of reference and its respective GTF annotation (also needed later for counting reads). Ideally, these files should be updated and can be downloaded from GENCODE or Ensembl. To avoid compatibility problems during indexing, make sure that both files come from the same database.
 
-    ***IMPORTANT** Remember that you cannot download files when in the Cluster, you must download them in your computer and then upload them using SSH (Cyberduck for instance).*
+***IMPORTANT** Remember that you cannot download files when in the Cluster, you must download them in your computer and then upload them using SSH (Cyberduck for instance).*  
 
 Once downloaded, you must decompress the files by:
 ````
@@ -67,7 +67,6 @@ Also if you genome is is in _.2bit_ format you will need to convert it to _.fa_ 
 twoBitToFa your_genome.2bit your_genome.fa
 ````
 
-
 #### Code
 Finally you can generate your genome index by using:
 
@@ -79,14 +78,14 @@ Note that this is action will take a lot of RAM. With `--runThreadN` you can ass
 
 #### STAR index output
 All STAR index files will be stored in the directory you indicated after `--genomeDir` option. All the files will be needed later for the alignment. 
-***IMPORTANT** The file system needs to have at least 100GB of disk space available for a typical mammalian genome.*
+***IMPORTANT** The file system needs to have at least 100GB of disk space available for a typical mammalian genome.*  
 </br>
 
 ### Alignment :train:
 After STAR index files are generated, the RNAseq reads (sequences) are mapped to the genome.
 
 #### Alignment input
-Here we will need the sequences to align in FASTA or FASTQ files format as well as all the files from STARindex. Also, when number of reads per gene want to counted while mapping with `--quantMode GeneCounts` annotation file used in the STARindex generation is required.
+Here we will need the sequences to align in FASTA or FASTQ files format as well as all the files from STAR index. Also, when you want the number of reads per gene want to be counted while mapping (with `--quantMode GeneCounts` option), the annotation file used in the STAR index generation is required.
 
 #### Code
 ````
@@ -96,21 +95,18 @@ STAR --runMode alignReads --genomeDir your_STARindex --readFilesIn your_seq_file
 #### Output
 STAR produces multiple output files. All files have standard name, however, you can change the file prefixes using `--outFileNamePrefix /path/to/output/dir/prefix`. By default, this parameter is ./, i.e. all output files are written in the current directory.
 
-* **Log files**: there are different types of log files generated. They provides progress statistics and information about the run useful for quality control and troubleshooting.
-* **Aligments in BAM format**: in our case we obtain output sorted by coordinate as *Aligned.sortedByCoord.out.bam* file. Other files can obteined in the opion `--outSAMtype`.
-* **Reads per gene files**: STAR outputs read counts per gene into
-ReadsPerGene.out.tab file with 4 columns which correspond to different strandedness options:
+* **Log files**: there are different types of log files generated. They provide progress statistics and information about the run, useful for quality control and troubleshooting.
+* **Alignments in BAM format**: in our case we obtain output sorted by coordinate as *Aligned.sortedByCoord.out.bam* file. Other files can be obtained using the option `--outSAMtype`.
+* **Reads per gene files**: STAR outputs read counts per gene into _ReadsPerGene.out.tab file_ with 4 columns which correspond to different strandedness options:
 
-    STAR outputs read counts per gene into
-**ReadsPerGene.out.tab** file with 4 columns which correspond to different strandedness options:
     * **column 1**: gene ID
-    * **column 2**: counts for unstranded RNA-seq
+    * **column 2**: counts for unstranded RNAseq
     * **column 3**: counts for the 1st read strand aligned with RNA (htseq-count option -s yes)
     * **column 4**: counts for the 2nd read strand aligned with RNA (htseq-count option -s reverse)
 
-    You must select the output according to the [strandedness of your data](http://onetipperday.sterding.com/2012/07/how-to-tell-which-library-type-to-use.html?showComment=1522859906203#c7586510008202176571) (for instance standard illumina would be unstranded).
+    You must select the output according to the [strandedness of your data](http://onetipperday.sterding.com/2012/07/how-to-tell-which-library-type-to-use.html?showComment=1522859906203#c7586510008202176571) (for instance, <ins>standard Illumina would be unstranded</ins>).
     
-## Multiple jobs generation in the Cluster :two_women_holding_hands:
+## Running multiple jobs simultaneously in the Cluster :two_women_holding_hands:
 Both STARindexing and aligments can take quite time to be performed due to the amount of data processed, and this depends on the amount of RAM available to use. In the Cluster you can highly increase the RAM used in the process in comparison to a computer and in case you have different replicates or samples, run them in parellel to save time. `Paralel_alignment_and_FastQC.sh` is a bash script intended to:
 1. Run in parellel jobs the aligments while counting reads per gene for each sample or replicate you may have, and then convert each resulting bam file into Bigwig. To do so it creates an indepedent job script for each FASTQ file which is later removed.
 2. Run a loop to perform a FasQC each of your samples and compile all graphs into a unique PDF file.
