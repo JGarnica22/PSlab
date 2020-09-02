@@ -1,6 +1,8 @@
-# Fastq RNAseq analysis :sparkles:
+# RNAseq data analysis pipeline :dna:
 
-In these scripts it will be described how to perform `fastQC` quality control of fastq files of RNAseq libraries as well as an alignment to a reference genome and counting the number of reads per gene using `STAR` tool. Note that these protocol are thought to be processed in the Cluster due to their highly RAM requeriments (for `STAR` ideally 32 GB), however, this code could be use in computer terminal. These scripts are written in `bash` language.
+RNA-sequencing (RNAseq) generates raw data in the _fastq_ format. Each sample you sequence will generate a compressed _fastq.gz_ file. These files will be used as input for the following analysis pipeline.
+
+The RNAseq analysis pipeline includes scripts to perform a `FastQC` quality control of each fastq file (sample) followed by the alignment of those to a reference genome and counting the number of reads per gene using the `STAR` tool. Note that this pipeline is thought to be run in the Cluster due to its high RAM requirements (for `STAR` ideally 32 GB); however, this code could be run in your computer Terminal, you will need longer time and your computer might overheat a bit. These scripts are written in `bash` language.
 
 ## Quality control of RNA-seq
 FastQC checks on raw sequence data coming from high throughput sequencing pipelines. It provides a modular set of analyses which you can use to give a quick impression of whether your data has any problems of which you should be aware before doing any further analysis. FastQC is a cross-platform application, written in java. In theory it should run on any platform which has a suitable java runtime environment. To run in the Cluster you will need to load the java and fastqc modules (see full bash script).
