@@ -107,15 +107,15 @@ STAR produces multiple output files. All files have standard name, however, you 
     You must select the output according to the [strandedness of your data](http://onetipperday.sterding.com/2012/07/how-to-tell-which-library-type-to-use.html?showComment=1522859906203#c7586510008202176571) (for instance, <ins>standard Illumina would be unstranded</ins>).
     
 ## Running multiple jobs simultaneously in the Cluster :two_women_holding_hands:
-Both STARindexing and aligments can take quite time to be performed due to the amount of data processed, and this depends on the amount of RAM available to use. In the Cluster you can highly increase the RAM used in the process in comparison to a computer and in case you have different replicates or samples, run them in parellel to save time. `Paralel_alignment_and_FastQC.sh` is a bash script intended to:
-1. Run in parellel jobs the aligments while counting reads per gene for each sample or replicate you may have, and then convert each resulting bam file into Bigwig. To do so it creates an indepedent job script for each FASTQ file which is later removed.
-2. Run a loop to perform a FasQC each of your samples and compile all graphs into a unique PDF file.
+Both STAR indexing and alignments can take quite some time to be performed due to the amount of data processed, and this depends on the amount of RAM available to use. In the Cluster you can highly increase the RAM used in the process in comparison to a computer and in case you have different replicates or samples, you can run them in parallel to save time. `Parallel_alignment_and_FastQC.sh` is a bash script intended to:
+1. Run in parallel jobs all alignments while counting reads per gene for each sample you may have, and then convert each resulting bam file into Bigwig. To do so, it creates an indepedent job script for each FASTQ file which is later removed.
+2. Run a loop to perform a FastQC for each of your samples and compile all graphs into a unique PDF file.
 
-To use it, upload all necessary files in the proper directories and send the script as a job: `bsub < Paralel_alignment_and_FastQC.sh`
+To use it, upload all necessary files in the proper directories and send the script as a job: `bsub < Parallel_alignment_and_FastQC.sh`
 
-### Differential expression analysis
+### Differential Expression Analysis
 
-Once finished the alignment before [differential expression analysis](https://github.com/patriciasolesanchez/PSlab/tree/master/DE_analysis_RNAseq) we ought to put together all the data for all our samples in a single data frame. To do so you can use `Merge_Reads_R.sh` script. This script do not need to be sent as a job since is not memory-demanding, you can run it in the Cluster interface just by typing `Merge_Reads_R.sh` or `bash Merge_Reads_R.sh`. This script will run a R script (Merge_Reads.R) which need to be in the same directory and properly organize the output files as well as erase unnecessary files.
+Once finished the alignment, before [Differential Expression Analysis](https://github.com/patriciasolesanchez/PSlab/tree/master/DE_analysis_RNAseq) we ought to put together all the data for all our samples in a single data frame. To do so, you can use `Merge_Reads_R.sh` script. This script does not need to be sent as a job since it is not memory-demanding, you can run it in the Cluster interface just by typing `Merge_Reads_R.sh` or `bash Merge_Reads_R.sh`. This script will run an R script (Merge_Reads.R) which needs to be in the same directory and will nproperly organize the output files as well as erase unnecessary files.
 
-`Merge_Reads.R` basically perform a loop to concatenate the unstranded reads per gene (column 2) of each **ReadsPerGene.out.tab** file into a common txt file **All_reads.txt**.
+`Merge_Reads.R` basically performs a loop to concatenate the unstranded reads per gene (column 2) of each **ReadsPerGene.out.tab** file into a common txt file **All_reads.txt**.
 
