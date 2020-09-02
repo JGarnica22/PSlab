@@ -2,7 +2,8 @@
 
 RNA-sequencing (RNAseq) generates raw data in the _fastq_ format. Each sample you sequence will generate a compressed _fastq.gz_ file. These files will be used as input for the following analysis pipeline.
 
-The RNAseq analysis pipeline includes scripts to perform a `FastQC` quality control of each fastq file (sample) followed by the alignment of those to a reference genome and counting the number of reads per gene using the `STAR` tool. Note that this pipeline is thought to be run in the Cluster due to its high RAM requirements (for `STAR` ideally 32 GB); however, this code could be run in your computer Terminal, you will need longer time and your computer might overheat a bit. These scripts are written in `bash` language.
+The RNAseq analysis pipeline includes scripts to perform a `FastQC` quality control of each fastq file (sample) followed by the alignment of those to a reference genome and counting the number of reads per gene using the `STAR` tool. Note that this pipeline is thought to be run in the Cluster due to its high RAM requirements (for `STAR` ideally 32 GB); however, this code could be run in your computer Terminal, you will need longer time and your computer might overheat a bit. These scripts are written in `bash` language.  
+</br>
 
 ## Quality control with FastQC
 FastQC checks on raw sequence data coming from high throughput sequencing pipelines. It provides a modular set of analyses which you can use to give a quick impression of whether your data has any problems of which you should be aware before doing any further analysis. FastQC is a cross-platform application, written in java. In theory it should run on any platform which has a suitable java runtime environment. To run it in the Cluster you will need to load the java and fastqc modules (see full bash script).
@@ -45,40 +46,42 @@ montage txt:- /Images/*.png \
 ````
 </br>
 
-## Read aligment with STAR
+## Read alignment with STAR
+The first thing you need for an STAR alignment is creating a STAR index for the genome you are going to align you sequences to. This will need to be done just once, the first time you use that genome. Once you have created the index files, you can use them for later alignments. 
 
-The first thing needed for STAR alignment is creating a STARindex for the genome you are going to align you sequences to, if you do not have it already. 
+### STAR index Input
+In order to generate the STAR index you will need two files: your genome of reference and its respective GTF annotation (also needed later for counting reads). Ideally, these files should be updated and can be downloaded from GENCODE or Ensembl. To avoid compatibility problems during indexing, make sure that both files come from the same database.
 
-#### STARindex Input
-In order to generate the STARindex you will need two files: your genome of reference and its respective GTF annotation (also needed later for counting reads). Ideally, these files should be as much updated as possible and can be downloaded from GENCODE or Ensembl, however, make sure that both files you will be using come from the same database, otherwise there could be problems.
+***IMPORTANT** Remember that you cannot download files when in the Cluster, you must download them in your computer and then upload them using SSH (Cyberduck for instance). 
 
-***Note**: Remember that you cannot download files in the Cluster, you must download and then upload them using SSH (Cyberduck for instance). 
-
-Once downloaded you must decompress the files by:
+Once downloaded, you must decompress the files by:
 ````
 gzip -d your_files
 ````
-Also if you genome is is in `.2bit` format you will need to convert it to `.fa`. To do so, install twobittofa with conda if not previously installed and use (this cannot be done on the Cluster):
+</br>
+
+Also if you genome is is in _.2bit_ format you will need to convert it to _.fa_ (fasta). To do so, use the 'twobittofa' tool. If not installed in your computer, you can install it through 'Conda'.
 ````
 twoBitToFa your_genome.2bit your_genome.fa
 ````
+</br>
 
-#### Code
+### Code
 Finally you can generate your genome index by using:
 
 ````
 STAR --runMode genomeGenerate --genomeDir /your_directory --genomeFastaFiles genome_reference.fa --sjdbGTFfile your_annotation.gtf --sjdbOverhang 49 --runThreadN 12
 ````
-Note that this is action will take a lot of RAM. With `--runThreadN` you can assign the number of nodes working, the more nodes the faster will be performed, however, never use all of your computer nodes for this task.
+Note that this is action will take a lot of RAM. With `--runThreadN` you can assign the number of nodes working, the more nodes the faster it will be performed.
+***IMPORTANT** Never use all of your computer nodes to run a task.
 
-#### STARindex output
-
-All STARindex files will be stored in the directory you indicated after `--genomeDir` option. All the files will be needed later for the alignment. 
-****Important note**: The file system needs to have at least 100GB of disk space available for a typical mammalian genome.
-
+### STAR index output
+All STAR index files will be stored in the directory you indicated after `--genomeDir` option. All the files will be needed later for the alignment. 
+***IMPORTANT** The file system needs to have at least 100GB of disk space available for a typical mammalian genome.
+</br>
 
 ### Alignment :train:
-After STARindex files are generated the RNA-seq reads (sequences) are mapped to the genome.
+After STAR index files are generated the RNAseq reads (sequences) are mapped to the genome.
 
 #### Aligment input
 Here we will need the sequences to align in FASTA or FASTQ files format as well as all the files from STARindex. Also, when number of reads per gene want to counted while mapping with `--quantMode GeneCounts` annotation file used in the STARindex generation is required.
