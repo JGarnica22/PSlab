@@ -4,16 +4,16 @@ RNA-sequencing (RNAseq) generates raw data in the _fastq_ format. Each sample yo
 
 The RNAseq analysis pipeline includes scripts to perform a `FastQC` quality control of each fastq file (sample) followed by the alignment of those to a reference genome and counting the number of reads per gene using the `STAR` tool. Note that this pipeline is thought to be run in the Cluster due to its high RAM requirements (for `STAR` ideally 32 GB); however, this code could be run in your computer Terminal, you will need longer time and your computer might overheat a bit. These scripts are written in `bash` language.
 
-## Quality control of RNA-seq
-FastQC checks on raw sequence data coming from high throughput sequencing pipelines. It provides a modular set of analyses which you can use to give a quick impression of whether your data has any problems of which you should be aware before doing any further analysis. FastQC is a cross-platform application, written in java. In theory it should run on any platform which has a suitable java runtime environment. To run in the Cluster you will need to load the java and fastqc modules (see full bash script).
+## Quality control with FastQC
+FastQC checks on raw sequence data coming from high throughput sequencing pipelines. It provides a modular set of analyses which you can use to give a quick impression of whether your data has any problems of which you should be aware before doing any further analysis. FastQC is a cross-platform application, written in java. In theory it should run on any platform which has a suitable java runtime environment. To run it in the Cluster you will need to load the java and fastqc modules (see full bash script).
 
 Visit their [website](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/) for more details.
 
-#### FastQC input
-You can use here BAM, SAM or FastQ files (any variant). In this case we will be using compressed fastq files (your_file.fastq.gz), as they will be decompressed and analyzed subsequently. BAM files will be generated later too.
+### FastQC input
+You can use BAM, SAM or fastq files (any variant) as input files. We will be using compressed fastq files (_your_file.fastq.gz_), as they will be decompressed and analyzed subsequently.
 
-#### FastQC output
-`FastQC` analysis provide some summary graphs to quicky evalute the quality of your data. Results can be exported to an HTML based report or to a PDF file. In this pipeline all graphs generated for all libraries are included in a single PDF file.
+### FastQC output
+`FastQC` analysis provides some summary graphs to quicky evalute the quality of your data. Results can be exported to an HTML based report or to a PDF file. In this pipeline all graphs generated for all libraries are included in a single PDF file.
 
 The graphs included are:
 * Basic Statistics
@@ -28,19 +28,22 @@ The graphs included are:
 * Overrepresented sequences
 * Adapter Content
 
-#### Code
-To run the `FastQC` from compressed fastq files you just need to use the following. However, this QC analysis is also included in the main script.
+### Code
+To run the `FastQC` tool with compressed fastq files you just need to use the following code:
 
 ````
 fastqc your_file.fastq.gz --extract -o output_directory
 ````
-To converge all graph into on PDF file use:
+</br>
+
+To converge all graphs into one PDF file use:
 
 ````
 summary.txt | \
 montage txt:- /Images/*.png \
 	-tile x3 -geometry +0.1+0.1 -title your_file.png
 ````
+</br>
 
 ## Read aligment with STAR
 
