@@ -104,7 +104,7 @@ STAR produces multiple output files. All files have standard name, however, you 
     * **column 3**: counts for the 1st read strand aligned with RNA (htseq-count option -s yes)
     * **column 4**: counts for the 2nd read strand aligned with RNA (htseq-count option -s reverse)
 
-    You must select the output according to the [strandedness of your data](http://onetipperday.sterding.com/2012/07/how-to-tell-which-library-type-to-use.html?showComment=1522859906203#c7586510008202176571) (for instance, <ins>standard Illumina would be unstranded</ins>).
+    You must select the output according to the [strandness of your data](http://onetipperday.sterding.com/2012/07/how-to-tell-which-library-type-to-use.html?showComment=1522859906203#c7586510008202176571) (for instance, <ins>standard Illumina sequences would be unstranded</ins>).
     
 ## Running multiple jobs simultaneously in the Cluster :two_women_holding_hands:
 Both STAR indexing and alignments can take quite some time to be performed due to the amount of data processed, and this depends on the amount of RAM available to use. In the Cluster you can highly increase the RAM used in the process in comparison to a computer and in case you have different replicates or samples, you can run them in parallel to save time. `Parallel_alignment_and_FastQC.sh` is a bash script intended to:
