@@ -54,7 +54,7 @@ The first thing you need for an STAR alignment is creating a STAR index for the 
 #### STAR indexing Input
 In order to generate the STAR index you will need two files: your genome of reference and its respective GTF annotation (also needed later for counting reads). Ideally, these files should be updated and can be downloaded from GENCODE or Ensembl. To avoid compatibility problems during indexing, make sure that both files come from the same database.
 
-***IMPORTANT** Remember that you cannot download files when in the Cluster, you must download them in your computer and then upload them using SSH (Cyberduck for instance).*
+    ***IMPORTANT** Remember that you cannot download files when in the Cluster, you must download them in your computer and then upload them using SSH (Cyberduck for instance).*
 
 Once downloaded, you must decompress the files by:
 ````
