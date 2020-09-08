@@ -4,7 +4,8 @@ Chromium Single Cell data (10x data) can be analyzed using Cell Ranger and Seura
 
 ## Cell Ranger 
 https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/what-is-cell-ranger
-[Josep]
+Josep
+[...]
 
 
 ## Seurat
