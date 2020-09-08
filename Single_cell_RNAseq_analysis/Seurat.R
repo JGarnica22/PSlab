@@ -301,3 +301,24 @@ ggsave(
   dpi = 300,
   limitsize = TRUE
 )
+
+
+# Finding differentially expressed features (cluster biomarkers)
+################################################################
+# By default, it identifes positive and negative markers of a single cluster (specified in ident.1), 
+# compared to all other cells. FindAllMarkers automates this process for all clusters, but you can also
+# test groups of clusters vs. each other, or against all cells.
+
+# Find markers for every cluster compared to all remaining cells, report only the positive ones
+Idents(scdata) <- "kmeans"
+markers <- FindAllMarkers(scdata,
+                          test.use = "negbinom", min.pct = 0.01)
+write.table(markers, "output/Cluster_markers.txt", quote = F, sep = "\t")
+
+#You can compare cluster or conditions 1 vs 1:
+Idents(scdata) <- "condition"
+COND <- FindMarkers(scdata, ident.1 = levels(Idents(scdata))[2], ident.2 = levels(Idents(scdata))[1],
+                   verbose = T, test.use = "negbinom",
+                   logfc.threshold = 0, min.pct = 0.01)
+
+write.table(COND, "output/Condition_markers.txt", quote = F, sep = "\t")
