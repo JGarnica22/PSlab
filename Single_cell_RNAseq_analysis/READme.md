@@ -16,6 +16,6 @@ The input for Seurat is the output of Cell Ranger, basically an aggr ("aggregate
      _features.tsv.gz_  
      _matrix.mtx.gz_  
 
-In Seurat you can normalized and scale data, calculate dimensionality reductions (PCA, tSNE, uMAP), draw heatmaps, feature plots, violin plots, etc. and perform DE analysis.
+In Seurat you can normalize and scale data, calculate dimensionality reductions (PCA, tSNE, uMAP), draw heatmaps, feature plots, violin plots, etc. and perform DE analysis.
 
 Use _Seurat.R_ to analyze your single cell raw count data after running Cell Ranger.
