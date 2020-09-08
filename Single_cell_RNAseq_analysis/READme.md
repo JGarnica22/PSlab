@@ -11,9 +11,11 @@ https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/l
 
 Seurat is an R package designed for QC, analysis, and exploration of single-cell RNA-seq data. Seurat aims to enable users to identify and interpret sources of heterogeneity from single-cell transcriptomic measurements, and to integrate diverse types of single-cell data. Seurat is developed and maintained by the [Satija lab] (https://satijalab.org/seurat/). For guided tutorials on how to use Seurat, visit this [website] (https://satijalab.org/seurat/vignettes.html).
 
-The input for Seurat is the output of Cell Ranger, basically an aggr ("aggregate") file that contains 3 files:  
-     barcodes.tsv.gz  
-     features.tsv.gz  
-     matrix.mtx.gz  
+The input for Seurat is the output of Cell Ranger, basically an aggr ("aggregate") file that contains single-cell raw counts in the form of 3 files:  
+     _barcodes.tsv.gz_  
+     _features.tsv.gz_  
+     _matrix.mtx.gz_  
 
+In Seurat you can normalized and scale data, calculate dimensionality reductions (PCA, tSNE, uMAP), draw heatmaps, feature plots, violin plots, etc. and perform DE analysis.
 
+Use _Seurat.R_ to analyze your single cell raw count data after running Cell Ranger.
