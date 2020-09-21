@@ -9,14 +9,14 @@
 #BSUB -M 1800
 
 
-# Load java module in order to run fasqc and STAR
+# Load modules in order to run FastQC and STAR
 module purge
 module load java/1.8.0u66 fastqc intel/2017.4 impi/2017.4 mkl/2017.4 gcc/5.3.0 gcc/4.9.1 openssl/1.1.1c python/3.7.4_pip STAR/2.7.5a
 
-# Create a folder to store the fastq_files and upload all of them there, also create a folder to store fastqc results.
+# Create a folder to store the fastq_files and upload all of them there
 # mkdir fastq_files
 
-# Create folders to store fastqc and STAR aligment
+# Create folders to store FastQC and STAR alignment
 cd /gpfs/projects/cek26/mouse
 mkdir fastqc
 mkdir alignment_counts
@@ -47,8 +47,8 @@ sed -i -e 's/\r$//' ../to_bsub/aligment_reads_$(cut -d'.' -f1 <<< $f).sh
 bsub < ../to_bsub/aligment_reads_$(cut -d'.' -f1 <<< $f).sh
 done
 
-# Perform quality control of RNA-seq using Fastqc tool for all processed samples and output a common pdf file
-# Run fastqc for each .fastq.gz file and save results file in different folders in fastqc_analysis directory
+# Perform quality control of RNAseq using FastQC tool for all processed samples and output a common pdf file
+# Run FastQC for each .fastq.gz file and save results file in different folders in fastqc_analysis directory
 
 for f in $(find ./fastq_files -name "*.fastq.gz" -exec basename {} \;)
 do
