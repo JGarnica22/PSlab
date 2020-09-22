@@ -1,6 +1,6 @@
 #This script is to analyze Single-cell RNAseq data from aggr (Cell Ranger output)
 #It was created for R 3.6.3 version (2020-05-22)
-#Copyright (C) 2020  Patricia SolÃ© SÃ¡nchez
+#Copyright (C) 2020  Patricia Solé Sánchez
 #################################################################################################
 
 # Seurat is an R package designed for QC, analysis, and exploration of single-cell RNA-seq data. 
@@ -125,7 +125,7 @@ scdata <- subset(scdata, subset = nFeature_RNA>200 & nFeature_RNA<5000 & percent
 
 # Normalization
 ############################################################
-# We employ a global-scaling normalization method âLogNormalizeâ that normalizes the feature 
+# We employ a global-scaling normalization method "LogNormalize" that normalizes the feature 
 # expression measurements for each cell by the total expression, multiplies this by a scale factor 
 # (10,000 by default), and log-transforms the result. Normalized values are stored in scdata[["RNA"]]@data.
 scdata <- NormalizeData(scdata, normalization.method = "LogNormalize", scale.factor = 10000)
