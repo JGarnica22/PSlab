@@ -1,6 +1,6 @@
 #This script is to analyze Single-cell RNAseq data from aggr (Cell Ranger output)
 #It was created for R 3.6.3 version (2020-05-22)
-#Copyright (C) 2020  Patricia Solé Sánchez
+#Copyright (C) 2020  Patricia SolÃ© SÃ¡nchez
 #################################################################################################
 
 # Seurat is an R package designed for QC, analysis, and exploration of single-cell RNA-seq data. 
@@ -33,7 +33,7 @@ for (i in bioc.packages) {
 
 library(devtools)
 
-dev.pack <- c("SeuratData")
+dev.pack <- c("satijalab/seurat-data")
 for (i in dev.pack) {
   if(!require(i, character.only = TRUE)) {
     devtools::install_github(i)
@@ -52,20 +52,18 @@ library(cowplot)
 library(magrittr)
 
 # Set your working directory (the project you are working in):
-setwd("/Users/patri/Documents/LAB/TESIS DOCTORAL 2015-2020/TR1 PROJECT/2020_05_10xGenomics_BDC_INS13-21_SANTAMARIA_09/Seurat")
+setwd("C:/Users/jgarn/OneDrive - Universitat de Barcelona/Documentos/Bioinformatics/Functionals/Seurat")
 
 # Specify parameters to be used along the script:
 #Indicate species working with (typicall mouse or human)
 species <- "mouse"
-#Indicate samples you sequenced separatedly (for example, you sorted you treated
+#Indicate samples you sequenced separatedly (for example, you sorted your treated
 #and control populations separatedly):
 #Indicate samples in the order they are barcoded!!
 #It's better to indicate sample type as TREATMENT_CONDITION
 sampletype <- c("BDC_CTL", "BDC_TET", "INS_CTL", "INS_TET")
 #Usually, those samples can be identified by the cell name. Each cell has a -number
 #at the end that identifies the sample.
-#Indicate sample numbers, usually from 1 to the number of samples you sequenced:
-samplenames <- 1:length(sampletype)
 
 # Read the data:
 # The Read10X function reads in the output of the cellranger pipeline from 10X 
@@ -73,14 +71,19 @@ samplenames <- 1:length(sampletype)
 # returning a unique molecular identified (UMI) count matrix. The values in this 
 # matrix represent the number of molecules for each feature (i.e. gene; row) that 
 # are detected in each cell (column).
+# Use filtered data
 
 # Indicate in the Read10X function, the directory of your input files (3 files must be
 # found in the data.dir: matrix.mt.gz, barcodes.tsv.gz and features.tsv.gz)
-data <- Read10X(data.dir = paste0 (getwd(), "/data/aggr/filtered_feature_bc_matrix/"))
+data <- Read10X(data.dir = paste0(getwd(), "/data/filtered_feature_bc_matrix/"))
 
 # We next use the count matrix to create a Seurat object. The object serves as a 
 # container that contains both data (like the count matrix) and analysis (like PCA, 
 # or clustering results) for a single-cell dataset.
+    # min.cells: Include features detected in at least this many cells. Will subset the counts matrix as well. 
+    # To reintroduce excluded features, create a new object with a lower cutoff.
+    # min.features: Include cells where at least this many features are detected.
+
 scdata <- CreateSeuratObject(counts = data, min.cells = 3, min.features = 200)
 
 # Check the expression (counts) for some genes in the first 100 cells:
@@ -108,7 +111,7 @@ data[c("Sell", "Cd3e", "Il10"), 1:100]
 if (species == "mouse") {
   scdata[["percent.mt"]] <- PercentageFeatureSet(scdata, pattern = "^mt-")
 } else {
-    scdata[["percent.mt"]] <- PercentageFeatureSet(scdata, pattern = "^MT-")
+  scdata[["percent.mt"]] <- PercentageFeatureSet(scdata, pattern = "^MT-")
 }
 
 # QC metrics can be found in the Seurat object metadata:
@@ -122,9 +125,9 @@ scdata <- subset(scdata, subset = nFeature_RNA>200 & nFeature_RNA<5000 & percent
 
 # Normalization
 ############################################################
-# We employ a global-scaling normalization method “LogNormalize” that normalizes the feature 
+# We employ a global-scaling normalization method âLogNormalizeâ that normalizes the feature 
 # expression measurements for each cell by the total expression, multiplies this by a scale factor 
-# (10,000 by default), and log-transforms the result. Normalized values are stored in pbmc[["RNA"]]@data.
+# (10,000 by default), and log-transforms the result. Normalized values are stored in scdata[["RNA"]]@data.
 scdata <- NormalizeData(scdata, normalization.method = "LogNormalize", scale.factor = 10000)
 
 # Identification of highly variable features
@@ -199,7 +202,7 @@ TSNEPlot(scdata, group.by = "condition", order = "CTL",
            axis.ticks = element_blank()) + coord_flip() + scale_x_reverse()
 
 ggsave(
-  "figs/tSNE_by_condition.pdf"),
+  paste0("figs/tSNE_by_condition.pdf"),
   plot = last_plot(),
   device = NULL,
   path = NULL,
@@ -227,7 +230,7 @@ ggsave(
   path = NULL,
   scale = 1,
   width = 5.5,
-  height = 5,
+  height = 3,
   units = "in",
   dpi = 300,
   limitsize = TRUE
@@ -239,7 +242,8 @@ ggsave(
 #help you identify the phenotype of the different clusters you see.
 
 #Read your txt containing the list of genes of interest:
-features <- read.table("data/genes_of_interest.txt", header = F, stringsAsFactors = F)$V1
+features <- read.table("data/Table1.txt", header = F, stringsAsFactors = F)$V1
+
 
 p <- FeaturePlot(scdata, reduction = "tsne",
                  features = features, 
@@ -258,18 +262,18 @@ cowplot::plot_grid(plotlist = p, ncol = 6)
 #of plots you want to make.
 
 ggsave(
-    "figs/feature_plots.pdf",
-    plot = last_plot(),
-    device = "pdf",
-    path = NULL,
-    scale = 1,
-    width = 7,
-    height = 1.67,
-    units = "in",
-    dpi = 300,
-    limitsize = TRUE
-  )
-}
+  "figs/feature_plots.pdf",
+  plot = last_plot(),
+  device = "pdf",
+  path = NULL,
+  scale = 1,
+  width = 7,
+  height = 1.67,
+  units = "in",
+  dpi = 300,
+  limitsize = TRUE
+)
+
 
 #Another type of visualization are heatmaps. You can see gene expression on each cluster for a set
 #genes of interest in the format of a heatmap
@@ -318,7 +322,7 @@ write.table(markers, "output/Cluster_markers.txt", quote = F, sep = "\t")
 #You can compare cluster or conditions 1 vs 1:
 Idents(scdata) <- "condition"
 COND <- FindMarkers(scdata, ident.1 = levels(Idents(scdata))[2], ident.2 = levels(Idents(scdata))[1],
-                   verbose = T, test.use = "negbinom",
-                   logfc.threshold = 0, min.pct = 0.01)
+                    verbose = T, test.use = "negbinom",
+                    logfc.threshold = 0, min.pct = 0.01)
 
 write.table(COND, "output/Condition_markers.txt", quote = F, sep = "\t")
