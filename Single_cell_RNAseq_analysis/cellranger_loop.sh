@@ -16,19 +16,18 @@ module load CELLRANGER/3.1.0
 # Switch to your working directory
 cd /gpfs/projects/cek26/10x_BDC_INS
 
-# Create folders results and store FASTQfiles in a new folder
+# Create results folder and store FASTQ files in a new folder
 mkdir cellranger_counts
 mkdir to_bsub
 
 # Loop to generate cellranger counts for each sample
-# Firstly, generate a list of the sample you have
+# First, generate a list of the samples you have
 for f in $(find ./fastq_files -name "*.fastq.gz" -exec basename {} \;)
 do
 echo $(cut -d'_' -f1 <<< $f)_$(cut -d'_' -f2 <<< $f) >> samples.txt
 done
 
 # Then generate the loop with the unique samples
-
 for f in $(sort -u samples.txt)
 do
 {
@@ -56,7 +55,6 @@ sed -i -e 's/\r$//' to_bsub/cellranger_count_$f.sh
 bsub < to_bsub/cellranger_count_$f.sh
 done
 
-
 # Do not start next steps until previous pipelines are over
 while [ $(sort -u samples.txt | wc -l) != $(find ./cellranger_counts -type f -name "*_info.h5" -print | wc -l) ]
 do
@@ -80,16 +78,12 @@ do
 echo $i,/gpfs/projects/cek26/10x_BDC_INS/cellranger_counts/$i/outs/molecule_info.h5 >> $aggr_id.csv
 done
 
-
 # Run cellranger aggr when counts finish
 mkdir cellranger_aggr
 cd cellranger_aggr
 cellranger aggr --id=$aggr_id \
                 --csv=/gpfs/projects/cek26/10x_BDC_INS/$aggr_id.csv \
                 --normalize=mapped
-
-
-
 
 # Remove used scripts
 rm -r ../to_bsub
