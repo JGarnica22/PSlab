@@ -75,27 +75,27 @@ Other arguments can be used for this command; for a complete list, see the [Comm
 ### CellRanger count outputs
 A successful CellRanger run should end with a message similar to `Pipestance completed successfully!`. The output of the pipeline will be contained in a folder named with the sample ID you specified. The subfolder named **outs** will contain the main pipeline output files. _.bam_ and _.bai_ files, _molecule_info.h5_, raw and filtered feature bc matrices and a _.cloupe_ file among others.
 
-Moreover, it will be generated a _web_summary.html_ which is highly recommended to check in order to review the main parameters of the run such as number of cells, as well as visualize a preliminar t-SNE projection. The process may take up to 9-10 hours, regardless of the number of samples if jobs are run in parallel. After this step, we recommend checking the summary metrics and then proceed to aggregate step in case you are working with more than one sample or GEM. Otherwise, proceed to `Seurat` analysis using the <ins>filtered</ins> matrices.
+Moreover, it will be generated a _web_summary.html_ which is highly recommended to check in order to review the main parameters of the run such as number of cells, as well as visualize a preliminar t-SNE projection. The process may take up to 9-10 hours, regardless of the number of samples if jobs are run in parallel. After this step, we recommend checking the summary metrics and then proceed to aggregate step in case you are working with more than one sample or GEM. Otherwise, proceed to `Seurat` analysis using the <ins>filtered</ins> matrices.  
 </br>
 
 ## Cellranger aggr :milky_way:
-The `cellranger aggr` command takes a **Aggreation CSV file** specifying a list of `cellranger count` output files (specifically the **molecule_info.h5** from each run), and produces a single feature-barcode matrix containing all the data. By default, the reads from each GEM well or sample are subsampled such that all GEM wells or samples have the same effective sequencing depth, measured in terms of reads that are confidently mapped to the transcriptome or assigned to the feature IDs per cell.
+The `cellranger aggr` command takes an **Aggreation CSV file** specifying a list of `cellranger count` output files (specifically the **molecule_info.h5** from each run), and produces a single feature-barcode matrix containing all the data. By default, the reads from each GEM well or sample are subsampled such that all GEM wells or samples have the same effective sequencing depth, measured in terms of reads that are confidently mapped to the transcriptome or assigned to the feature IDs per cell.
 
 ### Setting up the Aggregation CSV
 Create a CSV file with a header line containing the following columns:
 * **library_id**: Unique identifier for this input GEM well or sample. This will be used for labeling purposes only; it doesn't need to match any previous ID you've assigned to the GEM well.
 * **molecule_h5**: Path to the `molecule_info.h5` file produced by `cellranger count`. For example `/DIR/ID/outs/molecule_info.h5`.
 
-You can either make the CSV file in a text editor, or create it in Excel and export to CSV. Remember to save the file as UTF-8, and use `,` as seprators, not `;`. Your aggregation CSV should look like this:
+You can either make the CSV file in a text editor, or create it in Excel and export to CSV. Remember to save the file as UTF-8, and use `,` as separators, not `;`. Your aggregation CSV should look like this:
 ````
 library_id,molecule_h5
 LV123,/opt/runs/LV123/outs/molecule_info.h5
 LB456,/opt/runs/LB456/outs/molecule_info.h5
 LP789,/opt/runs/LP789/outs/molecule_info.h5
 ````
-You can also aggregate addition columns with meta-data (sample type, lab origin...).
+You can also aggregate additional columns with meta-data (sample type, lab origin, etc.).
 
-###  cellranger aggr run
+### Run Cellranger aggr
 These are the most common command line arguments (run `cellranger aggr --help` for a full list):
 ````
 cellranger aggr --id=[Run id] \
@@ -103,19 +103,18 @@ cellranger aggr --id=[Run id] \
                   --normalize=mapped
 ````
 * **id**: A unique run ID string. In this case, also a directory will be created with this name in order to store the outputs.
-* **csv**: directory to you aggregation CSV
+* **csv**: directory to your aggregation CSV
 * **normalize**: (Optional) String specifying how to normalize depth across the input libraries. Valid values: `mapped` (default), or `none`.
 
-### cellranger aggr outputs
-Similarly to `cellranger count` your outputs files will be in `outs` directory with more or less the same output file. Again check the summary metrics to see now our sequencing depth, normalization parameters and previsualize clusters. Now you can proceed to `Seurat` using the filtered matrices.
+### Cellranger aggr outputs
+Similarly to `cellranger count` your output files will be in `outs` directory with more or less the same output file. Again check the summary metrics to visualize  sequencing depth, normalization parameters and previsualize clusters. Now you can proceed to `Seurat` using the filtered matrices.  
+</br>
 
+## Cellranger loop
+`cellranger_loop.sh` is a script that generates as many jobs as samples to generate their single cell feature counts, provided that **transcriptome is properly uploaded and decompressed** as well as **FASTQ files properly named**. When all the jobs are done the script creates the **Aggregation CSV** for the samples run in `cellranger count` and subsequently runs the `cellranger aggr` for all the samples. The overall process should not take longer than 11 hours (aggregation should take about 1 hour).
 
-
-# Cellranger loop
-`cellranger_loop.sh` is a script that generate as many jobs as samples to generate their single cell feature counts, provided that **transcriptome is properly uploaded and decompressed** as well as **FASTQ files properly named**. When all the jobs are done the script creates a the **Aggregation CSV** for the samples run in teh `cellranger count` and subsequently run the `cellranger aggr` for all the samples. The overall process should not take longer than 11 hours (aggregation should take about 1 hour)
-Anyhow, we recommend checking the summary metrics of both count and aggr. Finally, you can proceed to `Seurat` analysis using the filtered matrices of `cellranger aggr` outs.
-
-
+Anyhow, we recommend checking the summary metrics of both count and aggr. Finally, you can proceed to `Seurat` analysis using the filtered matrices of `cellranger aggr` outs.  
+</br>
 
 ## Seurat
 
