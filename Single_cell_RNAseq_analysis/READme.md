@@ -22,7 +22,7 @@ The exact steps of the workflow vary depending on how many samples, GEM wells, a
 
 Moreover, `cellranger reanalyze` takes feature-barcode matrices produced by `cellranger count` or `cellranger aggr` and reruns the dimensionality reduction, clustering, and gene expression algorithms using tunable parameter settings.
 
-For more information visit [Cellranger Website](https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/what-is-cell-ranger).
+For more information visit [Cellranger Website](https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/what-is-cell-ranger).  
 </br>
 
 ## Cellranger count :triangular_ruler:
