@@ -13,6 +13,7 @@ Cell Ranger is a set of analysis pipelines that process Chromium single-cell RNA
 * **cellranger aggr** aggregates outputs from multiple runs of `cellranger count`, normalizing those runs to the same sequencing depth and then recomputing the feature-barcode matrices and analysis on the combined data. The `aggr` pipeline can be used to combine data from multiple samples or GEMs. `cellranger aggr` is not designed for combining multiple sequencing runs of the same GEM Well. For that, you should pass a list of FASTQ files from multiple sequencing runs of the same GEM well to the --fastqs argument of `cellranger count`.
 
 * **cellranger reanalyze** reruns the dimensionality reduction, clustering, and gene expression algorithms using tunable parameter settings.
+</br>
 
 ## Workflows
 If you are beginning with raw base call (BCL) files, the Cell Ranger workflow starts with demultiplexing the BCL files for each flowcell directory with `cellranger mkfastq`. If you are beginning with FASTQ files that have already been demultiplexed, you can jump right to `cellranger count`.
@@ -22,6 +23,7 @@ The exact steps of the workflow vary depending on how many samples, GEM wells, a
 Moreover, `cellranger reanalyze` takes feature-barcode matrices produced by `cellranger count` or `cellranger aggr` and reruns the dimensionality reduction, clustering, and gene expression algorithms using tunable parameter settings.
 
 For more information visit [Cellranger Website](https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/what-is-cell-ranger).
+</br>
 
 ## Cellranger count :triangular_ruler:
 ### FASTQ files names
@@ -74,7 +76,7 @@ Other arguments can be used for this command; for a complete list, see the [Comm
 A successful CellRanger run should end with a message similar to `Pipestance completed successfully!`. The output of the pipeline will be contained in a folder named with the sample ID you specified. The subfolder named **outs** will contain the main pipeline output files. _.bam_ and _.bai_ files, _molecule_info.h5_, raw and filtered feature bc matrices and a _.cloupe_ file among others.
 
 Moreover, it will be generated a _web_summary.html_ which is highly recommended to check in order to review the main parameters of the run such as number of cells, as well as visualize a preliminar t-SNE projection. The process may take up to 9-10 hours, regardless of the number of samples if jobs are run in parallel. After this step, we recommend checking the summary metrics and then proceed to aggregate step in case you are working with more than one sample or GEM. Otherwise, proceed to `Seurat` analysis using the <ins>filtered</ins> matrices.
-
+</br>
 
 ## Cellranger aggr :milky_way:
 The `cellranger aggr` command takes a **Aggreation CSV file** specifying a list of `cellranger count` output files (specifically the **molecule_info.h5** from each run), and produces a single feature-barcode matrix containing all the data. By default, the reads from each GEM well or sample are subsampled such that all GEM wells or samples have the same effective sequencing depth, measured in terms of reads that are confidently mapped to the transcriptome or assigned to the feature IDs per cell.
