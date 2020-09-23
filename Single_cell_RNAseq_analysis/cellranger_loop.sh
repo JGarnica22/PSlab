@@ -74,7 +74,7 @@ do
 aggr_id=$aggr_id'_'$u
 done
 aggr_id=Aggr$aggr_id
-echo library,molecule_h5 > $aggr_id.csv
+echo library_id,molecule_h5 > $aggr_id.csv
 for i in $(sort -u samples.txt)
 do
 echo $i,/gpfs/projects/cek26/10x_BDC_INS/cellranger_counts/$i/outs/molecule_info.h5 >> $aggr_id.csv
