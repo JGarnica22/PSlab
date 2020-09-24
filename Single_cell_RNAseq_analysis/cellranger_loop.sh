@@ -93,4 +93,4 @@ cellranger aggr --id=$aggr_id \
 
 # Remove used scripts
 rm -r ../to_bsub
-rm experiment.txt
+rm ../experiment.txt
