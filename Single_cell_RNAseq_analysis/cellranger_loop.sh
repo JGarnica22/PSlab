@@ -13,10 +13,16 @@
 # Load modules in order to run cellranger
 module load CELLRANGER/3.1.0
 
-# Switch to your working directory
-cd /gpfs/projects/cek26/10x_BDC_INS
+# Set and switch to your working directory
+wd=/gpfs/projects/cek26/10x_BDC_INS
+cd $wd
 
-# Create folders results and store FASTQfiles in a new folder
+# Create folders results and store FASTQfiles in a new folder [/fastq_files] inside the working directory, use the correct name nomenclature!
+# [Sample Name]_S1_L00[Lane Number]_[Read Type]_001.fastq.gz
+# Where Read Type is one of:
+# I1: Sample index read (optional)
+# R1: Read 1
+# R2: Read 2
 mkdir cellranger_counts
 mkdir to_bsub
 
@@ -27,28 +33,28 @@ do
 echo $(cut -d'_' -f1 <<< $f)_$(cut -d'_' -f2 <<< $f) >> samples.txt
 done
 
-# Then generate the loop with the unique samples
-
+# Then use a loop with the unique samples to generate respective jobs to be sent to bsub
+# if expected number of cells differ, the jobs need to be changed manually
 for f in $(sort -u samples.txt)
 do
 {
 echo \#!/bin/bash
-echo \#BSUB cwd /gpfs/projects/cek26
+echo \#BSUB cwd $wd
 echo \#BSUB -J cellranger_counts_$f
 echo \#BSUB -q bsc_ls
 echo \#BSUB -W 42:00
-echo \#BSUB -eo /gpfs/projects/cek26/10x_BDC_INS/bsub_reports/cellranger_counts_$f.err
-echo \#BSUB -oo /gpfs/projects/cek26/10x_BDC_INS/bsub_reports/cellranger_counts_$f.out
+echo \#BSUB -eo $wd/bsub_reports/cellranger_counts_$f.err
+echo \#BSUB -oo $wd/bsub_reports/cellranger_counts_$f.out
 echo \#BSUB -M 3000
 echo \#BSUB -n 256
 echo \#BSUB "span[ptile=16]"
 echo \#BSUB -x
 
 echo module load CELLRANGER/3.1.0
-echo cd /gpfs/projects/cek26/10x_BDC_INS/cellranger_counts
+echo cd $wd/cellranger_counts
 echo cellranger count --id=$f \
-                 --transcriptome=/gpfs/projects/cek26/10x_BDC_INS/refdata-gex-mm10-2020-A \
-                 --fastqs=/gpfs/projects/cek26/10x_BDC_INS/fastq_files \
+                 --transcriptome=$wd/refdata-gex-mm10-2020-A \
+                 --fastqs=$wd/fastq_files \
                  --expect-cells=10000 \
                  --sample=$f
 } > to_bsub/cellranger_count_$f.sh
@@ -77,7 +83,7 @@ aggr_id=Aggr$aggr_id
 echo library_id,molecule_h5 > $aggr_id.csv
 for i in $(sort -u samples.txt)
 do
-echo $i,/gpfs/projects/cek26/10x_BDC_INS/cellranger_counts/$i/outs/molecule_info.h5 >> $aggr_id.csv
+echo $i,$wd/cellranger_counts/$i/outs/molecule_info.h5 >> $aggr_id.csv
 done
 
 
@@ -85,7 +91,7 @@ done
 mkdir cellranger_aggr
 cd cellranger_aggr
 cellranger aggr --id=$aggr_id \
-                --csv=/gpfs/projects/cek26/10x_BDC_INS/$aggr_id.csv \
+                --csv=$wd/$aggr_id.csv \
                 --normalize=mapped
 
 
