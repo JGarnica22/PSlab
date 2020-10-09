@@ -67,4 +67,36 @@ Most trimming steps take one or more settings, delimited by ':' (a colon)
 
 After trimming of you files is recommendable run again a FastQC analysis to check that trimming worked well.
 
-## Aligment
+## Alignment
+After the assessment of sequence quality and proper trimming and filtering, reads need to be mapped to a reference genome. Bowtie2 and BWA-MEM are memory efficient and fast. 
+
+
+### Bowtie
+#### Genome index
+The first step for alignment is generate or download the genome index for bowtie2. You can download a complete package of already indexed (sequence, annotation, indexes for multiple aligners including BWA-MEM and bowtie2) from [Illumina's iGenomes site](https://support.illumina.com/sequencing/sequencing_software/igenome.html). Alternatively, you can build a ndw une using `bowtie2-build` using <your_genome.fa> sequence as only input. Bowtie2 index must include a set of 6 files with suffixes .1.bt2, .2.bt2, .3.bt2, .4.bt2, .rev.1.bt2, and .rev.2.bt2.
+
+Then you can proceed to align your reads using:
+````
+bowtie2 --very-sensitive -X 2000 -x <path_to_index/base> -U <your_file> | samtools view -u - | samtools sort - > <your_file.bam>
+````
+Bowtie2 output is a SAM file, which contains alignment information for each input read. The SAM can be compressed to a binary format (BAM) and sorted with SAMtools. This is best accomplished by piping the output from Bowtie2 directly to samtools.
+
+### BWA-MEM
+BWA works very similar to bowtie2, again we need to download and indicate the indexes of your reference genome, found at iGenomes too, or make them using `bwa index`. Next, we can procced with alignment using `bwa mem` command. Here is an example, like bowtie the output format is sam file, if you want to get bam files the best is to pipe it directly to samtools.
+````
+bwa mem -t -M genome_mus/BWA/index/GRCm38 <your_file> \
+| samtools sort -@32 -o <aligned_file.bam> -
+````
+**-M**: Mark shorter split hits as secondary (for `Picard` compatibility)
+
+## Remove PCR duplicates
+PCR duplicates are exact copies of DNA fragments that arise during PCR. Since they are artifacts of the library preparation procedure, they may interfere with the biological signal of interest. One commonly used program for removing PCR duplicates is Picard’s `MarkDuplicates`.
+
+````
+java -jar path_to/picard.jar MarkDuplicates I=aligned_file.bam O=aligned_file_nodup.bam \
+M=log_dups.txt REMOVE_DUPLICATES=true
+````
+M= allows to indicate a log file with duplication metrics
+REMOVE_DUPLICATES= if TRUE duplicates are removed from output file, FALSE is the default option.
+
+## PEAK CALLING
