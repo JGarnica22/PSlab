@@ -107,14 +107,11 @@ macs2 callpeak -t <file_to_call> -f <file_format> -q 0.05 --nomodel --extsize 15
 ````
 Some details about options used:
 
-**-t**: This is the only REQUIRED parameter for MACS. If you have more than one alignment file, you can specify them as -t A B C. MACS will pool up all these files together.
-**-n**: The name string of the experiment. MACS will use this string NAME to create output files like NAME_peaks.xls, NAME_negative_peaks.xls, NAME_peaks.bed...
-**--outdir**: MACS2 will save all output files into the specified folder for this option.
-**-f**: Format of tag file can be ELAND, BED, ELANDMULTI, ELANDEXPORT, SAM, BAM, BOWTIE, BAMPE, or BEDPE. 
-**-q**: The q-value (minimum FDR) cutoff to call significant regions. Default is 0.05.
-**--nomodel**: to bypass building the shifting model.
-**--extsize**: While --nomodel is set, MACS uses this parameter to extend reads in 5'->3' direction to fix-sized fragments.
-**--keep-dup**: It controls the MACS behavior towards duplicate tags at the exact same location. Need to be set at `all` if duplicated were previously removed.
-
-## Cluster loop :curly_loop:
-Use loop scripts to perform all the steps aforementioned automatically and in parellel in the cluster. All folders and subfolders will be created, just make sure to have your fastq files in a fasq_files folder, and to add and indicate the directory of your reference genome and software (Trimmomatic and Picard).
+* **-t**: This is the only REQUIRED parameter for MACS. If you have more than one alignment file, you can specify them as -t A B C. MACS will pool up all these files together.
+* **-n**: The name string of the experiment. MACS will use this string NAME to create output files like NAME_peaks.xls, NAME_negative_peaks.xls, NAME_peaks.bed...
+* **--outdir**: MACS2 will save all output files into the specified folder for this option.
+* **-f**: Format of tag file can be ELAND, BED, ELANDMULTI, ELANDEXPORT, SAM, BAM, BOWTIE, BAMPE, or BEDPE. 
+* **-q**: The q-value (minimum FDR) cutoff to call significant regions. Default is 0.05.
+* **--nomodel**: to bypass building the shifting model.
+* **--extsize**: While --nomodel is set, MACS uses this parameter to extend reads in 5'->3' direction to fix-sized fragments.
+* **--keep-dup**: It controls the MACS behavior towards duplicate tags at the exact same location. Need to be set at `all` if duplicated were previously removed.
