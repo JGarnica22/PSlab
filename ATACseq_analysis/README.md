@@ -115,3 +115,7 @@ Some details about options used:
 * **--nomodel**: to bypass building the shifting model.
 * **--extsize**: While --nomodel is set, MACS uses this parameter to extend reads in 5'->3' direction to fix-sized fragments.
 * **--keep-dup**: It controls the MACS behavior towards duplicate tags at the exact same location. Need to be set at `all` if duplicated were previously removed.
+
+
+## Cluster loop :curly_loop:
+Use loop scripts to perform all the steps aforementioned automatically and in parellel in the cluster. All folders and subfolders will be created, just make sure to have your fastq files in a fasq_files folder, and to add and indicate the directory of your reference genome and software (Trimmomatic and Picard).
