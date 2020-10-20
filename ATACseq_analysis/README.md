@@ -103,7 +103,7 @@ REMOVE_DUPLICATES= if TRUE duplicates are removed from output file, FALSE is the
 Peak calling is a computational method used to identify areas in the genome that have been enriched with aligned reads as a consequence of ATAC-seq experiment. There are various tools that are available for peak calling. One of the more commonly used peak callers is **MACS2** using the function `macs2 callpeak`, as in this example:
 ````
 macs2 callpeak -t <file_to_call> -f <file_format> -q 0.05 --nomodel --extsize 150 --keep-dup all \
--n <prefix_output> --outdir <output_directory> 2\> <log_file>.log
+-n <prefix_output> --outdir <output_directory> 2> <log_file>.log
 ````
 Some details about options used:
 
