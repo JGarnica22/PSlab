@@ -58,7 +58,7 @@ echo bowtie2 -p 32 --very-sensitive -X 2000 -x genome_mus/bowtie2/genome -U trim
 echo java -jar ../software/picard.jar MarkDuplicates -I alignment/bowtie_$(cut -d'.' -f1 <<< $f).bam -O alignment/no_dup/nd_$(cut -d'.' -f1 <<< $f).bam \
 -M alignment/no_dup/$(cut -d'.' -f1 <<< $f)_log_dups.txt -REMOVE_DUPLICATES true
 echo samtools index alignment/no_dup/nd_$(cut -d'.' -f1 <<< $f).bam
-echo macs2 callpeak -t alignment/no_dup/nd_$(cut -d'.' -f1 <<< $f).bam -f BAM -q 0.05 --nomodel --extsize 150 --keep-dup all \
+echo macs2 callpeak -t alignment/no_dup/nd_$(cut -d'.' -f1 <<< $f).bam -f BAM -g 1.87e9 -q 0.05 --nomodel --shift 4 --extsize 150 --keep-dup all \
 -n macs_$(cut -d'.' -f1 <<< $f) --outdir peak_calling 2\> peak_calling/macs_$(cut -d'.' -f1 <<< $f).log
 } > to_bsub/atacseq_$(cut -d'_' -f1 <<< $f).sh
 sed -i -e 's/\r$//' to_bsub/atacseq_$(cut -d'_' -f1 <<< $f).sh
