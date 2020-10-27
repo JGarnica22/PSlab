@@ -102,17 +102,19 @@ REMOVE_DUPLICATES= if TRUE duplicates are removed from output file, FALSE is the
 ## PEAK CALLING
 Peak calling is a computational method used to identify areas in the genome that have been enriched with aligned reads as a consequence of ATAC-seq experiment. There are various tools that are available for peak calling. One of the more commonly used peak callers is **MACS2** using the function `macs2 callpeak`, as in this example:
 ````
-macs2 callpeak -t <file_to_call> -f <file_format> -q 0.05 --nomodel --extsize 150 --keep-dup all \
+macs2 callpeak -t <file_to_call> -f <file_format> -q 0.05 -g <hs: 2.7e9; mm: 1.87e9> --nomodel --shift 4 --extsize 150 --keep-dup all \
 -n <prefix_output> --outdir <output_directory> 2> <log_file>.log
 ````
 Some details about options used:
 
 * **-t**: This is the only REQUIRED parameter for MACS. If you have more than one alignment file, you can specify them as -t A B C. MACS will pool up all these files together.
+* **-g**: It's the mappable genome size or effective genome size which is defined as the genome size which can be sequenced. Default is human.
 * **-n**: The name string of the experiment. MACS will use this string NAME to create output files like NAME_peaks.xls, NAME_negative_peaks.xls, NAME_peaks.bed...
 * **--outdir**: MACS2 will save all output files into the specified folder for this option.
 * **-f**: Format of tag file can be ELAND, BED, ELANDMULTI, ELANDEXPORT, SAM, BAM, BOWTIE, BAMPE, or BEDPE. 
 * **-q**: The q-value (minimum FDR) cutoff to call significant regions. Default is 0.05.
 * **--nomodel**: to bypass building the shifting model.
+* **--shift**: set an arbitrary shift in bp here. Please Use discretion while setting it other than the default value (0). When --nomodel is set, MACS will use this value to move cutting ends (5') then apply --extsize from 5' to 3' direction to extend them to fragments. When this value is negative, ends will be moved toward 3'->5' direction, otherwise 5'->3' direction.
 * **--extsize**: While --nomodel is set, MACS uses this parameter to extend reads in 5'->3' direction to fix-sized fragments.
 * **--keep-dup**: It controls the MACS behavior towards duplicate tags at the exact same location. Need to be set at `all` if duplicated were previously removed.
 
