@@ -199,8 +199,8 @@ for (p in 1:length(list_bed)){
 # Show where peaks fall on the chrosomes
 e <- read.delim(paste0("data/",list_bed[p]), comment.char = "#") %>%  mutate(chr = sapply("chr", paste0, chr)) %>% 
 toGRanges()
-covplot(e, weightCol="pileup", title = paste0(strsplit(as.character(list_bed), "_")[[p]][5],
-                                                           " peaks on chromosomes"))
+print(covplot(e, weightCol="pileup", title = paste0(strsplit(as.character(list_bed), "_")[[p]][5],
+                                                           " peaks on chromosomes")))
 ## Profile of ChIP peaks binding to TSS regions
 # Show how peaks fall around TSS regions
 tagMatrix <- getTagMatrix(e, windows=promoter) 
@@ -222,13 +222,13 @@ peaks <- GRangesList(Tconv1=eval(as.symbol(po[1])), Tconv3=eval(as.symbol(po[2])
 #Average profiles
 col <- c("darkolivegreen", "darkolivegreen4", 
          "firebrick1", "darkred")
-tagMatrixList <- lapply(peaks, getTagMatrix, windows=promtitle)
+tagMatrixList <- lapply(peaks, getTagMatrix, windows=promoter)
 plotAvgProf(tagMatrixList, xlim=c(-3000, 3000)) + scale_color_manual(values= col) +
   ggtitle("All samples average profile peaks around TSS")
 plotAvgProf(tagMatrixList, xlim=c(-3000, 3000), conf=0.95,resample=500, facet="row") + scale_color_manual(values= col) +
   ggtitle("All samples average profile peaks around TSS")
 tagHeatmap(tagMatrixList, xlim=c(-3000, 3000), color=NULL, 
-              title = "All samples peaks around TSS")
+              title = names(tagMatrixList))
 
 peakAnnoList <- lapply(peaks, annotatePeak, TxDb=TxDb,
                        tssRegion=c(-3000, 3000), verbose=FALSE)
