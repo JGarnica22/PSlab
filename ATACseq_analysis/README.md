@@ -123,7 +123,7 @@ Use loop scripts to perform all the steps aforementioned automatically and in pa
 
 The following data analysis comparing peaks between samples and visualizing the results shall be performed using `R` language, and preferably locally, not in the cluster.
 
-## DiffBind
+## DiffBind :sunrise_over_mountains:
 DiffBind provides functions for processing DNA data enriched for genomic loci including ChIPseq and ATAC-seq. It is designed to work with aligned sequence reads identified by a peak caller. The tool is optimized to work with multiple peak sets simultaneously and to identify sites that are differentially bound between sample groups.
 
 Generally, data process with DiffBind involve these phases:
@@ -164,8 +164,8 @@ dbreport <- dba.report(dbdata, th = , fold = )
 ````
 This command returns a GRanges object, appropiate for downstream processing. You can filter your report based on FDR threeshold (`th`) and/or foldchange (`fold`). 
 
-# Annotation
-The next steps once we know all the peaks found in our samples and the differentially bound peaks between our conditions is to know where these regions fall on the genome and nexts to what gens.
+# Annotation :name_badge:
+The next steps once we know all the peaks found in our samples and the differentially bound peaks between our conditions is to know where these regions fall on the genome and next to what genes.
 
 Here it will be described two annotations tools: Homer's `annotatePeaks` (run in terminal) and `ChIPseeker` (run in R, from Bioconductor).
 
@@ -173,13 +173,14 @@ Here it will be described two annotations tools: Homer's `annotatePeaks` (run in
 see requeriments and steps for installation at http://homer.ucsd.edu/homer/introduction/install.html
 #### Install Homer
 ````
+#!/bin/bash
 wget <link with latest version>
 perl /USER/homer/configureHomer.pl -install
 export PATH=$PATH:/home/USER/HOMER/.//bin/
 ````
 
 #### Run annotatePeaks
-Firstly, you need to generate a BED file with your peaks to be annotated. In this case, the differntially bound peaks.
+Firstly, you need to generate a BED file with your peaks to be annotated. In this case, the differentially bound peaks.
 
 BED files should have at minimum 6 columns (separated by TABs, additional columns will be ignored).
 
@@ -203,16 +204,17 @@ write.table (report, "out/diffbind_report.bed",
 
 Afterwards run `annotatePeaks.pl` in your terminal. You need to install your genome of use before that in case you do not have it already:
 ````
+#!/bin/bash
 # Check available genomes to download
 perl /home/USER/ATACseq/HOMER/.//configureHomer.pl -list
 # Install your genome
-perl /home/USER/ATACseq/HOMER/.//configureHomer.pl -install <your_genome>
+perl /home/USER/ATACseq/HOMER/.//configureHomer.pl -install mm10
 # Run annotation
 annotatePeaks.pl diffbind_report.bed mm10 -go <dir for GO analysis> > homer_anno2.txt
 ````
 The first two arguments, the peak file and genome, are required, and must be the first two arguments. `annotatePeaks.pl` also offers annotation enrichment analysis by specifying `-go GO output directory`.
 
-Finally, you can import `annotatePeak.pl` data again into R and merge with differential analysis report.
+Finally, you can import `annotatePeak.pl` data again into R and merge it with differential analysis report.
 ````
 anno <- read.table("data/homer_anno.txt",
                    header = T,
@@ -224,14 +226,13 @@ comp <- merge(mutate(report, PeakID=row.names(report)), anno, by = "PeakID", all
 comp <- comp[, -c(2:4, 6)]
 ````
 
-## ChIPseeker
-ChIP is a very useful tool to annotate peak data analysis and visualize this in ggplot graphs.
+## ChIPseeker :eyeglasses:
+ChIPseeker is a very useful tool to annotate peak data analysis and visualize this in ggplot graphs.
 
 ### Input
-ChIPseeker works with GRanges objects, so we can use the output of DiffBind reports or convert from our bed or .xlsx files. To convert bed file to GRanges you can use `readPeakFile()` and to convert .xlsx files (MACS2 output) you can use:
+ChIPseeker works with GRanges objects, so we can use the output of DiffBind reports or convert from our .bed or .xlsx files. To convert bed file to GRanges you can use `readPeakFile()` and to convert .xlsx files (MACS2 output) you can use:
 ````
-peak <- read.delim(<peak file>, comment.char = "#") %>% 
-toGRanges()
+peak <- read.delim(<peak file>, comment.char = "#") %>% toGRanges()
 ````
 ### Annotation
 Afterwards, you can annotate your peaks using `annotatePeak()`. 
@@ -258,4 +259,4 @@ enrichPathway(as.data.frame(peakAnno)$geneId, organism = "mouse")
 
 
 # Script
-Use `DiffBind_ChIPseeker.R` script to run all these steps combining DiffBind and ChIPseeker, obtaining the annotated differentially bound peaks and a comprehensive group of graphs visualazing the peaks dataset characteristics from each sample and from differentially bound peaks. 
+Use `DiffBind_ChIPseeker.R` script to run all these steps combining DiffBind and ChIPseeker, obtaining the annotated differentially bound peaks and a comprehensive group of graphs visualazing the peaks dataset characteristics from each sample and from differentially bound peaks, which will be exported in pdf files. 
