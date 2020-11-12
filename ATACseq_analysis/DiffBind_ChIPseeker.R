@@ -193,7 +193,9 @@ dbdata.DB <- dba.report(dbdata.anal, method=DBA_EDGER, th = 0.01, fold = 2)
 
 ## Represent results with ChIPseeker
 # Prepare the TSS regions for your genome
-promoter <- getPromoters(TxDb=TxDb, upstream=3000, downstream=3000)
+# Determine upstream and downtream values
+lim=5000
+promoter <- getPromoters(TxDb=TxDb, upstream=lim, downstream=lim)
 pdf("figs/Figures_peaks_seeker.pdf")
 for (p in 1:length(list_bed)){
 # Show where peaks fall on the chrosomes
@@ -204,12 +206,12 @@ print(covplot(e, weightCol="pileup", title = paste0(strsplit(as.character(list_b
 ## Profile of ChIP peaks binding to TSS regions
 # Show how peaks fall around TSS regions
 tagMatrix <- getTagMatrix(e, windows=promoter) 
-tagHeatmap(tagMatrix, xlim=c(-3000, 3000), color="red", 
+tagHeatmap(tagMatrix, xlim=c(-lim, lim), color="red", 
            title = paste0(strsplit(as.character(list_bed), "_")[[p]][5]," peaks around TSS"), 
            xlab = "Genomic Region (5'->3')" )
 
 # Average profile peaks binding to TSS region
-plotAvgProf(tagMatrix, xlim=c(-3000, 3000), conf = 0.95,
+plotAvgProf(tagMatrix, xlim=c(-lim, lim), conf = 0.95,
             xlab="Genomic Region (5'->3')", ylab = "Read Count Frequency") +
   ggtitle(paste0(strsplit(as.character(list_bed), "_")[[p]][5]," average profile peaks around TSS"))
 # Plots comparing differents samples
@@ -223,32 +225,32 @@ peaks <- GRangesList(Tconv1=eval(as.symbol(po[1])), Tconv3=eval(as.symbol(po[2])
 col <- c("darkolivegreen", "darkolivegreen4", 
          "firebrick1", "darkred")
 tagMatrixList <- lapply(peaks, getTagMatrix, windows=promoter)
-plotAvgProf(tagMatrixList, xlim=c(-3000, 3000)) + scale_color_manual(values= col) +
+plotAvgProf(tagMatrixList, xlim=c(-lim, lim)) + scale_color_manual(values= col) +
   ggtitle("All samples average profile peaks around TSS")
-plotAvgProf(tagMatrixList, xlim=c(-3000, 3000), conf=0.95,resample=500, facet="row") + scale_color_manual(values= col) +
+plotAvgProf(tagMatrixList, xlim=c(-lim, lim), conf=0.95,resample=500, facet="row") + scale_color_manual(values= col) +
   ggtitle("All samples average profile peaks around TSS")
-tagHeatmap(tagMatrixList, xlim=c(-3000, 3000), color=NULL, 
+tagHeatmap(tagMatrixList, xlim=c(-lim, lim), color=NULL, 
               title = names(tagMatrixList))
 
 peakAnnoList <- lapply(peaks, annotatePeak, TxDb=TxDb,
-                       tssRegion=c(-3000, 3000), verbose=FALSE)
+                       tssRegion=c(-lim, lim), verbose=FALSE)
 plotAnnoBar(peakAnnoList)
 plotDistToTSS(peakAnnoList)
 
 # Compare functional profiles
-genes <- lapply(peakAnnoList, function(i) as.data.frame(i)$geneId)
-names(genes) <- sub("_", "\n", names(genes))
-compKEGG <- compareCluster(geneCluster   = genes,
-                           fun           = "enrichKEGG",
-                           pvalueCutoff  = 0.05,
-                           pAdjustMethod = "BH")
-dotplot(compKEGG, showCategory = 15, title = "KEGG Pathway Enrichment Analysis")
+# genes <- lapply(peakAnnoList, function(i) as.data.frame(i)$geneId)
+# names(genes) <- sub("_", "\n", names(genes))
+# compKEGG <- compareCluster(geneCluster   = genes,
+#                            fun           = "enrichKEGG",
+#                            pvalueCutoff  = 0.05,
+#                            pAdjustMethod = "BH")
+# dotplot(compKEGG, showCategory = 15, title = "KEGG Pathway Enrichment Analysis")
 dev.off()
 
 ## Peak annotation with ChIPseeker, in this case let's annotate differentially bound peaks
 # to add "chr" to seqnames use:
 seqlevelsStyle(dbdata.DB) <- "UCSC"
-peakAnno <- annotatePeak(dbdata.DB, tssRegion=c(-3000, 3000),
+peakAnno <- annotatePeak(dbdata.DB, tssRegion=c(-lim, lim),
                          TxDb=TxDb, annoDb="org.Mm.eg.db")
 as.data.frame(peakAnno)
 #Export annotated data
