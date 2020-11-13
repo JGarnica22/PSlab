@@ -99,9 +99,9 @@ samples$Treatment <- samples$Condition
 samples[c(grep(pop[1], list_files)),"Replicate"] <- 1:length(grep(pop[1], list_files))
 samples[c(grep(pop[2], list_files)),"Replicate"] <- 1:length(grep(pop[2], list_files))
 # Peakcaller will be changing depending on the file use (see DiffBind vignette)
-# To call macs2 output format: “bed”: .bed file; peak score is in fifth column; 
-# “narrow”: default peak.format: narrowPeaks file;
-# "macs”: MACS .xls file.
+# To call macs2 output format: "bed": .bed file; peak score is in fifth column; 
+# "narrow": default peak.format: narrowPeaks file;
+# "macs": MACS .xls file.
 samples$PeakCaller <- "macs"
 list_bed <- list.files(path= paste0(getwd(), "/data"),
                          pattern= "*peaks.xls")
@@ -148,11 +148,14 @@ dev.off()
 
 # Establishing a contrast
 # Before running the differential analysis, we need to tell DiffBind which cell lines fall in which groups. 
-dbdata.contrast <- dba.contrast(dbdata.count, categories=DBA_CONDITION, minMembers = 2)
+dbdata.contrast <- dba.contrast(dbdata.count, categories=DBA_CONDITION, minMembers = 2 )
+#Set threshold to use in analyse, let's get all peaks and then filter by pvalue or FDR
+dbdata.contrast$config$th <- 1
 
 # Differential analysis
 # This will run an DESeq2 analysis using the default binding matrix
 dbdata.anal <- dba.analyze(dbdata.contrast, method=DBA_ALL_METHODS)
+
 # This shows how many sites are identified as being significantly differentially bound (DB) using the
 # default threshold of FDR <= 0.05
 
@@ -186,8 +189,9 @@ dev.off()
 
 # Retrieve differentially bound sites
 # These are returned as a GRanges object, appropriate for downstream processing.
-# Here you can filter your data based on FDR threshold (th) and fold change (fold)
-dbdata.DB <- dba.report(dbdata.anal, method=DBA_EDGER, th = 0.01, fold = 2)
+# Here you can filter your data based on FDR threshold (th) and fold change (fold) or you can filter this later as dataframe
+
+dbdata.DB <- dba.report(dbdata.anal) #, bUsePval = T, th = 0.05, fold = 2)
 
 
 
@@ -252,9 +256,22 @@ dev.off()
 seqlevelsStyle(dbdata.DB) <- "UCSC"
 peakAnno <- annotatePeak(dbdata.DB, tssRegion=c(-lim, lim),
                          TxDb=TxDb, annoDb="org.Mm.eg.db")
-as.data.frame(peakAnno)
+consensus <- as.data.frame(peakAnno)
+
+#filter your data
+th <- 0.05
+FC <- 2
+shared <- consensus %>% filter(p.value > th & abs(Fold) < FC)
+Differ_Tconv <- consensus %>% filter(p.value <= th & Fold >= FC)
+Differ_Tet <- consensus %>% filter(p.value <= th & Fold <= -FC)
+
 #Export annotated data
-write_xlsx(as.data.frame(peakAnno), "out/Diff_bound_seeker_anno.xlsx")
+write_xlsx(consensus, "out/All_consensus_peaks_annotated.xlsx")
+write_xlsx(shared, "out/Shared_peaks_annotated.xlsx")
+write_xlsx(Differ_Tconv, "out/Diff_Tconv_peaks_annotated.xlsx")
+write_xlsx(Differ_Tet, "out/Diff_Tet_peaks_annotated.xlsx")
+
+
 pathway <- enrichPathway(as.data.frame(peakAnno)$geneId, organism = "mouse")
 pdf("figs/Differentially_bound_annotation.pdf", width = 12)
 plotAnnoPie(peakAnno)
