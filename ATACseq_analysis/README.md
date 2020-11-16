@@ -71,7 +71,7 @@ After the assessment of sequence quality and proper trimming and filtering, read
 
 ### Bowtie
 #### Genome index
-The first step for alignment is generate or download the genome index for bowtie2. You can download a complete package of already indexed (sequence, annotation, indexes for multiple aligners including BWA-MEM and bowtie2) from [Illumina's iGenomes site](https://support.illumina.com/sequencing/sequencing_software/igenome.html). Alternatively, you can build a ndw une using `bowtie2-build` using <your_genome.fa> sequence as only input. Bowtie2 index must include a set of 6 files with suffixes .1.bt2, .2.bt2, .3.bt2, .4.bt2, .rev.1.bt2, and .rev.2.bt2.
+The first step for alignment is to generate or download the genome index for bowtie2. You can download a complete package of already indexed (sequence, annotation, indexes for multiple aligners including BWA-MEM and bowtie2) from [Illumina's iGenomes site](https://support.illumina.com/sequencing/sequencing_software/igenome.html). Alternatively, you can build a ndw une using `bowtie2-build` using <your_genome.fa> sequence as only input. Bowtie2 index must include a set of 6 files with suffixes .1.bt2, .2.bt2, .3.bt2, .4.bt2, .rev.1.bt2, and .rev.2.bt2.
 
 Then you can proceed to align your reads using:
 ````
@@ -80,7 +80,7 @@ bowtie2 --very-sensitive -X 2000 -x <path_to_index/base> -U <your_file> | samtoo
 Bowtie2 output is a SAM file, which contains alignment information for each input read. The SAM can be compressed to a binary format (BAM) and sorted with SAMtools. This is best accomplished by piping the output from Bowtie2 directly to samtools.
 
 ### BWA-MEM
-BWA works very similar to bowtie2, again we need to download and indicate the indexes of your reference genome, found at iGenomes too, or make them using `bwa index`. Next, we can procced with alignment using `bwa mem` command. Here is an example, like bowtie the output format is sam file, if you want to get bam files the best is to pipe it directly to samtools.
+BWA works very similar to bowtie2, again we need to download and indicate the indexes of your reference genome, found at iGenomes too, or make them using `bwa index`. Next, we can procced with the alignment using `bwa mem` command. Like bowtie the output format is a SAM file, if you want to get BAM files, the best is to pipe it directly to samtools. Here is an example:
 ````
 bwa mem -t -M genome_mus/BWA/index/GRCm38 <your_file> \
 | samtools sort -@32 -o <aligned_file.bam> -
@@ -98,21 +98,21 @@ M= allows to indicate a log file with duplication metrics
 REMOVE_DUPLICATES= if TRUE duplicates are removed from output file, FALSE is the default option.
 
 ## PEAK CALLING
-Peak calling is a computational method used to identify areas in the genome that have been enriched with aligned reads as a consequence of ATAC-seq experiment. There are various tools that are available for peak calling. One of the more commonly used peak callers is **MACS2** using the function `macs2 callpeak`, as in this example:
+Peak calling is a computational method used to identify areas in the genome that have been enriched with aligned reads and creating a 'peak' of reads. These correspond to accessible chromatin regions in an ATACseq experiment (equivalent to histone-marked or TF-binding regions in ChIPseq). There are various tools that are available for peak calling. One of the most used peak callers is **MACS2** using the function `macs2 callpeak`, as in this example:
 ````
 macs2 callpeak -t <file_to_call> -f <file_format> -q 0.05 --nomodel --extsize 150 --keep-dup all \
 -n <prefix_output> --outdir <output_directory> 2> <log_file>.log
 ````
 Some details about options used:
 
-* **-t**: This is the only REQUIRED parameter for MACS. If you have more than one alignment file, you can specify them as -t A B C. MACS will pool up all these files together.
+* **-t**: This is the only REQUIRED parameter for MACS. If you have more than one alignment file, you can specify them as -t A B C. MACS will pool up all these files together. ENTENC QUE NOMÉS ESPECIFIQUES MÉS D'UN FILE A L'OPCIÓ -t QUAN SÓN LA MATEIXA MOSTRA? POTSER ES PODRIA ESPECIFICAR
 * **-n**: The name string of the experiment. MACS will use this string NAME to create output files like NAME_peaks.xls, NAME_negative_peaks.xls, NAME_peaks.bed...
-* **--outdir**: MACS2 will save all output files into the specified folder for this option.
-* **-f**: Format of tag file can be ELAND, BED, ELANDMULTI, ELANDEXPORT, SAM, BAM, BOWTIE, BAMPE, or BEDPE. 
+* **--outdir**: MACS2 will save all output files into the specified folder.
+* **-f**: Format of tag file can be ELAND, BED, ELANDMULTI, ELANDEXPORT, SAM, BAM, BOWTIE, BAMPE, or BEDPE. QUIN ÉS EL FORMAT PER DEFAULT? O QUIN ÉS EL RECOMANAT A INDICAR?
 * **-q**: The q-value (minimum FDR) cutoff to call significant regions. Default is 0.05.
 * **--nomodel**: to bypass building the shifting model.
 * **--extsize**: While --nomodel is set, MACS uses this parameter to extend reads in 5'->3' direction to fix-sized fragments.
-* **--keep-dup**: It controls the MACS behavior towards duplicate tags at the exact same location. Need to be set at `all` if duplicated were previously removed.
+* **--keep-dup**: It controls the MACS behavior towards duplicate tags at the exact same location. Need to be set at `all` if duplicated were previously removed (i.e. with Picard).
 
 
 ## Cluster loop :curly_loop:
