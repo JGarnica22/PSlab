@@ -116,20 +116,20 @@ Some details about options used:
 
 
 ## Cluster loop :curly_loop:
-Use loop scripts to perform all the steps aforementioned automatically and in parellel in the cluster. All folders and subfolders will be created, just make sure to have your fastq files in a fasq_files folder, and to add and indicate the directory of your reference genome and software (Trimmomatic and Picard).
+Use loop scripts to perform all the steps aforementioned automatically and in parellel in the cluster. All folders and subfolders will be created, just make sure to have your fastq files in a fastq_files folder, and to add and indicate the directory of your reference genome and software (Trimmomatic and Picard).
 
 
 The following data analysis comparing peaks between samples and visualizing the results shall be performed using `R` language, and preferably locally, not in the cluster.
 
 ## DiffBind :sunrise_over_mountains:
-DiffBind provides functions for processing DNA data enriched for genomic loci including ChIPseq and ATAC-seq. It is designed to work with aligned sequence reads identified by a peak caller. The tool is optimized to work with multiple peak sets simultaneously and to identify sites that are differentially bound between sample groups.
+DiffBind provides functions for processing DNA data enriched for genomic loci including ChIPseq and ATACseq. It is designed to work with aligned sequence reads identified by a peak caller. The tool is optimized to work with multiple peak sets simultaneously and to identify sites that are differentially bound between sample groups.
 
 Generally, data process with DiffBind involve these phases:
 
 ### Reading in peaksets
-Usually peaksets are derived from peak callers. The easiest way to read in peaksets is using a comma-separated value sample sheet or create a dataframe with one line for each peakset. 
+Usually peaksets are derived from peak callers. The easiest way to read in peaksets is using a comma-separated value sample sheet or creating a dataframe with one line for each peakset. 
 
-With your sample sheet you can generate your DBA object, it contains how many peaks are in each peakset, as well as (in the first line) the total number of unique peaks after merging overlapping. Also, correlation heatmap and PCA can be generated which gives an initial clustering of the samples using the cross-correlations of each row of the binding matrix.
+With your sample sheet you can generate your DBA object, which measures how many peaks are in each peakset, as well as (in the first line) the total number of unique peaks after merging (overlapping?). Also, a correlation heatmap and PCA can be generated, which gives an initial clustering of the samples using the cross-correlations of each row of the binding matrix.
 ````
 dbdata <- dba(sampleSheet=<sample_sheet>)
 plot(dbdadta)
@@ -143,24 +143,22 @@ dbdata <- dba.count(dbdata)
 ````
 
 ### Differential binding affinity analysis
-Differential binding affinity analysis identify
-significantly differentially bound sites between sample groups. This will assign a p-value and FDR to each candidate binding site indicating confidence
-that they are differentially bound.
+Differential binding affinity analysis identifies significant differentially bound sites between sample groups. This will assign a p-value and FDR to each candidate binding site indicating the confidence that they are differentially bound.
 
 First of all, before running the differential analysis, we need to tell DiffBind which cell lines fall in which groups based on our sample sheet, then we can perform the analysis.
 ````
 dbadata <- dba.contrast(dbdata, categories =)
 dbdata <- dba.analyze(dbdata)
 ````
-This shows how many sites are identified as being significantly differentially bound (DB) using the default threshold of FDR <= 0.05.
-Again, we can perform PCA and Heatmaps with the affinity scores of these differntially bound sites. However, these plots are not results in the sense that the analysis is selecting for sites that differ between the two conditions, and hence are expected to form clusters.
+This shows how many sites are identified as significant differentially bound (DB) using the default threshold of FDR <= 0.05.
+Again, we can perform PCA and Heatmaps with the affinity scores of these differentially bound sites. However, these plots are not results in the sense that the analysis is selecting for sites that differ between the two conditions, and hence are expected to form clusters.
 
 ### Reporting
 Reporting mechanism enables differentially bound sites to be extracted for further processing, such as annotation, motif, and pathway analyses.
 ````
 dbreport <- dba.report(dbdata, th = , fold = )
 ````
-This command returns a GRanges object, appropiate for downstream processing. You can filter your report based on FDR threeshold (`th`) and/or foldchange (`fold`). 
+This command returns a GRanges object, appropiate for downstream processing. You can filter your report based on FDR threeshold (`th`) and/or Fold Change (`fold`). 
 
 # Annotation :name_badge:
 The next steps once we know all the peaks found in our samples and the differentially bound peaks between our conditions is to know where these regions fall on the genome and next to what genes.
