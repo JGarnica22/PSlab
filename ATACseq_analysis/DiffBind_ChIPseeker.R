@@ -195,11 +195,15 @@ dbdata.DB <- dba.report(dbdata.anal) #, bUsePval = T, th = 0.05, fold = 2)
 
 
 
-## Represent results with ChIPseeker
+## Represent results and annotate bam files and differential results with ChIPseeker
 # Prepare the TSS regions for your genome
 # Determine upstream and downtream values
+# ChIPseeker implements the annotatePeak function for annotating peaks with nearest gene and genomic region where the peak is located. 
+# Many annotation tools calculate the distance of a peak to the nearest TSS and annotates the peak to that gene. This can be misleading 
+# as binding sites might be located between two start sites of different genes.
 lim=5000
 promoter <- getPromoters(TxDb=TxDb, upstream=lim, downstream=lim)
+# Represent macs2 output files and annotate
 pdf("figs/Figures_peaks_seeker.pdf")
 for (p in 1:length(list_bed)){
 # Show where peaks fall on the chrosomes
@@ -255,11 +259,35 @@ dev.off()
 # to add "chr" to seqnames use:
 seqlevelsStyle(dbdata.DB) <- "UCSC"
 peakAnno <- annotatePeak(dbdata.DB, tssRegion=c(-lim, lim),
-                         TxDb=TxDb, annoDb="org.Mm.eg.db")
+                         TxDb=TxDb, annoDb="org.Mm.eg.db", flankDistance = lim, addFlankGeneInfo = T )
+
 consensus <- as.data.frame(peakAnno)
+# Remove repeated flanking gens corresponding to different transcripts
+consensus$flank_geneIds <- sapply(1:length(consensus$flank_geneIds), 
+                                  function(x){unique(as.numeric(strsplit(consensus$flank_geneIds[x], ";")[[1]]))})
+
+#annotate also flanking genes
+BM <- getBM(attributes=c("entrezgene_id", "chromosome_name", "start_position", "end_position" , "ensembl_gene_id", "external_gene_name", "strand"),
+            mart = ensembl, verbose = T)
+BMgr <- subset(BM, as.numeric(chromosome_name)>= 1 & as.numeric(chromosome_name) <=50 | chromosome_name == "X" | chromosome_name == "Y")
+# Nomenclature for chromosomes should be "chrX"
+#BMgr$chromosome_name <- sapply(BMgr$chromosome_name, function(x) {paste0("chr",x)})
+BMgr$strand <- sapply(BMgr$strand, function(x){if (x ==1){print("+")} else {print("-")}})
+
+consensus$flank_genename <- NA
+for (g in 1:length(consensus$flank_geneIds)){
+  li <- vector()
+  for (e in 1:length(unlist(consensus[g,25]))){
+    if (length(grep(unlist(consensus[g,25])[e], BMgr$entrezgene_id)) != 0) {
+   li[e] <-BMgr[grep(unlist(consensus[g,25])[e], BMgr$entrezgene_id), "external_gene_name"]
+    } else {li[e] <- NA}
+  }
+  consensus$flank_genename[g] <- list(li)
+ }
+  
 
 #filter your data
-th <- 0.05
+th <- 0.1
 FC <- 2
 shared <- consensus %>% filter(p.value > th & abs(Fold) < FC)
 Differ_Tconv <- consensus %>% filter(p.value <= th & Fold >= FC)
