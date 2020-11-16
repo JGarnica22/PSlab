@@ -163,67 +163,10 @@ This command returns a GRanges object, appropiate for downstream processing. You
 # Annotation :name_badge:
 The next steps once we know all the peaks found in our samples and the differentially bound peaks between our conditions is to know where these regions fall on the genome and next to what genes.
 
-Here it will be described two annotations tools: Homer's `annotatePeaks` (run in terminal) and `ChIPseeker` (run in R, from Bioconductor).
-
-## Homer annotatePeaks
-see requeriments and steps for installation at http://homer.ucsd.edu/homer/introduction/install.html
-#### Install Homer
-````
-#!/bin/bash
-wget <link with latest version>
-perl /USER/homer/configureHomer.pl -install
-export PATH=$PATH:/home/USER/HOMER/.//bin/
-````
-
-#### Run annotatePeaks
-Firstly, you need to generate a BED file with your peaks to be annotated. In this case, the differentially bound peaks.
-
-BED files should have at minimum 6 columns (separated by TABs, additional columns will be ignored).
-
-* Column1: chromosome (in `chr1` format)
-* Column2: starting position
-* Column3: ending position
-* Column4: Unique Peak ID
-* Column5: not used
-* Column6: Strand (+/- or 0/1, where 0="+", 1="-")
-
-This can be generated from the `dba.report` output using this code:
-````
-report <- as.data.frame(dbdata.DB) %>%
-mutate(Unique_ID=row.names(report)) %>%
-select(c(1:3, 12)) %>% 
-mutate(seqnames = sapply("chr", paste0, seqnames))
-report[,5:6] <- NA
-write.table (report, "out/diffbind_report.bed",
-             sep = "\t", dec = ".", quote = F, row.names = F, col.names = F)
-````
-
-Afterwards run `annotatePeaks.pl` in your terminal. You need to install your genome of use before that in case you do not have it already:
-````
-#!/bin/bash
-# Check available genomes to download
-perl /home/USER/ATACseq/HOMER/.//configureHomer.pl -list
-# Install your genome
-perl /home/USER/ATACseq/HOMER/.//configureHomer.pl -install mm10
-# Run annotation
-annotatePeaks.pl diffbind_report.bed mm10 -go <dir for GO analysis> > homer_anno2.txt
-````
-The first two arguments, the peak file and genome, are required, and must be the first two arguments. `annotatePeaks.pl` also offers annotation enrichment analysis by specifying `-go GO output directory`.
-
-Finally, you can import `annotatePeak.pl` data again into R and merge it with differential analysis report.
-````
-anno <- read.table("data/homer_anno.txt",
-                   header = T,
-                   sep = "\t",
-                   quote = "", 
-                   dec = ".")
-names(anno)[1] <- "PeakID"  
-comp <- merge(mutate(report, PeakID=row.names(report)), anno, by = "PeakID", all = T)
-comp <- comp[, -c(2:4, 6)]
-````
+Here it will be described two annotations tools: `ChIPseeker` (run in R, from Bioconductor) and Homer's `annotatePeaks` (run in terminal). We recommend using ChIPseeker directly in R after DiffBind analysis.
 
 ## ChIPseeker :eyeglasses:
-ChIPseeker is a very useful tool to annotate peak data analysis and visualize this in ggplot graphs.
+ChIPseeker is a very useful tool to annotate peak data analysis and visualize results in ggplot graphs.
 
 ### Input
 ChIPseeker works with GRanges objects, so we can use the output of DiffBind reports or convert from our .bed or .xlsx files. To convert bed file to GRanges you can use `readPeakFile()` and to convert .xlsx files (MACS2 output) you can use:
@@ -246,13 +189,70 @@ plotDistToTSS(peakAnno)
 vennpie(peakAnno)
 upsetplot(peakAnno, vennpie=T)
 ````
+
 ### Funcional enrichment analysis
 `ChIPseeker` can also perform functional enrichment analysis to identify predominant biological themes among these genes by incorporating biological knowledge provided by biological ontologies. For instance, Gene Ontology (GO).
 ````
 enrichPathway(as.data.frame(peakAnno)$geneId, organism = "mouse")
 ````
 
-
-
 # Script
-Use `DiffBind_ChIPseeker.R` script to run all these steps combining DiffBind and ChIPseeker, obtaining the annotated differentially bound peaks and a comprehensive group of graphs visualazing the peaks dataset characteristics from each sample and from differentially bound peaks, which will be exported in pdf files. 
+Use `DiffBind_ChIPseeker.R` script to run all these steps combining DiffBind and ChIPseeker, obtaining the annotated differentially bound peaks and a comprehensive group of graphs visualizing the peaks dataset characteristics from each sample and from differentially bound peaks, which will be exported in pdf files.
+
+
+## Homer annotatePeaks
+See requeriments and steps for installation at http://homer.ucsd.edu/homer/introduction/install.html
+
+#### Install Homer
+````
+#!/bin/bash
+wget <link with latest version>
+perl /USER/homer/configureHomer.pl -install
+export PATH=$PATH:/home/USER/HOMER/.//bin/
+````
+
+#### Run annotatePeaks
+First, you need to generate a BED file with your peaks to be annotated. In this case, the differentially bound peaks.
+
+BED files should have at minimum 6 columns (separated by TABs, additional columns will be ignored).
+* Column1: chromosome (in `chr1` format)
+* Column2: starting position
+* Column3: ending position
+* Column4: Unique Peak ID
+* Column5: not used
+* Column6: Strand (+/- or 0/1, where 0="+", 1="-")
+
+This can be generated from the `dba.report` output using this code:
+````
+report <- as.data.frame(dbdata.DB) %>%
+mutate(Unique_ID=row.names(report)) %>%
+select(c(1:3, 12)) %>% 
+mutate(seqnames = sapply("chr", paste0, seqnames))
+report[,5:6] <- NA
+write.table (report, "out/diffbind_report.bed",
+             sep = "\t", dec = ".", quote = F, row.names = F, col.names = F)
+````
+
+Afterwards run `annotatePeaks.pl` in your Terminal. You need to install your genome of use before that in case you do not have it already:
+````
+#!/bin/bash
+# Check available genomes to download
+perl /home/USER/ATACseq/HOMER/.//configureHomer.pl -list
+# Install your genome
+perl /home/USER/ATACseq/HOMER/.//configureHomer.pl -install mm10
+# Run annotation
+annotatePeaks.pl diffbind_report.bed mm10 -go <dir for GO analysis> > homer_anno2.txt
+````
+The first two arguments, the peak file and genome, are required, and must be the first two arguments. `annotatePeaks.pl` also offers annotation enrichment analysis by specifying `-go GO output directory`.
+
+Finally, you can import `annotatePeak.pl` data again into R and merge it with differential analysis report.
+````
+anno <- read.table("data/homer_anno.txt",
+                   header = T,
+                   sep = "\t",
+                   quote = "", 
+                   dec = ".")
+names(anno)[1] <- "PeakID"  
+comp <- merge(mutate(report, PeakID=row.names(report)), anno, by = "PeakID", all = T)
+comp <- comp[, -c(2:4, 6)]
+````
