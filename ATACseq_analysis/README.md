@@ -71,7 +71,7 @@ After the assessment of sequence quality and proper trimming and filtering, read
 
 ### Bowtie
 #### Genome index
-The first step for alignment is generate or download the genome index for bowtie2. You can download a complete package of already indexed (sequence, annotation, indexes for multiple aligners including BWA-MEM and bowtie2) from [Illumina's iGenomes site](https://support.illumina.com/sequencing/sequencing_software/igenome.html). Alternatively, you can build a ndw une using `bowtie2-build` using <your_genome.fa> sequence as only input. Bowtie2 index must include a set of 6 files with suffixes .1.bt2, .2.bt2, .3.bt2, .4.bt2, .rev.1.bt2, and .rev.2.bt2.
+The first step for alignment is to generate or download the genome index for bowtie2. You can download a complete package of already indexed (sequence, annotation, indexes for multiple aligners including BWA-MEM and bowtie2) from [Illumina's iGenomes site](https://support.illumina.com/sequencing/sequencing_software/igenome.html). Alternatively, you can build a ndw une using `bowtie2-build` using <your_genome.fa> sequence as only input. Bowtie2 index must include a set of 6 files with suffixes .1.bt2, .2.bt2, .3.bt2, .4.bt2, .rev.1.bt2, and .rev.2.bt2.
 
 Then you can proceed to align your reads using:
 ````
@@ -80,7 +80,7 @@ bowtie2 --very-sensitive -X 2000 -x <path_to_index/base> -U <your_file> | samtoo
 Bowtie2 output is a SAM file, which contains alignment information for each input read. The SAM can be compressed to a binary format (BAM) and sorted with SAMtools. This is best accomplished by piping the output from Bowtie2 directly to samtools.
 
 ### BWA-MEM
-BWA works very similar to bowtie2, again we need to download and indicate the indexes of your reference genome, found at iGenomes too, or make them using `bwa index`. Next, we can procced with alignment using `bwa mem` command. Here is an example, like bowtie the output format is sam file, if you want to get bam files the best is to pipe it directly to samtools.
+BWA works very similar to bowtie2, again we need to download and indicate the indexes of your reference genome, found at iGenomes too, or make them using `bwa index`. Next, we can procced with the alignment using `bwa mem` command. Like bowtie the output format is a SAM file, if you want to get BAM files, the best is to pipe it directly to samtools. Here is an example:
 ````
 bwa mem -t -M genome_mus/BWA/index/GRCm38 <your_file> \
 | samtools sort -@32 -o <aligned_file.bam> -
@@ -98,38 +98,38 @@ M= allows to indicate a log file with duplication metrics
 REMOVE_DUPLICATES= if TRUE duplicates are removed from output file, FALSE is the default option.
 
 ## PEAK CALLING
-Peak calling is a computational method used to identify areas in the genome that have been enriched with aligned reads as a consequence of ATAC-seq experiment. There are various tools that are available for peak calling. One of the more commonly used peak callers is **MACS2** using the function `macs2 callpeak`, as in this example:
+Peak calling is a computational method used to identify areas in the genome that have been enriched with aligned reads and creating a 'peak' of reads. These correspond to accessible chromatin regions in an ATACseq experiment (equivalent to histone-marked or TF-binding regions in ChIPseq). There are various tools that are available for peak calling. One of the most used peak callers is **MACS2** using the function `macs2 callpeak`, as in this example:
 ````
 macs2 callpeak -t <file_to_call> -f <file_format> -q 0.05 --nomodel --extsize 150 --keep-dup all \
 -n <prefix_output> --outdir <output_directory> 2> <log_file>.log
 ````
 Some details about options used:
 
-* **-t**: This is the only REQUIRED parameter for MACS. If you have more than one alignment file, you can specify them as -t A B C. MACS will pool up all these files together.
+* **-t**: This is the only REQUIRED parameter for MACS. If you have more than one alignment file, you can specify them as -t A B C. MACS will pool up all these files together. ENTENC QUE NOMÉS ESPECIFIQUES MÉS D'UN FILE A L'OPCIÓ -t QUAN SÓN LA MATEIXA MOSTRA? POTSER ES PODRIA ESPECIFICAR
 * **-n**: The name string of the experiment. MACS will use this string NAME to create output files like NAME_peaks.xls, NAME_negative_peaks.xls, NAME_peaks.bed...
-* **--outdir**: MACS2 will save all output files into the specified folder for this option.
-* **-f**: Format of tag file can be ELAND, BED, ELANDMULTI, ELANDEXPORT, SAM, BAM, BOWTIE, BAMPE, or BEDPE. 
+* **--outdir**: MACS2 will save all output files into the specified folder.
+* **-f**: Format of tag file can be ELAND, BED, ELANDMULTI, ELANDEXPORT, SAM, BAM, BOWTIE, BAMPE, or BEDPE. QUIN ÉS EL FORMAT PER DEFAULT? O QUIN ÉS EL RECOMANAT A INDICAR?
 * **-q**: The q-value (minimum FDR) cutoff to call significant regions. Default is 0.05.
 * **--nomodel**: to bypass building the shifting model.
 * **--extsize**: While --nomodel is set, MACS uses this parameter to extend reads in 5'->3' direction to fix-sized fragments.
-* **--keep-dup**: It controls the MACS behavior towards duplicate tags at the exact same location. Need to be set at `all` if duplicated were previously removed.
+* **--keep-dup**: It controls the MACS behavior towards duplicate tags at the exact same location. Need to be set at `all` if duplicated were previously removed (i.e. with Picard).
 
 
 ## Cluster loop :curly_loop:
-Use loop scripts to perform all the steps aforementioned automatically and in parellel in the cluster. All folders and subfolders will be created, just make sure to have your fastq files in a fasq_files folder, and to add and indicate the directory of your reference genome and software (Trimmomatic and Picard).
+Use loop scripts to perform all the steps aforementioned automatically and in parellel in the cluster. All folders and subfolders will be created, just make sure to have your fastq files in a fastq_files folder, and to add and indicate the directory of your reference genome and software (Trimmomatic and Picard).
 
 
 The following data analysis comparing peaks between samples and visualizing the results shall be performed using `R` language, and preferably locally, not in the cluster.
 
 ## DiffBind :sunrise_over_mountains:
-DiffBind provides functions for processing DNA data enriched for genomic loci including ChIPseq and ATAC-seq. It is designed to work with aligned sequence reads identified by a peak caller. The tool is optimized to work with multiple peak sets simultaneously and to identify sites that are differentially bound between sample groups.
+DiffBind provides functions for processing DNA data enriched for genomic loci including ChIPseq and ATACseq. It is designed to work with aligned sequence reads identified by a peak caller. The tool is optimized to work with multiple peak sets simultaneously and to identify sites that are differentially bound between sample groups.
 
 Generally, data process with DiffBind involve these phases:
 
 ### Reading in peaksets
-Usually peaksets are derived from peak callers. The easiest way to read in peaksets is using a comma-separated value sample sheet or create a dataframe with one line for each peakset. 
+Usually peaksets are derived from peak callers. The easiest way to read in peaksets is using a comma-separated value sample sheet or creating a dataframe with one line for each peakset. 
 
-With your sample sheet you can generate your DBA object, it contains how many peaks are in each peakset, as well as (in the first line) the total number of unique peaks after merging overlapping. Also, correlation heatmap and PCA can be generated which gives an initial clustering of the samples using the cross-correlations of each row of the binding matrix.
+With your sample sheet you can generate your DBA object, which measures how many peaks are in each peakset, as well as (in the first line) the total number of unique peaks after merging (overlapping?). Also, a correlation heatmap and PCA can be generated, which gives an initial clustering of the samples using the cross-correlations of each row of the binding matrix.
 ````
 dbdata <- dba(sampleSheet=<sample_sheet>)
 plot(dbdadta)
@@ -143,89 +143,30 @@ dbdata <- dba.count(dbdata)
 ````
 
 ### Differential binding affinity analysis
-Differential binding affinity analysis identify
-significantly differentially bound sites between sample groups. This will assign a p-value and FDR to each candidate binding site indicating confidence
-that they are differentially bound.
+Differential binding affinity analysis identifies significant differentially bound sites between sample groups. This will assign a p-value and FDR to each candidate binding site indicating the confidence that they are differentially bound.
 
 First of all, before running the differential analysis, we need to tell DiffBind which cell lines fall in which groups based on our sample sheet, then we can perform the analysis.
 ````
 dbadata <- dba.contrast(dbdata, categories =)
 dbdata <- dba.analyze(dbdata)
 ````
-This shows how many sites are identified as being significantly differentially bound (DB) using the default threshold of FDR <= 0.05.
-Again, we can perform PCA and Heatmaps with the affinity scores of these differntially bound sites. However, these plots are not results in the sense that the analysis is selecting for sites that differ between the two conditions, and hence are expected to form clusters.
+This shows how many sites are identified as significant differentially bound (DB) using the default threshold of FDR <= 0.05.
+Again, we can perform PCA and Heatmaps with the affinity scores of these differentially bound sites. However, these plots are not results in the sense that the analysis is selecting for sites that differ between the two conditions, and hence are expected to form clusters.
 
 ### Reporting
 Reporting mechanism enables differentially bound sites to be extracted for further processing, such as annotation, motif, and pathway analyses.
 ````
 dbreport <- dba.report(dbdata, th = , fold = )
 ````
-This command returns a GRanges object, appropiate for downstream processing. You can filter your report based on FDR threeshold (`th`) and/or foldchange (`fold`). 
+This command returns a GRanges object, appropiate for downstream processing. You can filter your report based on FDR threeshold (`th`) and/or Fold Change (`fold`). 
 
 # Annotation :name_badge:
 The next steps once we know all the peaks found in our samples and the differentially bound peaks between our conditions is to know where these regions fall on the genome and next to what genes.
 
-Here it will be described two annotations tools: Homer's `annotatePeaks` (run in terminal) and `ChIPseeker` (run in R, from Bioconductor).
-
-## Homer annotatePeaks
-see requeriments and steps for installation at http://homer.ucsd.edu/homer/introduction/install.html
-#### Install Homer
-````
-#!/bin/bash
-wget <link with latest version>
-perl /USER/homer/configureHomer.pl -install
-export PATH=$PATH:/home/USER/HOMER/.//bin/
-````
-
-#### Run annotatePeaks
-Firstly, you need to generate a BED file with your peaks to be annotated. In this case, the differentially bound peaks.
-
-BED files should have at minimum 6 columns (separated by TABs, additional columns will be ignored).
-
-* Column1: chromosome (in `chr1` format)
-* Column2: starting position
-* Column3: ending position
-* Column4: Unique Peak ID
-* Column5: not used
-* Column6: Strand (+/- or 0/1, where 0="+", 1="-")
-
-This can be generated from the `dba.report` output using this code:
-````
-report <- as.data.frame(dbdata.DB) %>%
-mutate(Unique_ID=row.names(report)) %>%
-select(c(1:3, 12)) %>% 
-mutate(seqnames = sapply("chr", paste0, seqnames))
-report[,5:6] <- NA
-write.table (report, "out/diffbind_report.bed",
-             sep = "\t", dec = ".", quote = F, row.names = F, col.names = F)
-````
-
-Afterwards run `annotatePeaks.pl` in your terminal. You need to install your genome of use before that in case you do not have it already:
-````
-#!/bin/bash
-# Check available genomes to download
-perl /home/USER/ATACseq/HOMER/.//configureHomer.pl -list
-# Install your genome
-perl /home/USER/ATACseq/HOMER/.//configureHomer.pl -install mm10
-# Run annotation
-annotatePeaks.pl diffbind_report.bed mm10 -go <dir for GO analysis> > homer_anno2.txt
-````
-The first two arguments, the peak file and genome, are required, and must be the first two arguments. `annotatePeaks.pl` also offers annotation enrichment analysis by specifying `-go GO output directory`.
-
-Finally, you can import `annotatePeak.pl` data again into R and merge it with differential analysis report.
-````
-anno <- read.table("data/homer_anno.txt",
-                   header = T,
-                   sep = "\t",
-                   quote = "", 
-                   dec = ".")
-names(anno)[1] <- "PeakID"  
-comp <- merge(mutate(report, PeakID=row.names(report)), anno, by = "PeakID", all = T)
-comp <- comp[, -c(2:4, 6)]
-````
+Here it will be described two annotations tools: `ChIPseeker` (run in R, from Bioconductor) and Homer's `annotatePeaks` (run in terminal). We recommend using ChIPseeker directly in R after DiffBind analysis.
 
 ## ChIPseeker :eyeglasses:
-ChIPseeker is a very useful tool to annotate peak data analysis and visualize this in ggplot graphs.
+ChIPseeker is a very useful tool to annotate peak data analysis and visualize results in ggplot graphs.
 
 ### Input
 ChIPseeker works with GRanges objects, so we can use the output of DiffBind reports or convert from our .bed or .xlsx files. To convert bed file to GRanges you can use `readPeakFile()` and to convert .xlsx files (MACS2 output) you can use:
@@ -248,13 +189,70 @@ plotDistToTSS(peakAnno)
 vennpie(peakAnno)
 upsetplot(peakAnno, vennpie=T)
 ````
+
 ### Funcional enrichment analysis
 `ChIPseeker` can also perform functional enrichment analysis to identify predominant biological themes among these genes by incorporating biological knowledge provided by biological ontologies. For instance, Gene Ontology (GO).
 ````
 enrichPathway(as.data.frame(peakAnno)$geneId, organism = "mouse")
 ````
 
-
-
 # Script
-Use `DiffBind_ChIPseeker.R` script to run all these steps combining DiffBind and ChIPseeker, obtaining the annotated differentially bound peaks and a comprehensive group of graphs visualazing the peaks dataset characteristics from each sample and from differentially bound peaks, which will be exported in pdf files. 
+Use `DiffBind_ChIPseeker.R` script to run all these steps combining DiffBind and ChIPseeker, obtaining the annotated differentially bound peaks and a comprehensive group of graphs visualizing the peaks dataset characteristics from each sample and from differentially bound peaks, which will be exported in pdf files.
+
+
+## Homer annotatePeaks
+See requeriments and steps for installation at http://homer.ucsd.edu/homer/introduction/install.html
+
+#### Install Homer
+````
+#!/bin/bash
+wget <link with latest version>
+perl /USER/homer/configureHomer.pl -install
+export PATH=$PATH:/home/USER/HOMER/.//bin/
+````
+
+#### Run annotatePeaks
+First, you need to generate a BED file with your peaks to be annotated. In this case, the differentially bound peaks.
+
+BED files should have at minimum 6 columns (separated by TABs, additional columns will be ignored).
+* Column1: chromosome (in `chr1` format)
+* Column2: starting position
+* Column3: ending position
+* Column4: Unique Peak ID
+* Column5: not used
+* Column6: Strand (+/- or 0/1, where 0="+", 1="-")
+
+This can be generated from the `dba.report` output using this code:
+````
+report <- as.data.frame(dbdata.DB) %>%
+mutate(Unique_ID=row.names(report)) %>%
+select(c(1:3, 12)) %>% 
+mutate(seqnames = sapply("chr", paste0, seqnames))
+report[,5:6] <- NA
+write.table (report, "out/diffbind_report.bed",
+             sep = "\t", dec = ".", quote = F, row.names = F, col.names = F)
+````
+
+Afterwards run `annotatePeaks.pl` in your Terminal. You need to install your genome of use before that in case you do not have it already:
+````
+#!/bin/bash
+# Check available genomes to download
+perl /home/USER/ATACseq/HOMER/.//configureHomer.pl -list
+# Install your genome
+perl /home/USER/ATACseq/HOMER/.//configureHomer.pl -install mm10
+# Run annotation
+annotatePeaks.pl diffbind_report.bed mm10 -go <dir for GO analysis> > homer_anno2.txt
+````
+The first two arguments, the peak file and genome, are required, and must be the first two arguments. `annotatePeaks.pl` also offers annotation enrichment analysis by specifying `-go GO output directory`.
+
+Finally, you can import `annotatePeak.pl` data again into R and merge it with differential analysis report.
+````
+anno <- read.table("data/homer_anno.txt",
+                   header = T,
+                   sep = "\t",
+                   quote = "", 
+                   dec = ".")
+names(anno)[1] <- "PeakID"  
+comp <- merge(mutate(report, PeakID=row.names(report)), anno, by = "PeakID", all = T)
+comp <- comp[, -c(2:4, 6)]
+````
