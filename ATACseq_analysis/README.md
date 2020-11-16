@@ -108,7 +108,7 @@ Some details about options used:
 * **-t**: This is the only REQUIRED parameter for MACS. If you have more than one alignment file, you can specify them as -t A B C. MACS will pool up all these files together. ENTENC QUE NOMÉS ESPECIFIQUES MÉS D'UN FILE A L'OPCIÓ -t QUAN SÓN LA MATEIXA MOSTRA? POTSER ES PODRIA ESPECIFICAR
 * **-n**: The name string of the experiment. MACS will use this string NAME to create output files like NAME_peaks.xls, NAME_negative_peaks.xls, NAME_peaks.bed...
 * **--outdir**: MACS2 will save all output files into the specified folder.
-* **-f**: Format of tag file can be ELAND, BED, ELANDMULTI, ELANDEXPORT, SAM, BAM, BOWTIE, BAMPE, or BEDPE. QUIN ÉS EL FORMAT PER DEFAULT? O QUIN ÉS EL RECOMANAT A INDICAR?
+* **-f**: Format of tag file can be ELAND, BED, ELANDMULTI, ELANDEXPORT, SAM, BAM, BOWTIE, BAMPE, or BEDPE. Default is “AUTO” which will allow MACS to decide the format automatically.
 * **-q**: The q-value (minimum FDR) cutoff to call significant regions. Default is 0.05.
 * **--nomodel**: to bypass building the shifting model.
 * **--extsize**: While --nomodel is set, MACS uses this parameter to extend reads in 5'->3' direction to fix-sized fragments.
@@ -129,7 +129,7 @@ Generally, data process with DiffBind involve these phases:
 ### Reading in peaksets
 Usually peaksets are derived from peak callers. The easiest way to read in peaksets is using a comma-separated value sample sheet or creating a dataframe with one line for each peakset. 
 
-With your sample sheet you can generate your DBA object, which measures how many peaks are in each peakset, as well as (in the first line) the total number of unique peaks after merging (overlapping?). Also, a correlation heatmap and PCA can be generated, which gives an initial clustering of the samples using the cross-correlations of each row of the binding matrix.
+With your sample sheet you can generate your DBA object, which measures how many peaks are in each peakset, as well as (in the first line) the total number of unique peaks after merging the overlapping ones. Also, a correlation heatmap and PCA can be generated, which gives an initial clustering of the samples using the cross-correlations of each row of the binding matrix.
 ````
 dbdata <- dba(sampleSheet=<sample_sheet>)
 plot(dbdadta)
