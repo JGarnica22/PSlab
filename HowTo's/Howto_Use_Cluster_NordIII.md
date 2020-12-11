@@ -46,12 +46,12 @@ There are two ways to copy files from/to the Cluster:
 We strongly recommend using **[Cyberduck](https://cyberduck.io/download/)** as a data transfer machine.
 
 ### 3.1. How to use Cyberduck
-After having installed Cyberduck, start a new conexion, then indicate connexion as SFTP. Indicate one of the blades as server  **{nord1,nord2,nord3}.bsc.es** and finally insert our user name _cek26664_ and password.
+After having installed Cyberduck, start a new conexion, then indicate connection as SFTP. Indicate one of the blades as server  **{nord1,nord2,nord3}.bsc.es** and finally insert our user name _cek26664_ and password.
 
 Once linked, you will be able to easily upload, download and modify files and directories in the cluster machine.
 
 ## 4. Modules environment
-External connexions to the web cannot be performed from the cluster. Tools that require internet access cannot be used, neither can tools be installed from the web. BSC support will install any tool, utility or compiler required, we just need to ask them. Right after you open session in the cluster, only default tools are accessible in the current configuration. In order to use different tools, you need to load the **modules** required for the task to perform, as well as indicate commands to load them in the batch jobs.
+External connection to the web cannot be performed from the cluster. Tools that require internet access cannot be used, neither can tools be installed from the web. BSC support will install any tool, utility or compiler required, we just need to ask them. Right after you open session in the cluster, only default tools are accessible in the current configuration. In order to use different tools, you need to load the **modules** required for the task to perform, as well as indicate commands to load them in the batch jobs.
 
 
 ### 4.1. Modules tool usage
