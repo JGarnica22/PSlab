@@ -63,7 +63,8 @@ Most trimming steps take one or more settings, delimited by ':' (a colon)
 * TOPHRED33: Convert quality scores to Phred-33
 * TOPHRED64: Convert quality scores to Phred-64
 
-After trimming of you files is recommendable run again a FastQC analysis to check that trimming worked well.
+After trimming of you files is recommendable run again a FastQC analysis to check that trimming worked well.  
+</br>
 
 ## Alignment
 After the assessment of sequence quality and proper trimming and filtering, reads need to be mapped to a reference genome. Bowtie2 and BWA-MEM are memory efficient and fast. 
@@ -85,7 +86,8 @@ BWA works very similar to bowtie2, again we need to download and indicate the in
 bwa mem -t -M genome_mus/BWA/index/GRCm38 <your_file> \
 | samtools sort -@32 -o <aligned_file.bam> -
 ````
-**-M**: Mark shorter split hits as secondary (for `Picard` compatibility)
+**-M**: Mark shorter split hits as secondary (for `Picard` compatibility)  
+</br>
 
 ## Remove PCR duplicates
 PCR duplicates are exact copies of DNA fragments that arise during PCR. Since they are artifacts of the library preparation procedure, they may interfere with the biological signal of interest. One commonly used program for removing PCR duplicates is Picard’s `MarkDuplicates`.
@@ -95,7 +97,8 @@ java -jar path_to/picard.jar MarkDuplicates I=aligned_file.bam O=aligned_file_no
 M=log_dups.txt REMOVE_DUPLICATES=true
 ````
 M= allows to indicate a log file with duplication metrics
-REMOVE_DUPLICATES= if TRUE duplicates are removed from output file, FALSE is the default option.
+REMOVE_DUPLICATES= if TRUE duplicates are removed from output file, FALSE is the default option.  
+</br>
 
 ## PEAK CALLING
 Peak calling is a computational method used to identify areas in the genome that have been enriched with aligned reads and creating a 'peak' of reads. These correspond to accessible chromatin regions in an ATACseq experiment (equivalent to histone-marked or TF-binding regions in ChIPseq). There are various tools that are available for peak calling. One of the most used peak callers is **MACS2** using the function `macs2 callpeak`, as in this example:
@@ -105,36 +108,39 @@ macs2 callpeak -t <file_to_call> -f <file_format> -q 0.05 --nomodel --extsize 15
 ````
 Some details about options used:
 
-* **-t**: This is the only REQUIRED parameter for MACS. If you have more than one alignment file, you can specify them as -t A B C. MACS will pool up all these files together. ENTENC QUE NOMÉS ESPECIFIQUES MÉS D'UN FILE A L'OPCIÓ -t QUAN SÓN LA MATEIXA MOSTRA? POTSER ES PODRIA ESPECIFICAR
+* **-t**: This is the only REQUIRED parameter for MACS. If you have more than one alignment file, you can specify them as -t A B C. MACS will pool up all these files together. 
+ENTENC QUE NOMÉS ESPECIFIQUES MÉS D'UN FILE A L'OPCIÓ -t QUAN SÓN LA MATEIXA MOSTRA? POTSER ES PODRIA ESPECIFICAR
 * **-n**: The name string of the experiment. MACS will use this string NAME to create output files like NAME_peaks.xls, NAME_negative_peaks.xls, NAME_peaks.bed...
 * **--outdir**: MACS2 will save all output files into the specified folder.
 * **-f**: Format of tag file can be ELAND, BED, ELANDMULTI, ELANDEXPORT, SAM, BAM, BOWTIE, BAMPE, or BEDPE. Default is “AUTO” which will allow MACS to decide the format automatically.
 * **-q**: The q-value (minimum FDR) cutoff to call significant regions. Default is 0.05.
 * **--nomodel**: to bypass building the shifting model.
 * **--extsize**: While --nomodel is set, MACS uses this parameter to extend reads in 5'->3' direction to fix-sized fragments.
-* **--keep-dup**: It controls the MACS behavior towards duplicate tags at the exact same location. Need to be set at `all` if duplicated were previously removed (i.e. with Picard).
-
+* **--keep-dup**: It controls the MACS behavior towards duplicate tags at the exact same location. Need to be set at `all` if duplicated were previously removed (i.e. with Picard).  
+</br>
 
 ## Cluster loop :curly_loop:
 Use loop scripts to perform all the steps aforementioned automatically and in parellel in the cluster. All folders and subfolders will be created, just make sure to have your fastq files in a fastq_files folder, and to add and indicate the directory of your reference genome and software (Trimmomatic and Picard).
 
 
-The following data analysis comparing peaks between samples and visualizing the results shall be performed using `R` language, and preferably locally, not in the cluster.
+The following data analysis comparing peaks between samples and visualizing the results shall be performed using `R` language, and preferably locally, not in the cluster.  
+</br>
 
 ## DiffBind :sunrise_over_mountains:
 DiffBind provides functions for processing DNA data enriched for genomic loci including ChIPseq and ATACseq. It is designed to work with aligned sequence reads identified by a peak caller. The tool is optimized to work with multiple peak sets simultaneously and to identify sites that are differentially bound between sample groups.
 
-Generally, data process with DiffBind involve these phases:
+Generally, data processing with DiffBind involves these phases:
 
 ### Reading in peaksets
 Usually peaksets are derived from peak callers. The easiest way to read in peaksets is using a comma-separated value sample sheet or creating a dataframe with one line for each peakset. 
 
-With your sample sheet you can generate your DBA object, which measures how many peaks are in each peakset, as well as (in the first line) the total number of unique peaks after merging the overlapping ones. Also, a correlation heatmap and PCA can be generated, which gives an initial clustering of the samples using the cross-correlations of each row of the binding matrix.
+With your sample sheet you can generate your DBA object, which measures how many peaks are in each peakset, as well as (indicated in the first line) the total number of unique peaks after merging the overlapping ones. Also, a correlation heatmap and PCA can be generated, which gives an initial clustering of the samples using the cross-correlations of each row of the binding matrix.
 ````
 dbdata <- dba(sampleSheet=<sample_sheet>)
 plot(dbdadta)
 dba.plotPCA(dbdata, label="ID")
 ````
+
 ### Counting reads
 Once a consensus peakset has been derived, DiffBind can use the supplied sequence read files to count how many reads overlap each interval for each
 unique sample. The final result of counting is a binding affinity matrix containing a read count for each sample at every consensus binding site, whether or not it was identified as a peak in that sample. Thus, a new column is added called **FRiP**, which stands for Fraction of Reads in Peaks. This is the proportion of reads for that sample that overlap a peak in the consensus peakset, and can be used to indicate which samples show more enrichment overall. With this matrix, the samples can be re-clustered using affinity, rather than occupancy, data. Same heatmap and PCA as previously can be generated to analyse this time the affinity scores.
@@ -150,7 +156,7 @@ First of all, before running the differential analysis, we need to tell DiffBind
 dbadata <- dba.contrast(dbdata, categories =)
 dbdata <- dba.analyze(dbdata)
 ````
-This shows how many sites are identified as significant differentially bound (DB) using the default threshold of FDR <= 0.05.
+This shows how many sites are identified as significant differentially bound (DB) using the default threshold of FDR≤0.05.
 Again, we can perform PCA and Heatmaps with the affinity scores of these differentially bound sites. However, these plots are not results in the sense that the analysis is selecting for sites that differ between the two conditions, and hence are expected to form clusters.
 
 ### Reporting
@@ -158,12 +164,13 @@ Reporting mechanism enables differentially bound sites to be extracted for furth
 ````
 dbreport <- dba.report(dbdata, th = , fold = )
 ````
-This command returns a GRanges object, appropiate for downstream processing. You can filter your report based on FDR threeshold (`th`) and/or Fold Change (`fold`). 
+This command returns a GRanges object, appropiate for downstream processing. You can filter your report based on FDR threeshold (`th`) and/or Fold Change (`fold`).  
+</br>
 
 # Annotation :name_badge:
-The next steps once we know all the peaks found in our samples and the differentially bound peaks between our conditions is to know where these regions fall on the genome and next to what genes.
+The next steps once we know all the peaks found in our samples and the differentially bound peaks between conditions is to know where these regions fall on the genome and next to what genes.
 
-Here it will be described two annotations tools: `ChIPseeker` (run in R, from Bioconductor) and Homer's `annotatePeaks` (run in terminal). We recommend using ChIPseeker directly in R after DiffBind analysis.
+Here are described two annotations tools: `ChIPseeker` (run in R, from Bioconductor) and Homer's `annotatePeaks` (run in Terminal). We recommend using ChIPseeker directly in R after DiffBind analysis.  
 
 ## ChIPseeker :eyeglasses:
 ChIPseeker is a very useful tool to annotate peak data analysis and visualize results in ggplot graphs.
@@ -173,6 +180,7 @@ ChIPseeker works with GRanges objects, so we can use the output of DiffBind repo
 ````
 peak <- read.delim(<peak file>, comment.char = "#") %>% toGRanges()
 ````
+
 ### Annotation
 Afterwards, you can annotate your peaks using `annotatePeak()`. 
 ````
@@ -181,7 +189,7 @@ seqlevelsStyle(peak) <- "UCSC"
 # Annotate
 peakAnno <- annotatePeak(peak, tssRegion=<Region Range of TSS>, TxDb=<TxDb object>, annoDb=<annotation package>)
 ````
-This creates a csAnno object which can be easily exported as data frame. Next, different graphs can be generated with this information.
+This creates a csAnno object which can be easily exported as a data frame. Next, different graphs can be generated with this information.
 ````
 plotAnnoPie(peakAnno)
 plotAnnoBar(peakAnno)
@@ -190,20 +198,20 @@ vennpie(peakAnno)
 upsetplot(peakAnno, vennpie=T)
 ````
 
-### Funcional enrichment analysis
+### Functional enrichment analysis
 `ChIPseeker` can also perform functional enrichment analysis to identify predominant biological themes among these genes by incorporating biological knowledge provided by biological ontologies. For instance, Gene Ontology (GO).
 ````
 enrichPathway(as.data.frame(peakAnno)$geneId, organism = "mouse")
 ````
 
-# Script
-Use `DiffBind_ChIPseeker.R` script to run all these steps combining DiffBind and ChIPseeker, obtaining the annotated differentially bound peaks and a comprehensive group of graphs visualizing the peaks dataset characteristics from each sample and from differentially bound peaks, which will be exported in pdf files.
-
+#### Script
+Use `DiffBind_ChIPseeker.R` script to run all these steps combining DiffBind and ChIPseeker, obtaining the annotated differentially bound peaks and a comprehensive group of graphs visualizing the peaks dataset characteristics from each sample and from differentially bound peaks, which will be exported in pdf files.  
+</br>
 
 ## Homer annotatePeaks
-See requeriments and steps for installation at http://homer.ucsd.edu/homer/introduction/install.html
+See requirements and steps for installation at http://homer.ucsd.edu/homer/introduction/install.html
 
-#### Install Homer
+### Install Homer
 ````
 #!/bin/bash
 wget <link with latest version>
@@ -211,10 +219,10 @@ perl /USER/homer/configureHomer.pl -install
 export PATH=$PATH:/home/USER/HOMER/.//bin/
 ````
 
-#### Run annotatePeaks
+### Run annotatePeaks
 First, you need to generate a BED file with your peaks to be annotated. In this case, the differentially bound peaks.
 
-BED files should have at minimum 6 columns (separated by TABs, additional columns will be ignored).
+BED files should have minimum 6 columns (separated by TABs, additional columns will be ignored).
 * Column1: chromosome (in `chr1` format)
 * Column2: starting position
 * Column3: ending position
