@@ -23,13 +23,7 @@ cd $wd
 # mkdir fastq_files
 
 # Create folders to store FastQC, trimmed sequences (if performing trimming) and alignment output
-mkdir fastqc
-mkdir trimmed
-mkdir alignment
-mkdir alignment/no_dup
-mkdir to_bsub
-mkdir peak_calling
-
+mkdir fastqc trimmed alignment alignment/no_dup to_bsub peak_calling
 
 for f in $(find ./fastq_files -name "*.fastq.gz" -exec basename {} \;)
 do
