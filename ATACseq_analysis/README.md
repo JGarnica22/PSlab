@@ -122,10 +122,9 @@ ENTENC QUE NOMÉS ESPECIFIQUES MÉS D'UN FILE A L'OPCIÓ -t QUAN SÓN LA MATEIXA
 </br>
 
 ## Cluster loop :curly_loop:
-Use loop scripts to perform all the steps aforementioned automatically and in parellel in the cluster. You have a _loop_bowtie2_macs2.sh_ and a _loop_bwa_macs2.sh_ script that will perform FastQC, Adapter trimming, Alignment and Peak calling; as indicated in the scrip name, they either use Bowtie2 or BWA-MEM as aligners.  
+Use loop scripts to perform all the steps aforementioned automatically and in parellel in the cluster. You have a _loop_bowtie2_macs2.sh_ and a _loop_bwa_macs2.sh_ script that will perform FastQC, Adapter trimming, Alignment and Peak calling; as indicated in the script name, they either use Bowtie2 or BWA-MEM as aligners.  
 
-All folders and subfolders will be created automatically in the process, just make sure to have your fastq files in a fastq_files folder, and to add and indicate the directory of your reference genome and software (Trimmomatic and Picard).
-
+All folders and subfolders will be created automatically in the process, just make sure to have your fastq files in a fastq_files folder and to add and indicate the directory of your reference genome and software (Trimmomatic and Picard).
 
 The following data analysis comparing peaks between samples and visualizing the results shall be performed using `R` language, and preferably locally, not in the cluster.  
 </br>
