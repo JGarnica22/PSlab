@@ -109,7 +109,9 @@ macs2 callpeak -t <file_to_call> -f <file_format> -q 0.05 --nomodel --extsize 15
 Some details about options used:
 
 * **-t**: This is the only REQUIRED parameter for MACS. If you have more than one alignment file, you can specify them as -t A B C. MACS will pool up all these files together. 
-ENTENC QUE NOMÉS ESPECIFIQUES MÉS D'UN FILE A L'OPCIÓ -t QUAN SÓN LA MATEIXA MOSTRA? POTSER ES PODRIA ESPECIFICAR
+
+ENTENC QUE NOMÉS ESPECIFIQUES MÉS D'UN FILE A L'OPCIÓ -t QUAN SÓN LA MATEIXA MOSTRA? POTSER ES PODRIA ESPECIFICAR  
+
 * **-n**: The name string of the experiment. MACS will use this string NAME to create output files like NAME_peaks.xls, NAME_negative_peaks.xls, NAME_peaks.bed...
 * **--outdir**: MACS2 will save all output files into the specified folder.
 * **-f**: Format of tag file can be ELAND, BED, ELANDMULTI, ELANDEXPORT, SAM, BAM, BOWTIE, BAMPE, or BEDPE. Default is “AUTO” which will allow MACS to decide the format automatically.
@@ -120,7 +122,9 @@ ENTENC QUE NOMÉS ESPECIFIQUES MÉS D'UN FILE A L'OPCIÓ -t QUAN SÓN LA MATEIXA
 </br>
 
 ## Cluster loop :curly_loop:
-Use loop scripts to perform all the steps aforementioned automatically and in parellel in the cluster. All folders and subfolders will be created, just make sure to have your fastq files in a fastq_files folder, and to add and indicate the directory of your reference genome and software (Trimmomatic and Picard).
+Use loop scripts to perform all the steps aforementioned automatically and in parellel in the cluster. You have a _loop_bowtie2_macs2.sh_ and a _loop_bwa_macs2.sh_ script that will perform FastQC, Adapter trimming, Alignment and Peak calling; as indicated in the scrip name, they either use Bowtie2 or BWA-MEM as aligners.  
+
+All folders and subfolders will be created automatically in the process, just make sure to have your fastq files in a fastq_files folder, and to add and indicate the directory of your reference genome and software (Trimmomatic and Picard).
 
 
 The following data analysis comparing peaks between samples and visualizing the results shall be performed using `R` language, and preferably locally, not in the cluster.  
