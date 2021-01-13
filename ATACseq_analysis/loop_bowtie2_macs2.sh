@@ -12,8 +12,7 @@
 
 # Load necessary modules
 module purge
-module load java/1.8.0u66 fastqc intel/2017.4 impi/2017.4 MKL/2017.4 gcc/5.3.0 OPENSSL/1.1.1c \
-PYTHON/3.7.4_pip BOWTIE/2.4.2 SAMTOOLS/1.9
+module load java/1.8.0u66 fastqc
 
 # Set your working directory
 wd=/gpfs/projects/cek26/ATACseq
@@ -41,7 +40,7 @@ echo \#BSUB "span[ptile=16]"
 echo \#BSUB -x
 
 echo module purge
-echo module load java/1.8.0u66 fastqc intel/2017.4 impi/2017.4 MKL/2017.4 gcc/5.3.0 OPENSSL/1.1.1c PYTHON/3.7.4_pip \
+echo module load intel/2017.4 impi/2017.4 MKL/2017.4 gcc/5.3.0 OPENSSL/1.1.1c PYTHON/3.7.4_pip \
 BOWTIE/2.4.2 SAMTOOLS/1.9
 echo cd /gpfs/projects/cek26/ATACseq
 echo java -jar ../software/Trimmomatic-0.39/trimmomatic-0.39.jar SE -threads 64 \
