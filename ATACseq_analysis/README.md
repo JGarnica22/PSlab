@@ -1,6 +1,7 @@
 # ATACseq analysis pipeline :icecream:
 
-This pipeline describes all the steps and tools needed to process ATACseq data, from fastq files to differential analysis and post-peak analysis.
+This pipeline describes all the steps and tools needed to process ATACseq data, from fastq files to differential analysis and post-peak analysis.  
+</br>
 
 ## Quality control: FastQC
 FastQC checks on raw sequence data coming from high throughput sequencing pipelines. It provides a modular set of analyses which you can use to give a quick impression of whether your data has any problems of which you should be aware before doing any further analysis. FastQC is a cross-platform application, written in java. In theory it should run on any platform which has a suitable java runtime environment. To run it in the Cluster you will need to load the java and fastqc modules (see full bash script).
