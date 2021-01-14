@@ -133,6 +133,8 @@ The following data analysis comparing peaks between samples and visualizing the 
 ## DiffBind :sunrise_over_mountains:
 DiffBind provides functions for processing DNA data enriched for genomic loci including ChIPseq and ATACseq. It is designed to work with aligned sequence reads identified by a peak caller. The tool is optimized to work with multiple peak sets simultaneously and to identify sites that are differentially bound between sample groups.
 
+As input for DiffBind you will need the peak files by macs2 (.xls) as well as the indexed alignment files (.bam and .bai) generated before.
+
 Generally, data processing with DiffBind involves these phases:
 
 ### Reading in peaksets
