@@ -96,6 +96,5 @@ rm $fastqc/$(cut -d'.' -f1 <<< $f)/*.zip
 done
 convert $fastqc/*.png $fastqc/fastqc_summary.pdf
 
-# Remove used scripts and log files
+# Remove used scripts
 rm -r to_bsub
-rm -r 
