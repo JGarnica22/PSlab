@@ -180,7 +180,7 @@ Use the nodes exclusively. This is the default behaviour except for sequential e
     #BSUB -M number
 ?????  INDICATE WHAT -M MEANS
 
-Then you can start writing your code, remember that if you want to add comments to your code use `# ` \ with a blank space afterwards.
+Then you can start writing your code, remember that if you want to add comments to your code use `# `  with a blank space afterwards.
 
 ### 6.2. Submit your job
 Once your sh script is uploaded to your working directory, use this command to run:
