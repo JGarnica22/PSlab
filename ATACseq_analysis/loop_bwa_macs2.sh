@@ -12,8 +12,7 @@
 
 # Load necessary modules
 module purge
-module load java/1.8.0u66 fastqc intel/2017.4 impi/2017.4 MKL/2017.4 gcc/5.3.0 OPENSSL/1.1.1c \
-PYTHON/3.7.4_pip BWA/0.7.7 SAMTOOLS/1.9
+module load java/1.8.0u66 fastqc
 
 # Set your working directory
 wd=/gpfs/projects/cek26/ATACseq
@@ -41,13 +40,13 @@ echo \#BSUB "span[ptile=16]"
 echo \#BSUB -x
 
 echo module purge
-echo module load java/1.8.0u66 fastqc intel/2017.4 impi/2017.4 MKL/2017.4 gcc/5.3.0 OPENSSL/1.1.1c PYTHON/3.7.4_pip \
+echo module load java/1.8.0u66 intel/2017.4 impi/2017.4 MKL/2017.4 gcc/5.3.0 OPENSSL/1.1.1c PYTHON/3.7.4_pip \
 BWA/0.7.7 SAMTOOLS/1.9
-echo cd /gpfs/projects/cek26/ATACseq
+echo cd $wd
 echo java -jar ../software/Trimmomatic-0.39/trimmomatic-0.39.jar SE -threads 64 \
 fastq_files/$f trimmed/trim_$f \
 ILLUMINACLIP:../software/Trimmomatic-0.39/adapters/NexteraSE.fa:2:30:10 LEADING:2 TRAILING:2 SLIDINGWINDOW:4:8 MINLEN:15
-echo bwa mem -t 32 -M genome_mus/BWA/index/GRCm38 trimmed/trim_$f \
+echo bwa mem -t 32 -M ../genome_mus/BWA/index/GRCm38 trimmed/trim_$f \
 \| samtools sort -@32 -o alignment/bwa_$(cut -d'.' -f1 <<< $f).bam -
 echo java -jar ../software/picard.jar MarkDuplicates -I alignment/bwa_$(cut -d'.' -f1 <<< $f).bam -O alignment/no_dup/nd_bwa_$(cut -d'.' -f1 <<< $f).bam \
 -M alignment/no_dup/$(cut -d'.' -f1 <<< $f)_log_dups.txt -REMOVE_DUPLICATES true
