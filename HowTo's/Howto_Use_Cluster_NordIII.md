@@ -6,15 +6,15 @@ For more information and details check [**Nord III User's Guide**](https://www.b
 
 ## 1. Connect to Nord III
 Open your terminal and use Secure Shell (ssh) tools to login. Other incoming connections such as telnet, ftp, rlogin, rcp or rsh are not accepted.
-Three login blades are available to access to Nord machine {nord1,nord2,nord3}.bsc.es. Our username is **cek26664** and the users to log in are:
+Three login blades are available to access to Nord machine {nord1,nord2,nord3}.bsc.es. 
+
+Each member of the team using the cluster should have their own username and password (personal and nontransferable). For example, one of our usernames is **cek26664** and the blades to log in are:
 
 
 * cek26664@nord1.bsc.es
 * cek26664@nord2.bsc.es
 * cek26664@nord3.bsc.es
 
-
-Our password is: ********
 
 Use the following command and you will be asked to type the password:
 
@@ -35,6 +35,7 @@ In order to change the password, you have to login into a different machine (dt0
     New Password: 
     Reenter New Password: 
     Password changed.
+
 Mind that the password change takes about 10 minutes to be effective.
 
 ## 3. File transfer
@@ -102,7 +103,14 @@ In the NordIII cluster you can access to different filesystems or directories:
 
 * **/gpfs/home:** This filesystem has the home directories of all the users, and when you log in you start in your home directory by default. Every user will have their own home directory to store own developed sources and their personal data. Also, it is highly discouraged to run jobs from this filesystem. Please **run your jobs on your group’s /gpfs/projects or /gpfs/scratch** instead.
 
-* **/gpfs/projects:** In addition to the home directory, there is a directory in /gpfs/projects for each group of users. For instance, the group bsc01 will have a /gpfs/projects/bsc01 directory ready to use. This space is intended to store data that needs to be shared between the users of the same group or project. 
+* **/gpfs/projects:** In addition to the home directory, there is a directory in /gpfs/projects for each group of users. For instance, our group **cek26** will have a /gpfs/projects/cek26 directory ready to use. This space is intended to store data that needs to be shared between the users of the same group or project. 
+
+    **IMPORTANT!** When you upload any files or perform any analysis in /gpfs/projects you need to give permissions to other users to be able to modify/move these files. For that, you need to run:
+    ````
+    chmod -R g+rwx
+    ````
+    That gives reading (r), writing (w) and executing (x) permissions to all members of the group.
+
 * **/gpfs/scratch:** Each user will have a directory over /gpfs/scratch. Its intended use is to store temporary files of your jobs during their execution. 
 
 Each of these directories is provided with a limited space disk assigned by BSC, be careful to assess that you have enough space disk in your working directory for your job outputs. In order to assess how much space we have available use:
@@ -165,7 +173,7 @@ The number of tasks for the job. In MPI executions corresponds to the number of 
 Use the nodes exclusively. This is the default behaviour except for sequential executions.
 
     #BSUB -M number
-?????  
+?????  INDICATE WHAT -M MEANS
 
 Then you can start writing your code, remember that if you want to add comments to your code use `# `  with a blank space afterwards.
 
