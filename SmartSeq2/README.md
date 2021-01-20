@@ -21,8 +21,7 @@ TraCer reconstructs the sequences of rearranged and expressed T cell receptor ge
 In NordIII cluster all these dependencies are contained in a singularity image. Therefore, in this case to run tracer you must use this command:
 
 ````
-singularity exec /apps/TRACER/SRC/images/tracer-0.6.0.sif <Command>
-<Options>
+singularity exec /apps/TRACER/SRC/images/tracer-0.6.0.sif <Command> <Options>
 ````
 
 For more details and installation instructions see [TraCer webpage](https://github.com/Teichlab/tracer#installation).
