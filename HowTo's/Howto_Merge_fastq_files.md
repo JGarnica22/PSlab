@@ -14,7 +14,7 @@ cat file*.fq > merged.fq
 ````
 ### Loop:
 ````
-for file in NA24694_GCCAAT_L001_R${i}_*fastq.gz; do
+for file in NA24694_GCCAAT_L001_R*fastq.gz; do
         cat "$file" >> EA00694_GCCAAT_L001_R${i}.fastq.gz
     done
 ````
