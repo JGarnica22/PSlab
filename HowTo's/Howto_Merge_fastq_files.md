@@ -12,7 +12,7 @@ cat file1.fq file2.fq file3.fq file4.fq file5.fq > merged.fq
 ````
 cat file*.fq > merged.fq
 ````
-### Loop
+### Loop:
 ````
 for file in NA24694_GCCAAT_L001_R${i}_*fastq.gz; do
         cat "$file" >> EA00694_GCCAAT_L001_R${i}.fastq.gz
