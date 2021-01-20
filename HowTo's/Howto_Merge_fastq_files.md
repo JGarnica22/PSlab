@@ -1,8 +1,8 @@
 # How to merge fastq files :cat:
 
-Sometimes you may have different fastq or fq files from the sample sample or condition but resequenced or from different lanes or flowcells. As a consequence you may want to merge them into a unique file to analyze them.
+Sometimes you may have different fastq or fq files from the same sample or condition but resequenced or from different lanes or flowcells. As a consequence, you may want to merge them into a unique file to analyze it.
 
-The best way is using `cat` UNIX tool (concatenate). There are different ways to do it: listing the files to merge, by a pattern or through a loop:
+The best way is using `cat` UNIX tool (_concatenate_). There are different ways to do it: listing the files, by a pattern or through a loop:
 
 ### Listing:
 ````
