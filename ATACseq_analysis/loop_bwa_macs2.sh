@@ -36,7 +36,7 @@ echo \#BSUB -eo $wd/bsub_reports/atacseq_$(cut -d'_' -f1 <<< $f).err
 echo \#BSUB -oo $wd/bsub_reports/atacseq_$(cut -d'_' -f1 <<< $f).out
 echo \#BSUB -M 1800
 echo \#BSUB -n 64
-echo \#BSUB "span[ptile=16]"
+echo \#BSUB -R "span[ptile=16]"
 echo \#BSUB -x
 
 echo module purge
