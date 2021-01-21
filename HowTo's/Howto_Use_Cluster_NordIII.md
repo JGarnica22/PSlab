@@ -111,9 +111,9 @@ In the NordIII cluster you can access to different filesystems or directories:
 
     **IMPORTANT:** _When you upload any files or perform any analysis in /gpfs/projects you need to give permissions to other users to be able to modify/move these files. For that, you need to run:_
     ````
-    chmod -R g+rwx
+    chmod -R g+rwx /gpfs/projects/cek26
     ````
-    _That gives reading (r), writing (w) and executing (x) permissions to all members of the group._
+    _That gives reading (r), writing (w) and executing (x) permissions in that directory to all members of the group._
 
 * **/gpfs/scratch:** Each user will have a directory over /gpfs/scratch. Its intended use is to store temporary files of your jobs during their execution. 
 
