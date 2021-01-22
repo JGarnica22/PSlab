@@ -58,7 +58,7 @@ library(ReactomePA)
 
 
 # Set your working directory (the project you are working in):
-setwd("C:/Users/jgarn/OneDrive - Universitat de Barcelona/Documentos/Bioinformatics/ATACseq/Diffbind")
+setwd("~/Downloads/ATACseq_pipeline")
 
 ## Indicate populations of interest, to be compared:
 # First indicate control population, then sample:
@@ -86,7 +86,8 @@ if (species == "mouse"){
 # Examine your files and generate short names for your samples based on the names of bam files
 list_files <- list.files(path= paste0(getwd(), "/data"),
                        pattern= "*.bam$")
-list_files <- sapply(c(1:length(list_files)), function(x){strsplit(as.character(list_files), "_")[[x]][3]})
+list_files <- sapply(c(1:length(list_files)), function(x){strsplit(as.character(list_files), "_")[[x]][2]})
+# Aquí ha de ser el string [2] perquè agafi el nom de la població: "nd_Tconv1_24121_..."
 
 samples <- data.frame(matrix(nrow=length(list_files), ncol=8))
 names(samples) <- c("SampleID", "Condition", "Factor", "Treatment", "Replicate", "bamReads", "Peaks",
@@ -99,7 +100,8 @@ samples$Treatment <- samples$Condition
 samples[c(grep(pop[1], list_files)),"Replicate"] <- 1:length(grep(pop[1], list_files))
 samples[c(grep(pop[2], list_files)),"Replicate"] <- 1:length(grep(pop[2], list_files))
 # Peakcaller will be changing depending on the file use (see DiffBind vignette)
-# To call macs2 output format: "bed": .bed file; peak score is in fifth column; 
+# To call macs2 output format: 
+# "bed": .bed file; peak score is in fifth column; 
 # "narrow": default peak.format: narrowPeaks file;
 # "macs": MACS .xls file.
 samples$PeakCaller <- "macs"
@@ -143,8 +145,11 @@ pdf(file = paste0("figs/DiffBind_plots_affinity.pdf"))
 plot(dbdata.count, main="Correlation heatmap with affinity data")
 pca2 <- dba.plotPCA(dbdata.count, label = "ID")
 grid.newpage()
-grid.table(dba.show(dbdata.anal))
+grid.table(dba.show(dbdata.count))
 dev.off()
+
+# Normalizing the data:
+norm <- dba.normalize(dbdata.count, normalize = DBA_NORM_LIB)
 
 # Establishing a contrast
 # Before running the differential analysis, we need to tell DiffBind which cell lines fall in which groups. 
@@ -176,6 +181,8 @@ dba.plotVenn(dbdata.anal, contrast=1, method=DBA_ALL_METHODS)
 #  Each point represents a binding site, with points in red representing sites identified as differentially bound.
 dba.plotMA(dbdata.anal, method=DBA_EDGER)
 dba.plotMA(dbdata.anal, bXY=T, method = DBA_EDGER)
+# Aquest segon plot no funciona
+
 # Volcano plots also highlight significantly differentially bound sites and show their fold changes:
 dba.plotVolcano(dbdata.anal, contrast=1, method = DBA_EDGER)
 # Boxplots provide a way to view how read distributions differ between classes of binding sites
@@ -193,20 +200,16 @@ dev.off()
 
 dbdata.DB <- dba.report(dbdata.anal) #, bUsePval = T, th = 0.05, fold = 2)
 
+#write.table(as.data.frame(dbdata.DB), "out/DESeq2_peaks.txt", quote = F, sep = "\t", row.names = F)
 
-
-## Represent results and annotate bam files and differential results with ChIPseeker
+## Represent results with ChIPseeker
 # Prepare the TSS regions for your genome
-# Determine upstream and downtream values
-# ChIPseeker implements the annotatePeak function for annotating peaks with nearest gene and genomic region where the peak is located. 
-# Many annotation tools calculate the distance of a peak to the nearest TSS and annotates the peak to that gene. This can be misleading 
-# as binding sites might be located between two start sites of different genes.
+# Determine upstream and downstream values
 lim=5000
 promoter <- getPromoters(TxDb=TxDb, upstream=lim, downstream=lim)
-# Represent macs2 output files and annotate
 pdf("figs/Figures_peaks_seeker.pdf")
 for (p in 1:length(list_bed)){
-# Show where peaks fall on the chrosomes
+# Show where peaks fall on the chromosomes
 e <- read.delim(paste0("data/",list_bed[p]), comment.char = "#") %>%  mutate(chr = sapply("chr", paste0, chr)) %>% 
 toGRanges()
 print(covplot(e, weightCol="pileup", title = paste0(strsplit(as.character(list_bed), "_")[[p]][5],
@@ -226,6 +229,9 @@ plotAvgProf(tagMatrix, xlim=c(-lim, lim), conf = 0.95,
 x <- read.delim(paste0("data/",list_bed[p]), comment.char = "#") %>%  mutate(chr = sapply("chr", paste0, chr)) %>% toGRanges()
 assign(paste0("Granges_", strsplit(as.character(list_bed), "_")[[p]][5]), x)
 }
+
+# Error després del loop
+
 po <- grep("Granges_*", names(.GlobalEnv),value=TRUE)
 peaks <- GRangesList(Tconv1=eval(as.symbol(po[1])), Tconv3=eval(as.symbol(po[2])), Tet1=eval(as.symbol(po[3])), 
                      Tet3=eval(as.symbol(po[4])))
@@ -259,35 +265,11 @@ dev.off()
 # to add "chr" to seqnames use:
 seqlevelsStyle(dbdata.DB) <- "UCSC"
 peakAnno <- annotatePeak(dbdata.DB, tssRegion=c(-lim, lim),
-                         TxDb=TxDb, annoDb="org.Mm.eg.db", flankDistance = lim, addFlankGeneInfo = T )
-
+                         TxDb=TxDb, annoDb="org.Mm.eg.db")
 consensus <- as.data.frame(peakAnno)
-# Remove repeated flanking gens corresponding to different transcripts
-consensus$flank_geneIds <- sapply(1:length(consensus$flank_geneIds), 
-                                  function(x){unique(as.numeric(strsplit(consensus$flank_geneIds[x], ";")[[1]]))})
-
-#annotate also flanking genes
-BM <- getBM(attributes=c("entrezgene_id", "chromosome_name", "start_position", "end_position" , "ensembl_gene_id", "external_gene_name", "strand"),
-            mart = ensembl, verbose = T)
-BMgr <- subset(BM, as.numeric(chromosome_name)>= 1 & as.numeric(chromosome_name) <=50 | chromosome_name == "X" | chromosome_name == "Y")
-# Nomenclature for chromosomes should be "chrX"
-#BMgr$chromosome_name <- sapply(BMgr$chromosome_name, function(x) {paste0("chr",x)})
-BMgr$strand <- sapply(BMgr$strand, function(x){if (x ==1){print("+")} else {print("-")}})
-
-consensus$flank_genename <- NA
-for (g in 1:length(consensus$flank_geneIds)){
-  li <- vector()
-  for (e in 1:length(unlist(consensus[g,25]))){
-    if (length(grep(unlist(consensus[g,25])[e], BMgr$entrezgene_id)) != 0) {
-   li[e] <-BMgr[grep(unlist(consensus[g,25])[e], BMgr$entrezgene_id), "external_gene_name"]
-    } else {li[e] <- NA}
-  }
-  consensus$flank_genename[g] <- list(li)
- }
-  
 
 #filter your data
-th <- 0.1
+th <- 0.05
 FC <- 2
 shared <- consensus %>% filter(p.value > th & abs(Fold) < FC)
 Differ_Tconv <- consensus %>% filter(p.value <= th & Fold >= FC)
