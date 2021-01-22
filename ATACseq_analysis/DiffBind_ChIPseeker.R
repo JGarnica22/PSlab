@@ -149,7 +149,8 @@ grid.table(dba.show(dbdata.count))
 dev.off()
 
 # Normalizing the data:
-norm <- dba.normalize(dbdata.count, normalize = DBA_NORM_LIB)
+# CHECK THIS STEP
+# norm <- dba.normalize(dbdata.count, normalize = DBA_NORM_LIB)
 
 # Establishing a contrast
 # Before running the differential analysis, we need to tell DiffBind which cell lines fall in which groups. 
