@@ -149,8 +149,7 @@ grid.table(dba.show(dbdata.count))
 dev.off()
 
 # Normalizing the data:
-# CHECK THIS STEP
-# norm <- dba.normalize(dbdata.count, normalize = DBA_NORM_LIB)
+norm <- dba.normalize(dbdata.count, normalize = DBA_NORM_LIB)
 
 # Establishing a contrast
 # Before running the differential analysis, we need to tell DiffBind which cell lines fall in which groups. 
@@ -264,7 +263,8 @@ dev.off()
 # to add "chr" to seqnames use:
 seqlevelsStyle(dbdata.DB) <- "UCSC"
 peakAnno <- annotatePeak(dbdata.DB, tssRegion=c(-lim, lim),
-                         TxDb=TxDb, annoDb="org.Mm.eg.db")
+                         TxDb=TxDb, annoDb="org.Mm.eg.db",
+                         flankDistance = lim, addFlankGeneInfo = T)
 consensus <- as.data.frame(peakAnno)
 
 #filter your data
