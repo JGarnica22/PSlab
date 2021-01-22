@@ -149,7 +149,8 @@ grid.table(dba.show(dbdata.count))
 dev.off()
 
 # Normalizing the data:
-norm <- dba.normalize(dbdata.count, normalize = DBA_NORM_LIB)
+# CHECK THIS STEP
+# norm <- dba.normalize(dbdata.count, normalize = DBA_NORM_LIB)
 
 # Establishing a contrast
 # Before running the differential analysis, we need to tell DiffBind which cell lines fall in which groups. 
@@ -200,9 +201,7 @@ dev.off()
 
 dbdata.DB <- dba.report(dbdata.anal) #, bUsePval = T, th = 0.05, fold = 2)
 
-#write.table(as.data.frame(dbdata.DB), "out/DESeq2_peaks.txt", quote = F, sep = "\t", row.names = F)
-
-## Represent results with ChIPseeker
+## Represent results and annotate bam files and differential results with ChIPseeker
 # Prepare the TSS regions for your genome
 # Determine upstream and downstream values
 lim=5000
