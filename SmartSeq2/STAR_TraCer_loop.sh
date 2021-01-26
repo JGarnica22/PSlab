@@ -124,3 +124,47 @@ done
 
 # Create a pdf containing all images for all samples as a report
 convert fastqc/*.png fastqc/fastqc_summary.pdf
+
+# Merge read counts and summarize tracer output
+
+while [ $(find ./$alig_folder -type f -name "*Read*" -print | wc -l) != $(find ./fastq_files -type f -name "*_1*.gz" -print | wc -l) ]
+do
+sleep 300;
+done
+
+module purge
+module load gcc/7.2.0 R/3.6.3
+
+
+# Merge all ReadPerGene dataframe column 2 (unstranded) into a unique dataframe for analysis with R, once all jobs are done.
+
+{
+echo RPG_list \<\- list.files\(path=paste0\(getwd\(\),\"/$alig_folder\"\), pattern= \"*ReadsPerGene*\"\)
+echo for \(g in 1\:length\(RPG_list\)\)\{
+echo   x \<\- read.table\(paste0\(getwd\(\), \"/$alig_folder/\", RPG_list\[g\]\)\) 
+echo  x1 \<\- x[\-\(1\:4\),c\(1,2\)]
+echo  names\(x1\) \<\- c\(\"Ensembl_id\", strsplit\(as.character\(RPG_list[g]\), split=\"_Re\", fixed=TRUE\)[[1]][1]\)
+echo if \(g == 1\)\{ all_reads \<\- x1 \} else \{all_reads \<\- merge\(all_reads, x1, by=\"Ensembl_id\"\) \}\}
+
+echo rownames\(all_reads\) \<\- all_reads\$Ensembl_id
+echo all_reads \<\- all_reads[,\-1]
+      
+echo write.table\(all_reads, \
+            file = paste0\(getwd\(\),\"/$alig_folder/Reads_all_samples.txt\"\), \
+            sep = "\t", quote = F, dec = ".", row.names = T, col.names = T\) 
+} > Smart.R
+R < Smart.R --save
+
+# summarise tracer
+
+while [ $(ls $tracer| wc -l) != $(find ./fastq_files -type f -name "*_1*.gz" -print | wc -l) ]
+do
+sleep 300;
+done
+
+module purge
+module load singularity
+
+singularity exec /apps/TRACER/SRC/images/tracer-0.6.0.sif tracer summarise -p 16 -s Mmus $tracer
+
+
