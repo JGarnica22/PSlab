@@ -149,12 +149,11 @@ grid.table(dba.show(dbdata.count))
 dev.off()
 
 # Normalizing the data:
-# CHECK THIS STEP
-# norm <- dba.normalize(dbdata.count, normalize = DBA_NORM_LIB)
+dbdata.norm <- dba.normalize(dbdata.count)
 
 # Establishing a contrast
 # Before running the differential analysis, we need to tell DiffBind which cell lines fall in which groups. 
-dbdata.contrast <- dba.contrast(dbdata.count, categories=DBA_CONDITION, minMembers = 2 )
+dbdata.contrast <- dba.contrast(dbdata.norm, categories=DBA_CONDITION, minMembers = 2 )
 #Set threshold to use in analyse, let's get all peaks and then filter by pvalue or FDR
 dbdata.contrast$config$th <- 1
 
@@ -225,11 +224,8 @@ plotAvgProf(tagMatrix, xlim=c(-lim, lim), conf = 0.95,
             xlab="Genomic Region (5'->3')", ylab = "Read Count Frequency") +
   ggtitle(paste0(strsplit(as.character(list_bed), "_")[[p]][5]," average profile peaks around TSS"))
 # Plots comparing differents samples
-x <- read.delim(paste0("data/",list_bed[p]), comment.char = "#") %>%  mutate(chr = sapply("chr", paste0, chr)) %>% toGRanges()
-assign(paste0("Granges_", strsplit(as.character(list_bed), "_")[[p]][5]), x)
+assign(paste0("Granges_", strsplit(as.character(list_bed), "_")[[p]][5]), e)
 }
-
-# Error després del loop
 
 po <- grep("Granges_*", names(.GlobalEnv),value=TRUE)
 peaks <- GRangesList(Tconv1=eval(as.symbol(po[1])), Tconv3=eval(as.symbol(po[2])), Tet1=eval(as.symbol(po[3])), 
