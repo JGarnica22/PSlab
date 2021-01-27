@@ -149,16 +149,17 @@ grid.table(dba.show(dbdata.count))
 dev.off()
 
 # Normalizing the data:
-dbdata.norm <- dba.normalize(dbdata.count)
+# CHECK THIS STEP
+# norm <- dba.normalize(dbdata.count, normalize = DBA_NORM_LIB)
 
 # Establishing a contrast
 # Before running the differential analysis, we need to tell DiffBind which cell lines fall in which groups. 
-dbdata.contrast <- dba.contrast(dbdata.norm, categories=DBA_CONDITION, minMembers = 2 )
+dbdata.contrast <- dba.contrast(dbdata.count, categories=DBA_CONDITION, minMembers = 2 )
 #Set threshold to use in analyse, let's get all peaks and then filter by pvalue or FDR
 dbdata.contrast$config$th <- 1
 
 # Differential analysis
-# This will run an DESeq2 analysis using the default binding matrix
+# This will run a DESeq2 analysis using the default binding matrix
 dbdata.anal <- dba.analyze(dbdata.contrast, method=DBA_ALL_METHODS)
 
 # This shows how many sites are identified as being significantly differentially bound (DB) using the
@@ -216,17 +217,17 @@ print(covplot(e, weightCol="pileup", title = paste0(strsplit(as.character(list_b
 # Show how peaks fall around TSS regions
 tagMatrix <- getTagMatrix(e, windows=promoter) 
 tagHeatmap(tagMatrix, xlim=c(-lim, lim), color="red", 
-           title = paste0(strsplit(as.character(list_bed), "_")[[p]][5]," peaks around TSS"), 
+           title = paste0(strsplit(as.character(list_bed), "_")[[p]][2]," peaks around TSS"), 
            xlab = "Genomic Region (5'->3')" )
 
 # Average profile peaks binding to TSS region
 plotAvgProf(tagMatrix, xlim=c(-lim, lim), conf = 0.95,
             xlab="Genomic Region (5'->3')", ylab = "Read Count Frequency") +
-  ggtitle(paste0(strsplit(as.character(list_bed), "_")[[p]][5]," average profile peaks around TSS"))
-# Plots comparing differents samples
-assign(paste0("Granges_", strsplit(as.character(list_bed), "_")[[p]][5]), e)
+  ggtitle(paste0(strsplit(as.character(list_bed), "_")[[p]][2]," average profile peaks around TSS"))
+# Plots comparing different samples
+x <- read.delim(paste0("data/",list_bed[p]), comment.char = "#") %>%  mutate(chr = sapply("chr", paste0, chr)) %>% toGRanges()
+assign(paste0("Granges_", strsplit(as.character(list_bed), "_")[[p]][2]), x)
 }
-# Error loop?? Takes very long
 
 po <- grep("Granges_*", names(.GlobalEnv),value=TRUE)
 peaks <- GRangesList(Tconv1=eval(as.symbol(po[1])), Tconv3=eval(as.symbol(po[2])), Tet1=eval(as.symbol(po[3])), 
@@ -265,7 +266,7 @@ peakAnno <- annotatePeak(dbdata.DB, tssRegion=c(-lim, lim),
                          flankDistance = lim, addFlankGeneInfo = T)
 consensus <- as.data.frame(peakAnno)
 
-#filter your data
+# Filter your data
 th <- 0.05
 FC <- 2
 shared <- consensus %>% filter(p.value > th & abs(Fold) < FC)
@@ -289,30 +290,3 @@ upsetplot(peakAnno, vennpie=T)
 grid.newpage()
 grid.table(as.data.frame(pathway))
 dev.off()
-
-
-# Homer annotation
-# save report as bed file, regardless of the genome used, chrosome column must include "chr"
-report <- as.data.frame(dbdata.DB)
-# Export bed file for Homer annotatePeaks.pl to be run in linux:
-report_bed <- report %>% mutate(Unique_ID=row.names(report)) %>% select(c(1:3, 12)) %>% 
-  mutate(seqnames = sapply("chr", paste0, seqnames) )
-report_bed[,5:6] <- NA
-write.table (report_bed, "out/diffbind_report.bed",
-             sep = "\t", dec = ".", quote = F, row.names = F, col.names = F)
-
-## Run annotatePeaks from Homer on linux, this option also run gene ontology (GO) analysis
-# annotatePeaks.pl diffbind_report.bed mm10 -go annotatepeak/GO > annotatepeak/homer_anno2.txt
-
-#Import annotation results and merge with report dataframe
-anno <- read.table("data/homer_anno2.txt",
-                   header = T,
-                   sep = "\t",
-                   quote = "", 
-                   dec = ".")
-names(anno)[1] <- "PeakID"  
-comp <- merge(mutate(report, PeakID=row.names(report)), anno, by = "PeakID", all = T)
-comp <- comp[, -c(2:4, 6)]
-
-#Export results
-write_xlsx(comp, paste0("out/Diff_bound_annotated_", pop[1], "_v_", pop[2] ,".xlsx"))
