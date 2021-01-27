@@ -109,9 +109,7 @@ macs2 callpeak -t <file_to_call> -f <file_format> -q 0.05 --nomodel --extsize 15
 ````
 Some details about options used:
 
-* **-t**: This is the only REQUIRED parameter for MACS. If you have more than one alignment file, you can specify them as -t A B C. MACS will pool up all these files together. 
-
-ENTENC QUE NOMÉS ESPECIFIQUES MÉS D'UN FILE A L'OPCIÓ -t QUAN SÓN LA MATEIXA MOSTRA? POTSER ES PODRIA ESPECIFICAR  
+* **-t**: This is the only REQUIRED parameter for MACS. If you have more than one alignment file, you can specify them as -t A B C. MACS will pool up all these files together.
 
 * **-n**: The name string of the experiment. MACS will use this string NAME to create output files like NAME_peaks.xls, NAME_negative_peaks.xls, NAME_peaks.bed...
 * **--outdir**: MACS2 will save all output files into the specified folder.
@@ -133,7 +131,7 @@ The following data analysis comparing peaks between samples and visualizing the 
 ## DiffBind :sunrise_over_mountains:
 DiffBind provides functions for processing DNA data enriched for genomic loci including ChIPseq and ATACseq. It is designed to work with aligned sequence reads identified by a peak caller. The tool is optimized to work with multiple peak sets simultaneously and to identify sites that are differentially bound between sample groups.
 
-As input for DiffBind you will need the peak files by macs2 (.xls) as well as the indexed alignment files (.bam and .bai) generated before.
+As input for DiffBind you will need the peak files by macs2 (.xls) as well as the indexed alignment files after duplicate removal (.bam and .bai) generated before.
 
 Generally, data processing with DiffBind involves these phases:
 
