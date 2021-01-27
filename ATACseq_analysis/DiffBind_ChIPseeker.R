@@ -226,6 +226,7 @@ plotAvgProf(tagMatrix, xlim=c(-lim, lim), conf = 0.95,
 # Plots comparing differents samples
 assign(paste0("Granges_", strsplit(as.character(list_bed), "_")[[p]][5]), e)
 }
+# Error loop?? Takes very long
 
 po <- grep("Granges_*", names(.GlobalEnv),value=TRUE)
 peaks <- GRangesList(Tconv1=eval(as.symbol(po[1])), Tconv3=eval(as.symbol(po[2])), Tet1=eval(as.symbol(po[3])), 
