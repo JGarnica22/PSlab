@@ -48,10 +48,10 @@ fastq_files/$f trimmed/trim_$f \
 ILLUMINACLIP:../software/Trimmomatic-0.39/adapters/NexteraSE.fa:2:30:10 LEADING:2 TRAILING:2 SLIDINGWINDOW:4:8 MINLEN:15
 echo bwa mem -t 32 -M ../genome_mus/BWA/index/GRCm38 trimmed/trim_$f \
 \| samtools sort -@32 -o alignment/bwa_$(cut -d'.' -f1 <<< $f).bam -
-echo java -jar ../software/picard.jar MarkDuplicates -I alignment/bwa_$(cut -d'.' -f1 <<< $f).bam -O alignment/no_dup/nd_bwa_$(cut -d'.' -f1 <<< $f).bam \
+echo java -jar ../software/picard.jar MarkDuplicates -I alignment/bwa_$(cut -d'.' -f1 <<< $f).bam -O alignment/no_dup/nd_$(cut -d'.' -f1 <<< $f).bam \
 -M alignment/no_dup/$(cut -d'.' -f1 <<< $f)_log_dups.txt -REMOVE_DUPLICATES true
-echo samtools index alignment/no_dup/nd_bwa_$(cut -d'.' -f1 <<< $f).bam
-echo macs2 callpeak -t alignment/no_dup/nd_bwa_$(cut -d'.' -f1 <<< $f).bam -f BAM -g 1.87e9 -q 0.05 --nomodel --shift 4 --extsize 150 --keep-dup all \
+echo samtools index alignment/no_dup/nd_$(cut -d'.' -f1 <<< $f).bam
+echo macs2 callpeak -t alignment/no_dup/nd_$(cut -d'.' -f1 <<< $f).bam -f BAM -g 1.87e9 -q 0.05 --nomodel --shift 4 --extsize 150 --keep-dup all \
 -n macs_bwa_$(cut -d'.' -f1 <<< $f) --outdir peak_calling 2\> peak_calling/macs_bwa_$(cut -d'.' -f1 <<< $f).log
 } > to_bsub/atacseq_$(cut -d'_' -f1 <<< $f).sh
 sed -i -e 's/\r$//' to_bsub/atacseq_$(cut -d'_' -f1 <<< $f).sh
