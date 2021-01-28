@@ -1,4 +1,4 @@
-# PSlab
+# PSlab :dna: :microbe: :microscope: :petri_dish:
 
 This repository contains all scripts and data used in the lab to perform RNAseq, ATACseq, and ChIPseq data analysis. <br />
 
