@@ -45,9 +45,11 @@ This file depends both of the restriction enzyme and the reference genome. It ca
 ````
 HICPRO_PATH/bin/utils/digest_genome.py -r A^AGCTT -o mm9_hindiii.bed mm9.fasta
 `````
+</br>
 
+**2) A table file of chromosomes’ size.**
 
-A table file of chromosomes’ size.
+````
 chr1    249250621
 chr2    243199373
 chr3    198022430
@@ -59,7 +61,10 @@ chr8    146364022
 chr9    141213431
 chr10   135534747
 (...)
-The bowtie2 indexes. See the bowtie2 manual page for details about how to create such indexes.
+````
+</br>
+
+**3) The bowtie2 indexes.** See the bowtie2 manual page for details about how to create such indexes.
 
 
 ## Raw data folder
