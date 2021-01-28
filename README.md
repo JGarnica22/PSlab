@@ -11,6 +11,7 @@ Create in your computer a folder for your specific project, this folder must con
   * figs -> where all the figures rendered over the analysis will be generated <br />
   * output -> tables and matrixs generated from the analysis in txt or excel format <br />
   * R -> it contains the script(s) used for the specific analysis  
+</br>
 
 ## In GitHub :octocat:
 
