@@ -85,7 +85,7 @@ if (species == "mouse"){
 # Generate automatically sample sheet peakset data, you need peak files as well as bam and respective bai files.
 # Examine your files and generate short names for your samples based on the names of bam files
 list_files <- list.files(path= paste0(getwd(), "/data"),
-                       pattern= "*.bam$")
+                         pattern= "*.bam$")
 list_files <- sapply(c(1:length(list_files)), function(x){strsplit(as.character(list_files), "_")[[x]][2]})
 # Aquí ha de ser el string [2] perquè agafi el nom de la població: "nd_Tconv1_24121_..."
 
@@ -106,7 +106,7 @@ samples[c(grep(pop[2], list_files)),"Replicate"] <- 1:length(grep(pop[2], list_f
 # "macs": MACS .xls file.
 samples$PeakCaller <- "macs"
 list_bed <- list.files(path= paste0(getwd(), "/data"),
-                         pattern= "*peaks.xls")
+                       pattern= "*peaks.xls")
 samples$Peaks <-as.vector(sapply("data/", paste0, list_bed))
 list_bam <- list.files(path= paste0(getwd(), "/data"),
                        pattern= "*.bam$")
@@ -124,7 +124,7 @@ plot(dbdata, main="Correlation heatmap peak caller score")
 pca1 <- dba.plotPCA(dbdata, label = "ID")
 # Also we can compare the number of peaks (intervals) in a bar plot
 dba.show(dbdata) %>% ggplot(aes(x=ID, y=Intervals)) + geom_bar(stat="identity") +
-ggtitle("Number of peaks") + xlab("Sample") + theme_economist()
+  ggtitle("Number of peaks") + xlab("Sample") + theme_economist()
 # and a Venn graph showing the binding site overlaps between all samples:
 dba.plotVenn(dbdata, dbdata$masks$All)
 grid.newpage()
@@ -192,7 +192,7 @@ dba.plotBox(dbdata.anal)
 # Binding affinity heatmap showing affinities for differentially bound sites
 hmap <- colorRampPalette(c("red", "black", "green"))(n = 4)
 dba.plotHeatmap(dbdata.count, method=DBA_ALL_METHODS, correlations=FALSE,
-                                scale="row", colScheme = hmap, main="Affinities for differentially bound sites")
+                scale="row", colScheme = hmap, main="Affinities for differentially bound sites")
 dev.off()
 
 # Retrieve differentially bound sites
@@ -201,92 +201,29 @@ dev.off()
 
 dbdata.DB <- dba.report(dbdata.anal) #, bUsePval = T, th = 0.05, fold = 2)
 
-## Represent results and annotate bam files and differential results with ChIPseeker
-# Prepare the TSS regions for your genome
-# Determine upstream and downstream values
-lim=5000
-promoter <- getPromoters(TxDb=TxDb, upstream=lim, downstream=lim)
-pdf("figs/Figures_peaks_seeker.pdf")
-for (p in 1:length(list_bed)){
-# Show where peaks fall on the chromosomes
-e <- read.delim(paste0("data/",list_bed[p]), comment.char = "#") %>%  mutate(chr = sapply("chr", paste0, chr)) %>% 
-toGRanges()
-print(covplot(e, weightCol="pileup", title = paste0(strsplit(as.character(list_bed), "_")[[p]][5],
-                                                           " peaks on chromosomes")))
-## Profile of ChIP peaks binding to TSS regions
-# Show how peaks fall around TSS regions
-tagMatrix <- getTagMatrix(e, windows=promoter) 
-tagHeatmap(tagMatrix, xlim=c(-lim, lim), color="red", 
-           title = paste0(strsplit(as.character(list_bed), "_")[[p]][2]," peaks around TSS"), 
-           xlab = "Genomic Region (5'->3')" )
 
-# Average profile peaks binding to TSS region
-plotAvgProf(tagMatrix, xlim=c(-lim, lim), conf = 0.95,
-            xlab="Genomic Region (5'->3')", ylab = "Read Count Frequency") +
-  ggtitle(paste0(strsplit(as.character(list_bed), "_")[[p]][2]," average profile peaks around TSS"))
-# Plots comparing different samples
-x <- read.delim(paste0("data/",list_bed[p]), comment.char = "#") %>%  mutate(chr = sapply("chr", paste0, chr)) %>% toGRanges()
-assign(paste0("Granges_", strsplit(as.character(list_bed), "_")[[p]][2]), x)
-}
+# HOMER annotation
+# Save report as bed file, regardless of the genome used, chromosome column must include "chr"
+report <- as.data.frame(dbdata.DB)
+# Export bed file for Homer annotatePeaks.pl to be run in linux:
+report_bed <- report %>% mutate(Unique_ID=row.names(report)) %>% select(c(1:3, 12)) %>% 
+  mutate(seqnames = sapply("chr", paste0, seqnames) )
+report_bed[,5:6] <- NA
+write.table (report_bed, "out/diffbind_report.bed",
+             sep = "\t", dec = ".", quote = F, row.names = F, col.names = F)
 
-po <- grep("Granges_*", names(.GlobalEnv),value=TRUE)
-peaks <- GRangesList(Tconv1=eval(as.symbol(po[1])), Tconv3=eval(as.symbol(po[2])), Tet1=eval(as.symbol(po[3])), 
-                     Tet3=eval(as.symbol(po[4])))
-#Average profiles
-col <- c("darkolivegreen", "darkolivegreen4", 
-         "firebrick1", "darkred")
-tagMatrixList <- lapply(peaks, getTagMatrix, windows=promoter)
-plotAvgProf(tagMatrixList, xlim=c(-lim, lim)) + scale_color_manual(values= col) +
-  ggtitle("All samples average profile peaks around TSS")
-plotAvgProf(tagMatrixList, xlim=c(-lim, lim), conf=0.95,resample=500, facet="row") + scale_color_manual(values= col) +
-  ggtitle("All samples average profile peaks around TSS")
-tagHeatmap(tagMatrixList, xlim=c(-lim, lim), color=NULL, 
-              title = names(tagMatrixList))
+## Run annotatePeaks from Homer on linux, this option also run gene ontology (GO) analysis
+# annotatePeaks.pl diffbind_report.bed mm10 -go annotatepeak/GO > annotatepeak/homer_anno2.txt
 
-peakAnnoList <- lapply(peaks, annotatePeak, TxDb=TxDb,
-                       tssRegion=c(-lim, lim), verbose=FALSE)
-plotAnnoBar(peakAnnoList)
-plotDistToTSS(peakAnnoList)
+# Import annotation results and merge with report dataframe
+anno <- read.table("data/homer_anno2.txt",
+                   header = T,
+                   sep = "\t",
+                   quote = "", 
+                   dec = ".")
+names(anno)[1] <- "PeakID"  
+comp <- merge(mutate(report, PeakID=row.names(report)), anno, by = "PeakID", all = T)
+comp <- comp[, -c(2:4, 6)]
 
-# Compare functional profiles
-# genes <- lapply(peakAnnoList, function(i) as.data.frame(i)$geneId)
-# names(genes) <- sub("_", "\n", names(genes))
-# compKEGG <- compareCluster(geneCluster   = genes,
-#                            fun           = "enrichKEGG",
-#                            pvalueCutoff  = 0.05,
-#                            pAdjustMethod = "BH")
-# dotplot(compKEGG, showCategory = 15, title = "KEGG Pathway Enrichment Analysis")
-dev.off()
-
-## Peak annotation with ChIPseeker, in this case let's annotate differentially bound peaks
-# to add "chr" to seqnames use:
-seqlevelsStyle(dbdata.DB) <- "UCSC"
-peakAnno <- annotatePeak(dbdata.DB, tssRegion=c(-lim, lim),
-                         TxDb=TxDb, annoDb="org.Mm.eg.db",
-                         flankDistance = lim, addFlankGeneInfo = T)
-consensus <- as.data.frame(peakAnno)
-
-# Filter your data
-th <- 0.05
-FC <- 2
-shared <- consensus %>% filter(p.value > th & abs(Fold) < FC)
-Differ_Tconv <- consensus %>% filter(p.value <= th & Fold >= FC)
-Differ_Tet <- consensus %>% filter(p.value <= th & Fold <= -FC)
-
-#Export annotated data
-write_xlsx(consensus, "out/All_consensus_peaks_annotated.xlsx")
-write_xlsx(shared, "out/Shared_peaks_annotated.xlsx")
-write_xlsx(Differ_Tconv, "out/Diff_Tconv_peaks_annotated.xlsx")
-write_xlsx(Differ_Tet, "out/Diff_Tet_peaks_annotated.xlsx")
-
-
-pathway <- enrichPathway(as.data.frame(peakAnno)$geneId, organism = "mouse")
-pdf("figs/Differentially_bound_annotation.pdf", width = 12)
-plotAnnoPie(peakAnno)
-plotAnnoBar(peakAnno)
-plotDistToTSS(peakAnno)
-vennpie(peakAnno)
-upsetplot(peakAnno, vennpie=T)
-grid.newpage()
-grid.table(as.data.frame(pathway))
-dev.off()
+# Export results
+write_xlsx(comp, paste0("out/Diff_bound_annotated_", pop[1], "_v_", pop[2] ,".xlsx"))
