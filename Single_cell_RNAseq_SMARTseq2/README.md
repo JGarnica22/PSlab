@@ -102,7 +102,86 @@ The following output files are generated:
 
 
 ## Seurat analysis :raised_hands:
+Seurat analysis for SmartSeq2 is based on [Seurat.R](https://github.com/patriciasolesanchez/PSlab/blob/master/Single_cell_RNAseq_10x/Seurat.R) script of 10X pipeline with few modifications here detailed. After applying these modifications you can run the rest of the commands to analyze and generate graphs.
 
+These changes are included in [Seurat_Smartseq2.R](https://github.com/patriciasolesanchez/PSlab/blob/master/Single_cell_RNAseq_SMARTseq2/Seurat_SmartSeq2.R) script as an example of an analysis which included different projects, thus code for integration is included. For more info about single-cell integration go to [Data_integration_Seurat.md](https://github.com/patriciasolesanchez/PSlab/blob/master/Single_cell_RNAseq_10x/Data_integration_Seurat.md).
+
+#### Import data
+In this case, instead of having the 3 files coming from the cellranger pipeline that can be imported with the function `Read10X()`, we need to load the txt file obtained previously from STAR quantification with all the information using `read.table()`.
+
+Note that as long as your single-cell data is arranged as dataframe which each row names is a gene and each column represents a cell you can convert it to a Seurat object using `CreateSeuratObject()`. 
+
+#### Change gene nomenclature (optional)
+Depending on the genome and annotation file used your genes may be labelled with ensembl_id, convert them to gene name with `biomaRt` using for instance this bunch of code. It is easier to do this before creating the Seurat object.
+
+````
+species <- "mouse"
+en <- sapply(strsplit(rownames(df), ".", fixed = T), "[", 1) %>% as.data.frame()
+names(en) <- "ensembl_gene_id"
+if (species == "mouse"){
+  TxDb <- TxDb.Mmusculus.UCSC.mm10.knownGene
+  org.SYMBOL2EG <- org.Mm.egSYMBOL2EG
+  org.SYMBOL <- org.Mm.egSYMBOL
+  ensembl <- useMart("ENSEMBL_MART_ENSEMBL", dataset="mmusculus_gene_ensembl")
+} else {
+  TxDb <- TxDb.Hsapiens.UCSC.hg38.knownGene
+  org.SYMBOL2EG <- org.Hs.egSYMBOL2EG
+  org.SYMBOL <- org.Hs.egSYMBOL
+  ensembl <- useMart("ENSEMBL_MART_ENSEMBL", dataset="hsapiens_gene_ensembl")
+}
+BM <- getBM(attributes=c("ensembl_gene_id", "external_gene_name", "chromosome_name"),
+            mart = ensembl, verbose = T)
+enbm <- merge(en, BM, by="ensembl_gene_id")
+row.names(df) <- make.names(enbm$external_gene_name, unique = T)
+````
+
+**IMPORTANT**: Also check the nomenclature of mitchondrial genes to see if they are `mt-` or `mt.` prefixed when calculating the QC metrics.
+````
+if (species == "mouse") {
+  scdata[["percent.mt"]] <- PercentageFeatureSet(scdata, pattern = "^mt.")
+} else {
+  scdata[["percent.mt"]] <- PercentageFeatureSet(scdata, pattern = "^MT.")
+}
+````
+
+
+#### Add metadata
+Once you have created you Seurat object you can add as many informationa as you want using the function `AddMetaData(object, metadata, col.name = NULL)` or more easily adding columns to your seurat object metada: `seuratobject@metadata$newcol`.
+
+At this point is essential to indicate to which group, condition, sampletype, etc. corresponds each of the cells. There are many ways to do that, using a loop, with a dataframe containing the information... This will allow us to analyze the data based on this parameters. For instance:
+````
+scdata$sampletype <- colnames(scdata)
+for (i in 1:length(sampletype)){
+  scdata@meta.data[grep(paste0("-", i), colnames(scdata)), "sampletype"] <- sampletype[i]
+}
+````
+or
+
+````
+for (i in rownames(scdata@meta.data)){
+  scdata@meta.data[i , "sampletype"] <- sub(".*?_", "", samples[ i ,"SAMPLE NAME"])
+}
+````
+
+Moreover, at this point you must add also the data the **TCR clonotype information** obtained from `TraCer`. In this case we recommend using `merge`. With this you will be able to visualize how clonotype align with the clusters and sample types or conditions. 
+
+````
+# import TraCer data
+tracer <- read.csv(paste0(getwd(),"/data/cell_data.csv"))
+# Optionally divide the information in different columns in order to be available to subfiltrate. 
+tracer <- tracer %>% separate(A_productive, c("A_produc_TRV", "A_produc_CDR3", "A_produc_TRJ"), "_", remove = F)
+tracer <- tracer %>% separate(B_productive, c("B_produc_TRV", "B_produc_CDR3", "B_produc_TRJ"), "_", remove = F)
+
+# Create a column in metadata with the cellnames in order to be able to merge
+scdata@meta.data$cell_name <- rownames(scdata@meta.data)
+scdata@meta.data <- merge(scdata@meta.data, tracer, by = "cell_name", all = T )
+rownames(scdata@meta.data) <- scdata@meta.data$cell_name
+
+# Delete cell name column and cells that produced a TCR sequence but were discarded when seurat object was created
+scdata@meta.data <- scdata@meta.data %>% dplyr::select(-cell_name) %>% filter(is.na(sampletype) == F)
+````
+
+After these steps you can peform an usual Seurat analysis as detailed in [Seurat.R](https://github.com/patriciasolesanchez/PSlab/blob/master/Single_cell_RNAseq_10x/Seurat.R).
 
 
 
