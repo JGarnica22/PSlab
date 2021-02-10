@@ -82,6 +82,7 @@ all <- read.table("data/Reads_all_samples.txt", sep = "\t", quote = "",
                   dec = ".", header = T, na.strings = T)
 # Discard all rows with only 0 in all the cells
 all2 <- all[rowSums(all)>0, ]
+# Arrange cell names
 names(all2)[671:length(names(all2))] <- sapply(strsplit(names(all2)[671:length(names(all2))], "_1", fixed = T), "[", 1)
 names(all2) <- str_replace_all(names(all2), "[.]" , "-")
 
@@ -104,7 +105,7 @@ if (species == "mouse"){
 BM <- getBM(attributes=c("ensembl_gene_id", "external_gene_name", "chromosome_name"),
             mart = ensembl, verbose = T)
 enbm <- merge(en, BM, by="ensembl_gene_id")
-rownames(all2) <- make.names(enbm$external_gene_name, unique = T)
+row.names(all2) <- make.names(enbm$external_gene_name, unique = T)
 
 # We next use the count matrix to create a Seurat object. The object serves as a 
 # container that contains both data (like the count matrix) and analysis (like PCA, 
@@ -177,7 +178,7 @@ head(scdata@meta.data)
 VlnPlot(scdata, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), pt.size = 0.5, ncol = 3)
 
 # Subset data (these parameters by default, modify thresholds if you like to filter differently)
-scdata <- subset(scdata, subset = nFeature_RNA>300 & nFeature_RNA<2000 & percent.mt<15)
+scdata <- subset(scdata, subset = nFeature_RNA>300 & nFeature_RNA<2000 & percent.mt<10)
 
 
 ## START DATA INTEGRATION ##
@@ -221,7 +222,7 @@ scdata <- integrated
 # set during IntegrateData
 DefaultAssay(scdata) <- "integrated"
 
-# Run workflow for visualization and clustering
+# Run workflow for visualization and clustering normally
 all.genes <- rownames(scdata)
 scdata@meta.data$clonal_group <- as.factor(scdata@meta.data$clonal_group)
 scdata <- ScaleData(scdata, verbose = TRUE, features = all.genes)
@@ -240,7 +241,7 @@ DimPlot(scdata, reduction = "umap", dims = c(1,2)) + DimPlot(scdata, group.by = 
 scdata <- FindNeighbors(scdata, dims = 1:10)
 scdata <- FindClusters(scdata, resolution = 0.5)
 DimPlot(scdata, reduction = "tsne", dims = c(1,2))
-TSNEPlot(scdata, group.by = "sampletype", shape.by = "seurat_clusters", pt.size = 3) + theme(
+TSNEPlot(scdata, group.by = "seurat_clusters", pt.size = 3) + theme(
   axis.line = element_blank(),
   axis.text.x = element_blank(),
   axis.text.y = element_blank(),
@@ -260,7 +261,7 @@ numberofclusters <- 3
 set.seed(1)
 scdata$kmeans <- kmeans(scdata@reductions[["pca"]]@cell.embeddings, centers = numberofclusters)$cluster
 scdata@meta.data$kmeans <- as.factor(scdata@meta.data$kmeans)
-TSNEPlot(scdata, group.by = "clonal_group", shape.by = "sampletype", pt.size = 3) + theme(
+TSNEPlot(scdata, group.by = "kmeans", pt.size = 3) + theme(
   axis.line = element_blank(),
   axis.text.x = element_blank(),
   axis.text.y = element_blank(),
@@ -283,7 +284,7 @@ ggsave(
 # You can determine the factor by which you color/group the cells using group.by
 #You can color/group cells by condition:
 TSNEPlot(scdata, group.by = "sampletype", 
-          pt.size = 2) + theme(
+          pt.size = 3) + theme(
            axis.line = element_blank(),
            axis.text.x = element_blank(),
            axis.text.y = element_blank(),
@@ -304,7 +305,7 @@ ggsave(
 )
 
 # Or you can even split the plot by condition, to see if some cells only appear in one condition:
-TSNEPlot(scdata["RNA"], split.by = "sampletype", group.by = "B_produc_TRV", 
+TSNEPlot(scdata, split.by = "kmeans", group.by = "sampletype", shape.by = "condition",
          pt.size = 3) + theme(
            axis.line = element_blank(),
            axis.text.x = element_blank(),
@@ -372,28 +373,6 @@ DoHeatmap(subset(scdata, downsample = 1000), features = features[features %in% r
           size = 3, angle = 0) + 
   scale_fill_gradient2(low = "blue", mid = "white", high = "red")
 
-#If you know the phenotype of the clusters, you can change the names of the Idents in order to
-#show the cluster names in the heatmap
-cluster.names <- c("Th0", "TFH", "TR1")
-names(cluster.names) <- levels(scdata)
-scdata <- RenameIdents(scdata, cluster.names)
-
-DoHeatmap(subset(scdata, downsample = 1000), features = features[features %in% rownames(scdata)],
-          size = 3, angle = 0) + 
-  scale_fill_gradient2(low = "blue", mid = "white", high = "red")
-
-ggsave(
-  "figs/Heatmap.pdf",
-  plot = last_plot(),
-  device = "pdf",
-  path = NULL,
-  scale = 1,
-  width = 5,
-  height = 8,
-  units = "in",
-  dpi = 300,
-  limitsize = TRUE
-)
 
 
 # Finding differentially expressed features (cluster biomarkers)
@@ -404,8 +383,9 @@ ggsave(
 
 # Find markers for every cluster compared to all remaining cells, report only the positive ones
 Idents(scdata) <- "kmeans"
+DefaultAssay(scdata) <- "RNA"
 markers <- FindAllMarkers(scdata,
-                          test.use = "negbinom", min.pct = 0.01)
+                          test.use = "negbinom", min.pct = 0.05)
 write.table(markers, "output/Cluster_markers.txt", quote = F, sep = "\t")
 
 #You can compare cluster or conditions 1 vs 1:
@@ -415,4 +395,9 @@ COND <- FindMarkers(scdata, ident.1 = levels(Idents(scdata))[2], ident.2 = level
                     logfc.threshold = 0, min.pct = 0.01)
 
 write.table(COND, "output/Condition_markers.txt", quote = F, sep = "\t")
+
+
+
+#### Compare with other files
+prev <- readRDS(paste0(getwd(), "/previous/RDS/SANTAMARIA_01+03_clustered.rds"))
 
