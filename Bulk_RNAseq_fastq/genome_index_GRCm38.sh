@@ -1,10 +1,10 @@
 #!/bin/bash
 #BSUB cwd /gpfs/projects/cek26
-#BSUB -J STAR_index_GRCm38
+#BSUB -J STAR_index
 #BSUB -q bsc_debug
 #BSUB -W 02:00
-#BSUB -eo /gpfs/projects/cek26/mm10/reports/STAR_index_GRCm38.err
-#BSUB -oo /gpfs/projects/cek26/mm10/reports/STAR_index_GRCm38.out
+#BSUB -eo /gpfs/projects/cek26/mm10/reports/STAR_index.err
+#BSUB -oo /gpfs/projects/cek26/mm10/reports/STAR_index.out
 #BSUB -M 1800
 
 # Load modules in order to run FastQC and STAR
