@@ -78,7 +78,7 @@ Alternatively, you can dowload this from the [UCSC page](http://hgdownload.soe.u
 
 
 ### Raw data folder
-Put all input files in a single data folder. The input files have to be organized with a folder per sample (i.e. create a folder per sample and add fastq files for each sample in the corresponding folder).
+Put all input files in a single data folder. The input files have to be organized with a folder per sample (i.e. create a folder per sample and add fastq files for each sample in the corresponding folder).  
 </br>
 
 
@@ -95,7 +95,6 @@ The _config-hicpro.txt_ file that you can find here has our tested parameters to
 6. LIGATION_SITE: indicate the sequence that is generated after ligating your digested genome. It depends on the cutting sequence of your restriction enzyme (e.g. DpnII cuts at GATC and the ligation site is GATCGATC).
 </br>
 
-
 ### Run HiC-Pro
 
 In order to use HiC-Pro, you can check tool options by using:
@@ -110,6 +109,7 @@ MY_INSTALL_PATH/bin/HiC-Pro -i FULL_PATH_TO_RAW_DATA -o FULL_PATH_TO_OUTPUTS -c 
 ````
 
 **IMPORTANT!** You need to indicate an output folder that does not previously exist. If you run the pipeline again on an already existing folder, the pipeline will give error and not run.
+</br>
 
 You can run your HiC-Pro analysis in the cluster by directly submitting the _hicpro.sh_ script.
 
@@ -118,25 +118,32 @@ bsub < hicpro.sh
 ````
 </br>
 
-### RESULTS
 
-Reads Mapping
-Each mate is independantly aligned on the reference genome. The mapping is performed in two steps. First, the reads are aligned using an end-to-end aligner. Second, reads spanning the ligation junction are trimmmed from their 3’ end, and aligned back on the genome. Aligned reads for both fragment mates are then paired in a single paired-end BAM file. Singletons and multi-hits can be discarded according the confirguration parameters. Note that if if the LIGATION_SITE parameter in the not defined, HiC-Pro will skip the second step of mapping.
-Fragment assignment and filtering
-Each aligned reads can be assigned to one restriction fragment according to the reference genome and the restriction enzyme.
-The next step is to separate the invalid ligation products from the valid pairs. Dangling end and self circles pairs are therefore excluded.
-Only valid pairs involving two different restriction fragments are used to build the contact maps. Duplicated valid pairs associated to PCR artefacts are discarded.
-The fragment assignment can be visualized through a BAM files of aliged pairs where each pair is flagged according to its classification.
-In case of Hi-C protocols that do not require a restriction enzyme such as DNase Hi-C or micro Hi-C, the assignment to a restriction is not possible. If no GENOME_FRAGMENT file are specified, this step is ignored. Short range interactions can however still be discarded using the MIN_CIS_DIST parameter.
-Quality Controls
-HiC-Pro performs a couple of quality controls for most of the analysis steps. The alignment statistics are the first quality controls. Aligned reads in the first (end-to-end) step, and alignment after trimming are reported. Note that in pratice, we ususally observed around 10-20% of trimmed reads. An abnormal level of trimmed reads can reflect a ligation issue.
-Once the reads are aligned on the genome, HiC-pro checks the number of singleton, multiple hits or duplicates. The fraction of valid pairs are presented for each type of ligation products. Invalid pairs such as dangling and or self-circle are also represented. A high level of dangling ends, or an imbalance in valid pairs ligation type can be due to a ligation, fill-in or digestion issue.
-Finally HiC-Pro also calculated the distribution of fragment size on a subset of valid pairs. Additional statistics will report the fraction of intra/inter-chromosomal contacts, as well as the proportion of short range (<20kb) versus long range (>20kb) contacts.
-Map builder
-Intra et inter-chromosomal contact maps are build for all specified resolutions. The genome is splitted into bins of equal size. Each valid interaction is associated with the genomic bins to generate the raw maps.
-ICE normalization
-Hi-C data can contain several sources of biases which has to be corrected. HiC-Pro proposes a fast implementation of the original ICE normalization algorithm (Imakaev et al. 2012), making the assumption of equal visibility of each fragment. The ICE normalization can be used as a standalone python package through the iced python package.
-BROWSING THE RESULTS
+The HiC-Pro is run in the following steps:
+
+#### Reads Mapping
+Each mate is independantly aligned on the reference genome. The mapping is performed in two steps. First, the reads are aligned using an end-to-end aligner. Second, reads spanning the ligation junction are trimmmed from their 3’ end, and aligned back on the genome. Aligned reads for both fragment mates are then paired in a single paired-end BAM file. Singletons and multi-hits can be discarded according the confirguration parameters. 
+
+**IMPORTANT!** If the LIGATION_SITE parameter in the not defined, HiC-Pro will skip the second step of mapping! Alignment rate will be much worse.
+
+#### Fragment assignment and filtering
+Each aligned read can be assigned to one restriction fragment according to the reference genome and the restriction enzyme. The next step is to separate the invalid ligation products from the valid pairs. Dangling end and self circles pairs are therefore excluded. Only **valid pairs** involving two different restriction fragments are used to build the contact maps. Duplicated valid pairs associated to PCR artefacts are discarded.
+
+#### Quality Controls
+HiC-Pro performs QC for most of the analysis steps. The alignment statistics are the first QC. Aligned reads in the first (end-to-end) step, and alignment after trimming are reported (in pratice, we ususally observed around 10-20% of trimmed reads). \* An abnormal level of trimmed reads can reflect a ligation issue.
+
+Once the reads are aligned on the genome, HiC-pro checks the number of singleton, multiple hits or duplicates. The fraction of valid pairs are presented for each type of ligation products. You would expect a balance in valid pairs ligation type (1/4 each).
+
+Finally HiC-Pro also calculates the distribution of fragment size on a subset of valid pairs. Additional statistics will report the fraction of intra/inter-chromosomal contacts, as well as the proportion of short range (<20kb) versus long range (>20kb) contacts.
+
+#### Map builder
+Intra and inter-chromosomal contact maps are build for all specified resolutions. The genome is splitted into bins of equal size. Each valid interaction is associated with the genomic bins to generate the raw maps.
+
+#### ICE normalization
+HiC-Pro uses a fast implementation of the original ICE normalization algorithm (Imakaev et al. 2012), making the assumption of equal visibility of each fragment.  
+</br>
+
+### RESULTS
 All outputs follow the input organization, with one folder per sample. See the results section for more information.
 
 bowtie_results
