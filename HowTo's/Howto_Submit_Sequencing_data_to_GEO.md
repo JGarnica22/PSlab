@@ -47,6 +47,6 @@ OS X: `md5 <file>`
 #### Uploading your submission
 There are two steps for submission:
 
-1. Transfer all your files to the GEO FTP server as indicated [here](https://www.ncbi.nlm.nih.gov/geo/info/submissionftp.html).
+1. Transfer all your files to the GEO FTP server as indicated [here](https://www.ncbi.nlm.nih.gov/geo/info/submissionftp.html). We recommend using a program like **FileZilla** to transfer the data to the FTP repository.
 2. After the FTP transfer is complete, notify GEO using the [Submit to GEO web form](https://submit.ncbi.nlm.nih.gov/geo/submission/).
 
