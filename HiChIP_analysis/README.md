@@ -73,10 +73,13 @@ You will generate this file when using the _Generate_annotation_files.R_ script 
 Alternatively, you can dowload this from the [UCSC page](http://hgdownload.soe.ucsc.edu/goldenPath/mm10/bigZips/) as a _mm10.chrom.sizes_ file.  
 </br>
 
-**3) The bowtie2 indexes.** See the bowtie2 manual page for details about how to create such indexes.
+**3) The bowtie2 indexes.** See detailed information on how to get or generate Bowtie2 indexes in the [ATACseq info](https://github.com/patriciasolesanchez/PSlab/tree/master/ATACseq_analysis).  
+</br>
 
 
 ### Raw data folder
+
+
 
 
 ### Configuration file
