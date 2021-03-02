@@ -1,6 +1,6 @@
 # What is GEO? :earth_americas:
 
-The **Gene Expression Omnibus (GEO)** is a public repository that archives and freely distributes comprehensive sets of microarray, NGS, and other forms of high-throughput functional genomic data submitted by the scientific community. GEO accepts next generation sequence data that examine quantitative gene expression, gene regulation, epigenomics or other aspects of functional genomics using methods such as RNAseq, ChIP-seq, HiC-seq, methyl-seq, etc. 
+The **Gene Expression Omnibus (GEO)** is a public repository that archives and freely distributes comprehensive sets of microarray, NGS, and other forms of high-throughput functional genomic data submitted by the scientific community. GEO accepts NGS data that examine quantitative gene expression, gene regulation, epigenomics or other aspects of functional genomics using methods such as RNAseq, ChIP-seq, HiC-seq, methyl-seq, etc. 
 
 In addition to data storage, a collection of web-based interfaces and applications are available to help users query and download the studies and gene expression patterns stored in GEO. For more information about various aspects of GEO, please see our [FAQs page](https://www.ncbi.nlm.nih.gov/geo/info/faq.html#what).
 
