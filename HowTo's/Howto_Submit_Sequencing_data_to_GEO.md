@@ -14,7 +14,7 @@ Once a GEO accession number is quoted in a manuscript (including publicly posted
 ## Submitting high-throughput sequence data to GEO
 Previous to submission, you need to create a _My NCBI_ account (you can create one [here](https://www.ncbi.nlm.nih.gov/account/register/?back_url=/geo/submitter/)) and complete a _My GEO Profile_ form with the contact information to be displayed on the GEO records.
 
-Every submission needs to contain raw data, processed data, and descriptive information about the samples, protocols and overall study in a supported deposit format. You can find detailed information on how to submit High Throughput Data [here](https://www.ncbi.nlm.nih.gov/geo/info/seq.html).  
+Every submission needs to contain raw data, processed data, and descriptive information about the samples, protocols and overall study in a supported deposit format. You can find detailed information on how to submit high-throughput sequence data [here](https://www.ncbi.nlm.nih.gov/geo/info/seq.html).  
 </br>
 
 ### Metadata spreadsheet 
