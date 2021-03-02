@@ -129,8 +129,8 @@ Each mate is independantly aligned on the reference genome. The mapping is perfo
 Each aligned read can be assigned to one restriction fragment according to the reference genome and the restriction enzyme. The next step is to separate the invalid ligation products from the valid pairs. Dangling end and self circles pairs are therefore excluded. Only **valid pairs** involving two different restriction fragments are used to build the contact maps. Duplicated valid pairs associated to PCR artefacts are discarded.
 
 #### 3) Quality Controls
-HiC-Pro performs QC for most of the analysis steps. The alignment statistics are the first QC. Aligned reads in the first (end-to-end) step, and alignment after trimming are reported (in pratice, we ususally observed around 10-20% of trimmed reads). \* An abnormal level of trimmed reads can reflect a ligation issue.
-Once the reads are aligned on the genome, HiC-pro checks the number of singleton, multiple hits or duplicates. The fraction of valid pairs are presented for each type of ligation products. You would expect a balance in valid pairs ligation type (1/4 each).
+HiC-Pro performs QC for most of the analysis steps. The alignment statistics are the first QC. Aligned reads in the first (end-to-end) step, and alignment after trimming are reported (in pratice, we ususally observed around 10-20% of trimmed reads). _\* An abnormal level of trimmed reads can reflect a ligation issue._  
+Once the reads are aligned on the genome, HiC-pro checks the number of singleton, multiple hits or duplicates. The fraction of valid pairs are presented for each type of ligation products. You would expect a balance in valid pairs ligation type (1/4 each).  
 Finally HiC-Pro also calculates the distribution of fragment size on a subset of valid pairs. Additional statistics will report the fraction of intra/inter-chromosomal contacts, as well as the proportion of short range (<20kb) versus long range (>20kb) contacts.
 
 #### 4) Map builder
@@ -156,8 +156,11 @@ read name / chr_reads1 / pos_reads1 / strand_reads1 / chr_reads2 / pos_reads2 / 
 
 * Matrix: contains the contact maps. This folder is organized with raw and iced contact maps for all resolutions. Only no zero values are stored. BED files describing the genomic bins are also generated. Note that abs and ord files are identical in the context of Hi-C data as the contact maps are symmetric. Contact maps are stored as a triplet sparse format:
 ````
-Contact maps are stored as a triplet sparse format ;
 bin_i / bin_j / counts_ij
 ````
 
-* Pic: contains graphical outputs of the quality control checks.
+* Pic: contains graphical outputs of the quality control checks.  
+</br>
+
+
+NEXT STEPS: peak calling and differential analysis (FitHiChIP and HiChIP_peaks tools).
