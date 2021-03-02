@@ -40,9 +40,9 @@ For barcode/multiplexed data, whenever possible, demultiplex the files so that e
 
 **MD5 Checksums**: it's recommended that submitters provide MD5 checksums for their raw data files. The checksums are used to verify file integrity. Checksums can be calculated using the following methods:
 
-Unix: `md5sum <file>`
+Unix: `md5sum <file>`  
 OS X: `md5 <file>`
-
+</br>
 
 #### Uploading your submission
 There are two steps for submission:
