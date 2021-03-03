@@ -1,12 +1,12 @@
 # this is a comment,,,
-[gene-expression]
-reference,/home/ubuntu/refdata-gex-mm10-2020-A
+[gene-expression],,,
+reference,/home/ubuntu/refdata-gex-mm10-2020-A,,
 expect-cells,10000,,
 ,,,
 [feature]
 reference,/home/ubuntu/analysis/PVT001/feature_reference.csv,,
 [vdj]
-reference,/home/ubuntu/refdata-cellranger-vdj-GRCm38-alts-ensembl-5.0.0
+reference,/home/ubuntu/refdata-cellranger-vdj-GRCm38-alts-ensembl-5.0.0,,
 ,,,
 [libraries],,,
 fastq_id,fastqs,lanes,feature_types
