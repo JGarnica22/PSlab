@@ -5,7 +5,7 @@ expect-cells,10000,,
 ,,,
 [feature],,,
 reference,/home/ubuntu/analysis/PVT001/feature_reference.csv,,
-[vdj]
+[vdj],,,
 reference,/home/ubuntu/refdata-cellranger-vdj-GRCm38-alts-ensembl-5.0.0,,
 ,,,
 [libraries],,,
