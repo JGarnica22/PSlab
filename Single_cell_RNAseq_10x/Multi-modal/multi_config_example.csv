@@ -1,0 +1,15 @@
+# this is a comment,,,
+[gene-expression]
+reference,/home/ubuntu/refdata-gex-mm10-2020-A
+expect-cells,10000,,
+,,,
+[feature]
+reference,/home/ubuntu/analysis/PVT001/feature_reference.csv,,
+[vdj]
+reference,/home/ubuntu/refdata-cellranger-vdj-GRCm38-alts-ensembl-5.0.0
+,,,
+[libraries],,,
+fastq_id,fastqs,lanes,feature_types
+1-4-FB,/home/ubuntu/mount/PVT001/H35GTDRXY/outs/fastq_path/H35GTDRXY,any,Antibody Capture
+1-4-GEX,/home/ubuntu/mount/PVT001/H3H73DRXY/outs/fastq_path/H3H73DRXY,any,Gene Expression
+1-4-VDJ,/home/ubuntu/mount/PVT001/H35GTDRXY/outs/fastq_path/H35GTDRXY,any,VDJ
