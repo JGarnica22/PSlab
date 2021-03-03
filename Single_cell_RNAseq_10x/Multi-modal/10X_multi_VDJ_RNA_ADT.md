@@ -22,7 +22,18 @@ cellranger multi --id=samples345 --csv=project/samples345.csv
 
 The multi config CSV contains both the library definitions and experiment configuration variables. It is composed of up to four sections: `[gene-expression]`, `[feature]`, `[vdj]`, and `[libraries]`. The `[gene-expression]`, `[feature]`, and `[vdj]` sections have at most two columns, and are responsible for configuring their respective portions of the experiment. The `[libraries]` section specifies where input FASTQ files may be found. Click here for a multi config [template](https://github.com/patriciasolesanchez/PSlab/blob/master/Single_cell_RNAseq_10x/Multi-modal/multi_config_template.csv) and [example](https://github.com/patriciasolesanchez/PSlab/blob/master/Single_cell_RNAseq_10x/Multi-modal/multi_config_example.csv).
 
-Basically, in the multi-config.csv file it must indicated reference genome for gene expression and vdj respective analysis, location of the fastq files and the features included in the libraries (*‘Gene Expression’, ‘VDJ’, ‘VDJ-T’, ‘VDJ-B’, ‘Antibody Capture’, ‘CRISPR Guide Capture’, or ‘Antigen Capture’*).
+**IMPORTANT:** use the correct name nomenclature for fastq files!!
+
+**[Sample Name]_S1_L00[Lane Number]_[Read Type]_001.fastq.gz**
+
+Where Read Type is one of:
+* I1: Sample index read (optional)
+* R1: Read 1
+* R2: Read 2
+
+
+
+Basically, in the multi-config.csv file it must be indicated reference genome for gene expression and vdj respective analysis, location of the fastq files and the features included in the libraries (*‘Gene Expression’, ‘VDJ’, ‘VDJ-T’, ‘VDJ-B’, ‘Antibody Capture’, ‘CRISPR Guide Capture’, or ‘Antigen Capture’*).
 
 Optional arguments can also be added, such as previously seen --force-cells. For more information visit [10X genomics](https://support.10xgenomics.com/single-cell-vdj/software/pipelines/latest/using/multi).
 
