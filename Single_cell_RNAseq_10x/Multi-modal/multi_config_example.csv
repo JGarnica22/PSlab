@@ -1,4 +1,4 @@
-# this is a comment,,,
+# multi-config file,,,
 [gene-expression],,,
 reference,/home/ubuntu/refdata-gex-mm10-2020-A,,
 expect-cells,10000,,
