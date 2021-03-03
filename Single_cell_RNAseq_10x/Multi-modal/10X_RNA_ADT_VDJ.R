@@ -34,7 +34,7 @@ scdata <- NormalizeData(scdata, normalization.method = "LogNormalize",
 
 # After this you can add the ADT data to the Seurat object by running this:
 scdata[["ADT"]] <-  CreateAssayObject(data[["Antibody Capture"]][,colnames(scdata),
-                                                                 drop = F])
+                                      drop = F])
 
 # Again normalize the ADT data if not previously
 scdata <- NormalizeData(scdata, assay = "TET", normalization.method = "CLR")
@@ -88,6 +88,26 @@ DimPlot(subset(scdata, subset = clonotype_id != "NA") , group.by = "clonotype_id
         reduction = "tsne", dims = c(1,2))
 
 # if you have multiple ADT variables you can do scatter plot with those
+# and even plot data from different assays
 
+# Note that when working with different assays you should specify with which
+# you want to work with by:
+DefaultAssay(scdata) <- "ADT"
 
+# Alternately, we can use specific assay keys to specify a specific modality,
+# thus we do not need to specify the default assay.
+Key(cbmc[["RNA"]])
+## [1] "rna_"
+Key(cbmc[["ADT"]])
+## [1] "adt_"
+
+# Scatter for the same genes of different 
+FeatureScatter(pbmc10k, feature1 = "adt_CD3", feature2 = "rna_CD3E", pt.size = 1)
+
+# Feature plot for a ADT
+FeaturePlot(scdata, reduction = "tsne",
+            features = "PE-TotalSeqC", 
+            max.cutoff = 3,
+            cols = c("grey", "red"), 
+            combine = T)
 
