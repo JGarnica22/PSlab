@@ -31,13 +31,13 @@ Optional arguments can also be added, such as previously seen --force-cells. For
 
 A successful cellranger multi run should conclude with a message similar to this:
 
-bash````
+````
 Waiting 6 seconds for UI to do final refresh.
 Pipestance completed successfully!
  
 yyyy-mm-dd hh:mm:ss Shutting down.
 Saving pipestance info to "samples365.mri.tgz"
-bash````
+````
 
 The output of the pipeline will be contained in a folder named with the **run ID** you specified (e.g. samples345). The subfolder named outs will contain the main pipeline outputs with the following structure:
 
