@@ -106,7 +106,7 @@ Sample2,/opt/runs/Sample2/outs/per_sample_outs/Sample2,D1,pbmc_t1,Post-Vaccinati
 Output files of `cellranger aggr` pipeline will be the same directories and files as individual jobs from `cellranger multi` but will be alocated in a single folder named as indiated in `--id`. `cellranger aggr` does not perform a cell-calling step, it simply aggregates the cell calls from each input job into a final set of cell calls.
 
 # :construction: IMPORTANT:
-All this tools are integrated in [cellranger_multi_loop.sh](https://github.com/patriciasolesanchez/PSlab/blob/master/Single_cell_RNAseq_10x/Multi-modal/cellranger_multi_loop.sh), in order just change few parameters and run all of them alone. **Pipeline still to be tested!!**
+All these tools are integrated in [cellranger_multi_loop.sh](https://github.com/patriciasolesanchez/PSlab/blob/master/Single_cell_RNAseq_10x/Multi-modal/cellranger_multi_loop.sh), in order to just change few parameters and run all of them alone. **Pipeline still to be tested!!**
 
 ## Seurat analysis :globe_with_meridians:
 
