@@ -98,18 +98,14 @@ In addition to CSV columns described above, `cellranger aggr` accepts optional c
 Here is an example of a config file:
 ````
 library_id,library_outs,donor,origin,treatment
-1-4,/media/josep/Elements/Parvus/cellranger/1-4/outs,1-4,1-4,1
-1-5,/media/josep/Elements/Parvus/cellranger/1-5/outs,1-5,1-5,1
-1-6,/media/josep/Elements/Parvus/cellranger/1-6/outs,1-6,1-6,1
-1-7,/media/josep/Elements/Parvus/cellranger/1-7/outs,1-7,1-7,1
-2-10,/media/josep/Elements/Parvus/cellranger/2-10/outs,2-10,2-10,2
-2-11,/media/josep/Elements/Parvus/cellranger/2-11/outs,2-11,2-11,2
-2-12,/media/josep/Elements/Parvus/cellranger/2-12/outs,2-12,2-12,2
-2-6,/media/josep/Elements/Parvus/cellranger/2-6/outs,2-6,2-6,2
+Sample1,/opt/runs/Sample1/outs/per_sample_outs/Sample1,D1,pbmc_t0,Pre-Vaccination
+Sample2,/opt/runs/Sample2/outs/per_sample_outs/Sample2,D1,pbmc_t1,Post-Vaccination
 ````
 
 ### cellranger aggr output files
 Output files of `cellranger aggr` pipeline will be the same directories and files as individual jobs from `cellranger multi` but will be alocated in a single folder named as indiated in `--id`. `cellranger aggr` does not perform a cell-calling step, it simply aggregates the cell calls from each input job into a final set of cell calls.
+
+:construction: IMPORTANT: all this tools are integrated in [cellranger_multi_loop.sh](https://github.com/patriciasolesanchez/PSlab/blob/master/Single_cell_RNAseq_10x/Multi-modal/cellranger_multi_loop.sh), in order just change few parameters and run all of them alone. **Pipeline still to be tested**
 
 ## Seurat analysis :globe_with_meridians:
 
