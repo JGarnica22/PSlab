@@ -1,0 +1,2 @@
+id,name,read,pattern,sequence,feature_type
+PE,PE_TotalSeqC,R2,5PNNNNNNNNNN(BC),TGACCAGTTCCGCAT,Antibody Capture
