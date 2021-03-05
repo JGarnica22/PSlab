@@ -23,5 +23,6 @@ cd $wd
 
 for f in $(find Calgary/Char-files -name  "*.gz")
 do
+echo $f
 gzip -t $f && echo ok || echo corrupted
 done
