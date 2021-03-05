@@ -46,7 +46,9 @@ OS X: `md5 <file>`
 For example, in the Mac Terminal you can type:
 ````
 (find . -name "*.xlsx"  -exec md5 {} \;; find . -name "*.gz" -exec md5 {} \;)> md5.txt
-````  
+````
+
+You will check md5sums for all _.xlsx_ files (most probably processed files) and _.gz_ files (fastq.gz files or aggregated files).
 </br>
 
 #### Uploading your submission
