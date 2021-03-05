@@ -140,4 +140,4 @@ cellranger aggr --id=$id \
 
 
 echo cellranger aggr completed
-echo PIPELINE COMPLETED, proceed to Seurat analysis!
+echo PIPELINE $id COMPLETED, proceed to Seurat analysis!
