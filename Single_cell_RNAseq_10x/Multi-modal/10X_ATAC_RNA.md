@@ -49,7 +49,7 @@ The pipeline will create a new folder named with the **sample ID** you specified
 
 To see other command-line argument run cellranger-arc count --help, here are some useful:
 | Argument                   | Description                              |
-|-----------------------     |------------------------------------------|
+|----------------------------|------------------------------------------|
 | `--gex-exclude-introns`    | Disable counting of intronic reads. In this mode we only count reads that are exonic and compatible with annotated splice junctions in the reference. Note: using this mode will reduce the UMI counts in the count matrix. |
 | `--min-atac-count`         | **Cell-caller override**: define the minimum number of transposition events in peaks for a cell barcode. Note: this option must be specified in conjunction with `--min-gex-count`. If you specify `--min-atac-count=500` `--min-gex-count=300` then a barcode is considered a cell if it has at least 500 ATAC transposition events in peaks OR at least 300 GEX UMI counts. It is advisable to use these parameters only after reviewing the web summary generated using default parameters. |
 | `--min-gex-count`          | **Cell-caller override**: define the minimum number of UMI counts for a cell barcode. Note: this option must be specified in conjunction with `--min-atac-count`. It is advisable to use these parameters only after reviewing the web summary generated using default parameters. |
