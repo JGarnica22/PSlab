@@ -42,6 +42,11 @@ For barcode/multiplexed data, whenever possible, demultiplex the files so that e
 
 Unix: `md5sum <file>`  
 OS X: `md5 <file>`  
+
+For example, in the Mac Terminal you can type:
+````
+(find . -name "*.xlsx"  -exec md5 {} \;; find . -name "*.gz" -exec md5 {} \;)> md5.txt
+````  
 </br>
 
 #### Uploading your submission
