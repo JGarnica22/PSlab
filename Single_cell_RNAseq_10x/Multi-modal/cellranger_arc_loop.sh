@@ -95,5 +95,4 @@ do
 	sleep 300;
 done
 
-echo PIPELINE COMPLETED, proceed to Seurat analysis!
-
+echo PIPELINE $id COMPLETED, proceed to Seurat analysis!
