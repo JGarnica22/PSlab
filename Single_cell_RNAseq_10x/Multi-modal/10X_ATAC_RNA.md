@@ -22,14 +22,12 @@ Next, construct a 3-column libraries CSV file that specifies the location of the
 | `sample`                | Sample name. Important, sample name must have this format: SampleName_S1_L001_R1_001.fastq.gz |
 | `library_type`          | This field is case-sensitive and must exactly match `Chromatin Accessibility` for a Multiome ATAC library and `Gene Expression` for a Multiome GEX library. |
 
-For instance, a library CSV file would look like this for 2 samples:
+For instance, a library CSV file would look like this:
 
 ````
 fastqs,sample,library_type
 /fastq_files/GEX_fastq,sample1,Gene Expression
 /fastq_files/ATAC_fastq,sample1,Chromatin Accessibility
-/fastq_files/GEX_fastq,sample2,Gene Expression
-/fastq_files/ATAC_fastq,sample2,Chromatin Accessibility
 ````
 
 #### Run cellranger-arc count
