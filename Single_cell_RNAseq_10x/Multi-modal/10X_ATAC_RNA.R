@@ -248,7 +248,7 @@ scdata <- SetAssayData(scdata, assay = 'ATAC', slot = 'motifs', new.data = motif
 # Note that this step can take 30-60 minutes!!
 scdata <- RunChromVAR(
   object = scdata,
-  genome = BSgenome.Hsapiens.UCSC.hg38
+  genome = genome
 )
 
 # Then, we explore the multimodal dataset to identify key regulators of each cell state.
