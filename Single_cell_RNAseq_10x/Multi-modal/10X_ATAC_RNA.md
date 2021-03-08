@@ -93,5 +93,7 @@ The output of the pipeline will be contained in the folder named with the sample
 | `analysis`                      | Various secondary analyses that utilize the ATAC data, the GEX data, and their linkage: dimensionality reduction and clustering results for the ATAC and GEX data, differential expression, and differential accessibility for all clustering results above and linkage between ATAC and GEX data. See [Analysis Overview](https://support.10xgenomics.com/single-cell-multiome-atac-gex/software/pipelines/latest/output/analysis) for more information. |
 
 
+## Aggregation of samples 
+:question: cellranger-arc do not offer tools to aggregate data from differents replicates, this should be done in Seurat.
 
 ## Seurat WNN analysis RNA+ATAC :twisted_rightwards_arrows:
