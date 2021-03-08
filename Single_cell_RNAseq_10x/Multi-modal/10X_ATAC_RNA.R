@@ -14,7 +14,8 @@
 # https://satijalab.org/seurat/
 
 # Load required packages:
-cran.packages <- c("Seurat", "Signac", "tidyverse") #Best last version
+cran.packages <- c("Seurat", "Signac", "tidyverse",
+                   "patchwork", "devtools") #Best last version
 for (i in cran.packages) {
   if(!require(i, character.only = T)) {
     install.packages(i)
@@ -25,16 +26,34 @@ for (i in cran.packages) {
   library(i, character.only = T)
 }
 
-# Set here the species you are working with:
+devtools.packages <- c("immunogenomics/presto") #Best last version
+for (i in devtools.packages) {
+  if(!require(i, character.only = T)) {
+    devtools::install_github(i)
+    print(paste(i,"just installed"))
+  } else {
+    print(paste(i,"was already installed"))
+  }
+  library(i, character.only = T)
+}
+devtools::install_github("immunogenomics/presto")
+#############################################################################
+## Set here the species you are working with:
+#############################################################################
 species <- "mouse" # say here either "mouse" or "human"
 if (species == "mouse") {
   ensdb <- "EnsDb.Mmusculus.v79"
+  bsgen <- "BSgenome.Mmusculus.UCSC.mm10"
   genome <- "mm10" # indicate here the genome used for mapping!!
+  mt <- "^mt-"
 } else {
   ensdb <- "EnsDb.Hsapiens.v86"
+  bsgen <- "BSgenome.Hsapiens.UCSC.hg38"
   genome <- "hg38" # indicate here the genome used for mapping!!
+  mt <- "^MT-"
 }
-bioc.packages <- c(ensdb)
+bioc.packages <- c(ensdb, bsgen, "JASPAR2020", "TFBSTools", "motifmatchr",
+                   "chromVAR")
 for (i in bioc.packages) {
   if (!require(i, character.only = T)) {
     BiocManager::install(i)
@@ -55,6 +74,10 @@ for (i in bioc.packages) {
 
 # Then we will create a Seurat object based on the gene expression data, and 
 # then add in the ATAC-seq data as a second assay.
+
+###########################################################################
+## Indicate here the folder where to find the cellranger-arc data
+###########################################################################
 setwd("C:/Users/Garnica/OneDrive - Universitat de Barcelona/PS")
 
 # load 10x hdf5 file containing both RNA and ATAC data. 
@@ -66,11 +89,8 @@ atac_counts <- data$Peaks
 
 # Create Seurat object
 scdata <- CreateSeuratObject(counts = rna_counts)
-if (species == "mouse") {
-  scdata[["percent.mt"]] <- PercentageFeatureSet(scdata, pattern = "^mt-")
-} else {
-  scdata[["percent.mt"]] <- PercentageFeatureSet(scdata, pattern = "^MT-")
-}
+scdata[["percent.mt"]] <- PercentageFeatureSet(scdata, pattern = mt)
+
 
 # Now add in the ATAC-seq data
 # we'll only use peaks in standard chromosomes
@@ -117,7 +137,8 @@ scdata <- subset(
 # RNA analysis
 DefaultAssay(scdata) <- "RNA"
 # Attention SCTtransform function normalize data, so input data must be non-normalized
-scdata <- SCTransform(scdata, verbose = FALSE) %>%
+scdata <- SCTransform(scdata, verbose = FALSE) %>% #Perform NormalizeData, FindVariableFeatures,
+                                                   # and ScaleData workflow
           RunPCA() %>%
           RunTSNE(dims = 1:50, reduction.name = 'tsne.rna',
                   reduction.key = 'rnatsne_')
@@ -145,10 +166,11 @@ scdata <- FindClusters(scdata, graph.name = "wsnn", algorithm = 3,
 # Visualize and explore graphs with clusters
 plrna <- DimPlot(scdata, reduction = "tsne.rna") + ggtitle("RNA")
 platac <- DimPlot(scdata, reduction = "tsne.atac") + ggtittle("ATAC")
-plwnn <- DimPlot(scdata, reduction = "wnn.tsne") + ggtitle("RNA")
+plwnn <- DimPlot(scdata, reduction = "wnn.tsne") + ggtitle("WNN")
 plrna + platac + plwnn & NoLegend() & theme(plot.title = element_text(hjust = 0.5))
 
-
+# You can peform sub-clustering on specifics clusters to find additional structures:
+scdata <- FindSubCluster(scdata, cluster = 6, graph.name = "wsnn", algorithm = 3)
 
 # Plot aggregated signal
 # https://satijalab.org/signac/articles/visualization.html
@@ -208,4 +230,76 @@ for (f in features){
 }
 
 
+
+# Next we will examine the accessible regions of each cell to determine
+# enriched motifs. We will use the chromVAR package from the Greenleaf lab.
+# This calculates a per-cell accessibility score for known motifs, and adds 
+# these scores as a third assay (chromvar) in the Seurat object.
+
+# Scan the DNA sequence of each peak for the presence of each motif, and create
+# a Motif object
+DefaultAssay(scdata) <- "ATAC"
+pwm_set <- getMatrixSet(x = JASPAR2020, opts = list(species = 9606, all_versions = FALSE))
+motif.matrix <- CreateMotifMatrix(features = granges(scdata), pwm = pwm_set,
+                                  genome = genome, use.counts = FALSE)
+motif.object <- CreateMotifObject(data = motif.matrix, pwm = pwm_set)
+scdata <- SetAssayData(scdata, assay = 'ATAC', slot = 'motifs', new.data = motif.object)
+
+# Note that this step can take 30-60 minutes!!
+scdata <- RunChromVAR(
+  object = scdata,
+  genome = BSgenome.Hsapiens.UCSC.hg38
+)
+
+# Then, we explore the multimodal dataset to identify key regulators of each cell state.
+# Paired data allow identification of transcription factors (TFs) 
+# that satisfy multiple criteria, helping to narrow down the list of putative 
+# regulators to the most likely candidates. We aim to identify TFs whose expression
+# is enriched in multiple cell types in the RNA measurements, but also have enriched
+# accessibility for their motifs in the ATAC measurements.
+
+# We can then represent features plots of gene expression and accessibility enrichment
+# of some TFs.
+# First, convert from motif name to motif ID or vice versa to get motifs for a certain TF.
+
+feat_TF <- features[] #only list TF!
+
+pdf("figs/expression_motifs_plots_.pdf", width = 12, height = 8)
+  for (f in feat_TF){
+    motif.name <- ConvertMotifID(scdata, name = f) 
+    gene_plot <- FeaturePlot(scdata, features = paste0("sct_", f),
+                             reduction = 'wnn.tsne')
+    motif_plot <- FeaturePlot(scdata, features = motif.name,
+                              min.cutoff = 0, cols = c("lightgrey", "darkred"),
+                              reduction = 'wnn.tsne')
+    gene_plot | motif_plot
+  }
+dev.off()
+
+
+# If we want to quantify this relationship and search across all cell types, 
+# we will use the presto package to perform fast differential expression. 
+# We run two tests: one using gene expression data, and the other using chromVAR 
+# motif accessibilities. presto calculates a p-value based on the Wilcox rank sum test,
+# which is also the default test in Seurat, and we restrict our search to TFs that
+# return significant results in both tests.
+
+# presto also calculates an “AUC” statistic, which reflects the power of each gene
+# (or motif) to serve as a marker of cell type. A maximum AUC value of 1 indicates
+# a perfect marker. Since the AUC statistic is on the same scale for both genes
+# and motifs, we take the average of the AUC values from the two tests, and use
+# this to rank TFs for each cell type:
+  
+markers_rna <- wilcoxauc(scdata,
+                         group_by = 'seurat_clusters', #group by samples or condition!
+                         assay = 'data',
+                         seurat_assay = 'SCT')
+markers_motifs <- wilcoxauc(scdata,
+                            group_by = 'seurat_clusters', #group by samples or condition!
+                            assay = 'data', seurat_assay = 'chromvar')
+motif.names <- markers_motifs$feature
+colnames(markers_rna) <- paste0("RNA.", colnames(markers_rna))
+colnames(markers_motifs) <- paste0("motif.", colnames(markers_motifs))
+markers_rna$gene <- markers_rna$RNA.feature
+markers_motifs$gene <- ConvertMotifID(pbmc, id = motif.names)
 
