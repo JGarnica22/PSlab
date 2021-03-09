@@ -46,11 +46,13 @@ if (species == "mouse") {
   bsgen <- "BSgenome.Mmusculus.UCSC.mm10"
   genome <- "mm10" # indicate here the genome used for mapping!!
   mt <- "^mt-"
+  blacklist <- "blacklist_mm10"
 } else {
   ensdb <- "EnsDb.Hsapiens.v86"
   bsgen <- "BSgenome.Hsapiens.UCSC.hg38"
   genome <- "hg38" # indicate here the genome used for mapping!!
   mt <- "^MT-"
+  blacklist <- "blacklist_hg38_unified"
 }
 bioc.packages <- c(ensdb, bsgen, "JASPAR2020", "TFBSTools", "motifmatchr",
                    "chromVAR")
@@ -83,12 +85,15 @@ setwd("C:/Users/Garnica/OneDrive - Universitat de Barcelona/PS")
 # load 10x hdf5 file containing both RNA and ATAC data. 
 data <- Read10X_h5("data/PS_filtered_feature_bc_matrix.h5")
 
+
+## !!!! Merge objects from different samples???
 # extract RNA and ATAC data
 rna_counts <- data$`Gene Expression`
 atac_counts <- data$Peaks
 
 # Create Seurat object
 scdata <- CreateSeuratObject(counts = rna_counts)
+# Create QC metrics for mithocondrial content
 scdata[["percent.mt"]] <- PercentageFeatureSet(scdata, pattern = mt)
 
 
@@ -113,22 +118,81 @@ scdata[["ATAC"]] <- CreateChromatinAssay(
   annotation = annotations
 )
 
+### Alternatively you can also call peaks using mac2:#####################
+# The set of peaks identified using Cellranger often merges distinct peaks 
+# that are close together. This can create a problem for certain analyses, 
+# particularly motif enrichment analysis and peak-to-gene linkage. To identify 
+# a more accurate set of peaks, we can call peaks using MACS2 with the CallPeaks()
+# function. Here we call peaks on all cells together, but we could identify peaks 
+# for each group of cells separately by setting the group.by parameter, and this 
+# can help identify peaks specific to rare cell populations
+
+# call peaks using MACS2
+peaks <- CallPeaks(scdata, 
+                   macs2.path = "/bin/macs2")
+# remove peaks on nonstandard chromosomes and in genomic blacklist regions
+peaks <- keepStandardChromosomes(peaks, pruning.mode = "coarse")
+peaks <- subsetByOverlaps(x = peaks, ranges = blacklist, invert = TRUE)
+
+# quantify counts in each peak
+macs2_counts <- FeatureMatrix(
+  fragments = Fragments(scdata),
+  features = peaks,
+  cells = colnames(scdata))
+
+# create a new assay using the MACS2 peak set and add it to the Seurat object
+scdata[["peaks"]] <- CreateChromatinAssay(
+  counts = macs2_counts,
+  fragments = fragpath,
+  annotation = annotation
+)
+
+
+
+
+# Create QC metrics for ATAC data
+DefaultAssay(scdata) <- "ATAC"
+scdata <- NucleosomeSignal(scdata)
+scdata <- TSSEnrichment(scdata)
+scdata$pct_reads_in_peaks <- scdata$peak_region_fragments / 
+                             scdata$passed_filters * 100
+scdata$blacklist_ratio <- scdata$blacklist_region_fragments /
+                          scdata$peak_region_fragments
+scdata$blacklist_fraction <- FractionCountsInRegion(
+                                                    object = scdata,
+                                                    assay = 'ATAC',
+                                                    regions = blacklist)
+# DefaultAssay(scdata) <- "peaks"
+# scdata <- NucleosomeSignal(scdata)
+# scdata <- TSSEnrichment(scdata)
 
 # perform basic QC based on the number of detected molecules for each modality
 # as well as mitochondrial percentage.
-VlnPlot(scdata, features = c("nCount_ATAC", "nCount_RNA","percent.mt"),
-        ncol = 3, log = TRUE, pt.size = 0.5) + NoLegend()
+VlnPlot(scdata, features = c("nCount_RNA", "nFeature_RNA", "percent.mt",
+                             "nCount_ATAC", "nFeature_ATAC",
+                             "TSS.enrichment", "nucleosome_signal",
+                             "nCount_peaks", "nFeature_peaks",
+                             "pct_reads_in_peaks", "peak_region_fragments",
+                             "blacklist_ratio", "blacklist_fraction"),
+        ncol = 4, log = TRUE, pt.size = 0.5) + NoLegend()
 
-# Subset based on QC plots!
+# Subset based on QC plots!!
 scdata <- subset(
   x = scdata,
   subset = nCount_ATAC < 7e4 &
     nCount_ATAC > 5e3 &
     nCount_RNA < 25000 &
     nCount_RNA > 1000 &
-    percent.mt < 20
+    percent.mt < 20 &
+    nucleosome_signal < 2.5 &
+    TSS.enrichment >0.75 &
+    blacklist_ratio < 0.05
 )
 
+scdata$high.tss <- ifelse(scdata$TSS.enrichment > 2, 'High', 'Low')
+TSSPlot(scdata, group.by = 'high.tss') + NoLegend()
+scdata$nucleosome_group <- ifelse(scdata$nucleosome_signal > 4, 'NS > 4', 'NS < 4')
+FragmentHistogram(object = scdata, group.by = 'nucleosome_group')
 
 # We next perform pre-processing and dimensional reduction on both assays 
 # independently, using standard approaches for RNA and ATAC-seq data.
@@ -138,7 +202,7 @@ scdata <- subset(
 DefaultAssay(scdata) <- "RNA"
 # Attention SCTtransform function normalize data, so input data must be non-normalized
 scdata <- SCTransform(scdata, verbose = FALSE) %>% #Perform NormalizeData, FindVariableFeatures,
-                                                   # and ScaleData workflow
+                                                   # and ScaleData workflow, stored in "SCT" assay
           RunPCA() %>%
           RunTSNE(dims = 1:50, reduction.name = 'tsne.rna',
                   reduction.key = 'rnatsne_')
@@ -146,7 +210,7 @@ scdata <- SCTransform(scdata, verbose = FALSE) %>% #Perform NormalizeData, FindV
 # ATAC analysis
 # We exclude the first dimension as this is typically correlated with
 # sequencing depth. This function also normalize data.
-DefaultAssay(scdata) <- "ATAC"
+DefaultAssay(scdata) <- "ATAC" #or use "peaks here
 scdata <- RunTFIDF(scdata)
 scdata <- FindTopFeatures(scdata, min.cutoff = 'q0')
 scdata <- RunSVD(scdata)
@@ -218,7 +282,7 @@ for (f in features){
     expr_plot <- ExpressionPlot(
       object = scdata,
       features = f,
-      assay = "RNA"
+      assay = "SCT"
     )
     # Combine previous plots into a single one
     CombineTracks(
@@ -250,6 +314,20 @@ scdata <- RunChromVAR(
   object = scdata,
   genome = genome
 )
+
+
+#Alternatively, find overepresetned motifs by:
+# https://satijalab.org/signac/articles/motif_vignette.html
+
+da_peaks <- FindAllMarkers(
+  object = scdata,
+  features = features,
+  only.pos = TRUE,
+  test.use = 'LR',
+  latent.vars = 'nCount_ATAC') #or peaks
+
+
+
 
 # Then, we explore the multimodal dataset to identify key regulators of each cell state.
 # Paired data allow identification of transcription factors (TFs) 
@@ -301,5 +379,42 @@ motif.names <- markers_motifs$feature
 colnames(markers_rna) <- paste0("RNA.", colnames(markers_rna))
 colnames(markers_motifs) <- paste0("motif.", colnames(markers_motifs))
 markers_rna$gene <- markers_rna$RNA.feature
-markers_motifs$gene <- ConvertMotifID(pbmc, id = motif.names)
+markers_motifs$gene <- ConvertMotifID(scdata, id = motif.names)
+
+
+
+#############################################################################
+## LINK PEAKS TO GENES ##
+# For each gene, we can find the set of peaks that may regulate the gene by by 
+# computing the correlation between gene expression and accessibility at nearby peaks,
+# and correcting for bias due to GC content, overall accessibility, and peak size.
+
+# Running this step on the whole genome can be time consuming, so you can use a
+# subset of genes as an example. 
+
+DefaultAssay(scdata) <- "ATAC"  #or "peaks"
+
+# first compute the GC content for each peak
+scdata <- RegionStats(scdata, genome = genome)
+
+# link peaks to genes
+scdata <- LinkPeaks(
+  object = scdata,
+  peak.assay = "ATAC", #or "peaks"
+  expression.assay = "SCT",
+  genes.use = features) #or remove this option if you want to run over all the genome.
+  
+# Visualize with coverageplot as done before.
+pdf("figs/link_peaks_genes.pdf", width = 12, height = 8)
+for (f in features){
+  CoveragePlot(
+  object = scdata,
+  region = f,
+  features = f,
+  expression.assay = "SCT",
+  idents = "seurat_clusters", #or sample type, conditions, etc
+  extend.upstream = 500,
+  extend.downstream = 10000)
+}
+dev.off()
 
