@@ -1,6 +1,7 @@
 # Single cell RNAseq analysis :zap:
 
-Chromium Single Cell data (10x data) can be analyzed using Cell Ranger and Seurat. First, the analysis pipeline in Cell Ranger performs sample demultiplexing, barcode processing, and single cell 3' gene counting. Then, gene count matrices can be used in Seurat to perform clustering and differential expression analysis.
+Chromium Single Cell data (10x data) can be analyzed using Cell Ranger and Seurat. First, the analysis pipeline in Cell Ranger performs sample demultiplexing, barcode processing, and single cell 3' gene counting. Then, gene count matrices can be used in Seurat to perform clustering and differential expression analysis.  
+</br>
 
 # Cell Ranger :crystal_ball:
 
@@ -103,7 +104,7 @@ cellranger aggr --id=[Run id] \
                   --normalize=mapped
 ````
 * **id**: A unique run ID string. In this case, also a directory will be created with this name in order to store the outputs.
-* **csv**: directory to your aggregation CSV
+* **csv**: directory to your aggregation CSV.
 * **normalize**: (Optional) String specifying how to normalize depth across the input libraries. Valid values: `mapped` (default), or `none`.
 
 ### Cellranger aggr outputs
