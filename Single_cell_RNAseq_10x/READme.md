@@ -64,9 +64,9 @@ cellranger count --id=[title of this run] \
                  --sample=[Sample Name]
 ````
 * **id**: title of this run, in order to avoid mistakes the most convenient is to use [Sample Name] as id too. Make sure it does not exist a previous folder with this same name before running the pipeline since a new directory with this name will be generated to store the outputs.
-* **transcriptome**: here you need to indicate the directory of yor transcriptome once already decompressed.
+* **transcriptome**: here you need to indicate the directory of your transcriptome once already decompressed.
 * **expected-cells**: aproximate number of cells that you pressume has been processed.
-* **sample**: the name of you sample as indicated in the first part of your FASTQ file. Note that all samples must have the same sample name and will be processed together, regardless of their lane or read.
+* **sample**: the name of your sample as indicated in the first part of your FASTQ file. Note that all samples must have the same sample name and will be processed together, regardless of their lane or read.
 
 Other arguments can be used for this command; for a complete list, see the [Command Line Argument Reference](https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/using/count#args), or run `cellranger count --help`.
 
@@ -75,7 +75,7 @@ Other arguments can be used for this command; for a complete list, see the [Comm
 ### CellRanger count outputs
 A successful CellRanger run should end with a message similar to `Pipestance completed successfully!`. The output of the pipeline will be contained in a folder named with the sample ID you specified. The subfolder named **outs** will contain the main pipeline output files. _.bam_ and _.bai_ files, _molecule_info.h5_, raw and filtered feature bc matrices and a _.cloupe_ file among others.
 
-Moreover, it will be generated a _web_summary.html_ which is highly recommended to check in order to review the main parameters of the run such as number of cells, as well as visualize a preliminar t-SNE projection. The process may take up to 9-10 hours, regardless of the number of samples if jobs are run in parallel. After this step, we recommend checking the summary metrics and then proceed to aggregate step in case you are working with more than one sample or GEM. Otherwise, proceed to `Seurat` analysis using the <ins>filtered</ins> matrices.  
+Moreover, a _web_summary.html_ will be generated, which is highly recommended to check in order to review the main parameters of the run such as number of cells, as well as to visualize a preliminar t-SNE projection. The process may take up to 9-10 hours, regardless of the number of samples if jobs are run in parallel. After this step, we recommend checking the summary metrics and then proceed to aggregate step in case you are working with more than one sample or GEM. Otherwise, proceed to `Seurat` analysis using the <ins>filtered</ins> matrices.  
 </br>
 
 ## Cellranger aggr :milky_way:
