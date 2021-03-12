@@ -108,15 +108,15 @@ The following output files are generated:
 ## Seurat analysis :raised_hands:
 Seurat analysis for SMARTseq2 is based on [Seurat.R](https://github.com/patriciasolesanchez/PSlab/blob/master/Single_cell_RNAseq_10x/Seurat.R) script of 10X pipeline with few modifications here detailed. After applying these modifications you can run the rest of the commands to analyze and generate graphs.
 
-These changes are included in [Seurat_Smartseq2.R](https://github.com/patriciasolesanchez/PSlab/blob/master/Single_cell_RNAseq_SMARTseq2/Seurat_SmartSeq2.R) script as an example of an analysis which included different projects, thus code for integration is included. For more info about single-cell integration go to [Data_integration_Seurat.md](https://github.com/patriciasolesanchez/PSlab/blob/master/Single_cell_RNAseq_10x/Data_integration_Seurat.md).
+These changes are included in [Seurat_Smartseq2.R](https://github.com/patriciasolesanchez/PSlab/blob/master/Single_cell_RNAseq_SMARTseq2/Seurat_SmartSeq2.R) script with an analysis example. If you require to work with data coming from different projects, you can find info about single-cell integration in [Data_integration_Seurat.md](https://github.com/patriciasolesanchez/PSlab/blob/master/Single_cell_RNAseq_10x/Data_integration_Seurat.md).
 
 #### Import data
 In this case, instead of having the 3 files coming from the cellranger pipeline that can be imported with the function `Read10X()`, we need to load the txt file obtained previously from STAR quantification with all the information using `read.table()`.
 
-Note that as long as your single-cell data is arranged as dataframe which each row names is a gene and each column represents a cell you can convert it to a Seurat object using `CreateSeuratObject()`. 
+Note that as long as your single-cell data is arranged as a dataframe (in which each rowname is a gene and each column represents a cell) you can convert it to a Seurat object using `CreateSeuratObject()`. 
 
 #### Change gene nomenclature (optional)
-Depending on the genome and annotation file used your genes may be labelled with ensembl_id, convert them to gene name with `biomaRt` using for instance this bunch of code. It is easier to do this before creating the Seurat object.
+Depending on the genome and annotation file used, your genes may be labelled with ensembl_id instead of the gene name. Convert them to gene name with `biomaRt` using the following code. It is easier to do this before creating the Seurat object.
 
 ````
 species <- "mouse"
@@ -150,9 +150,9 @@ if (species == "mouse") {
 
 
 #### Add metadata
-Once you have created you Seurat object you can add as many informationa as you want using the function `AddMetaData(object, metadata, col.name = NULL)` or more easily adding columns to your seurat object metada: `seuratobject@metadata$newcol`.
+Once you have created you Seurat object you can add as much information as you want using the function `AddMetaData(object, metadata, col.name = NULL)` or more easily adding columns to your seurat object metada: `seuratobject@metadata$newcol`.
 
-At this point is essential to indicate to which group, condition, sampletype, etc. corresponds each of the cells. There are many ways to do that, using a loop, with a dataframe containing the information... This will allow us to analyze the data based on this parameters. For instance:
+At this point it is essential to which group, condition, sample type, etc. each of the cells corresponds to. There are many ways to do that, using a loop, with a dataframe containing the information... This will allow us to analyze the data based on these parameters. For instance:
 ````
 scdata$sampletype <- colnames(scdata)
 for (i in 1:length(sampletype)){
@@ -167,7 +167,7 @@ for (i in rownames(scdata@meta.data)){
 }
 ````
 
-Moreover, at this point you must add also the data the **TCR clonotype information** obtained from `TraCer`. In this case we recommend using `merge`. With this you will be able to visualize how clonotype align with the clusters and sample types or conditions. 
+Moreover, at this point you must add also the **TCR clonotype information** obtained from `TraCer`. In this case we recommend using `merge`. With this you will be able to visualize how the clonotypes distribute within the clusters and sample types or conditions. 
 
 ````
 # import TraCer data
@@ -186,7 +186,4 @@ scdata@meta.data <- scdata@meta.data %>% dplyr::select(-cell_name) %>% filter(is
 ````
 
 After these steps you can peform an usual Seurat analysis as detailed in [Seurat.R](https://github.com/patriciasolesanchez/PSlab/blob/master/Single_cell_RNAseq_10x/Seurat.R).
-
-
-
 
