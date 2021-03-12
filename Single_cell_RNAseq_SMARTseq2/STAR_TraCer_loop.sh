@@ -48,13 +48,14 @@ echo Group_1\=\$\(echo \"\$all\" \| head \-n $part\)
 echo Group_2\=\$\(echo \"\$all\" \| tail \-n $part\)
 echo Group_3\=\$\(echo \"\$all\" \| tail \-n $(expr $part \* 2 + 2) \| head \-n $(expr $part + 2)\)
 
-# Loop for STAR aligment and gene count
+# Loop for STAR alignment and gene count
 echo for f in $i 
 echo do
 echo if \[ \-f $alig_folder\/\$\(cut \-d \".\" \-f1 \<\<\< \$f \| sed \'s/..$//\'\)_ReadsPerGene.out.tab \]\; then
 echo echo \$\(cut \-d \".\" \-f1 \<\<\< \$f \| sed \'s/..$//\'\) "done"
 echo else
-#Perform alignment
+
+# Perform alignment
 echo echo doing STAR \$\(cut \-d \".\" \-f1 \<\<\< \$f \| sed \'s/..$//\'\)
 echo STAR --runMode alignReads --genomeDir $in/STAR_index --readFilesIn fastq_files/\$f fastq_files/\$\(cut \-d \".\" \-f1 \<\<\< \$f \| sed \'s/..$//\'\)_2*.gz --readFilesCommand zcat \
 --outFileNamePrefix $alig_folder\/\$\(cut \-d \".\" \-f1 \<\<\< \$f \| sed \'s/..$//\'\) \
@@ -66,7 +67,7 @@ echo done
 sed -i -e 's/\r$//' to_bsub/Smart_STAR_$i.sh
 bsub < to_bsub/Smart_STAR_$i.sh
 
- # Loop for tracer
+ # Loop for TraCer
 {
 echo \#!/bin/bash
 echo \#BSUB cwd /gpfs/projects/cek26
@@ -89,7 +90,7 @@ echo Group_1\=\$\(echo \"\$all\" \| head \-n $part\)
 echo Group_2\=\$\(echo \"\$all\" \| tail \-n $part\)
 echo Group_3\=\$\(echo \"\$all\" \| tail \-n $(expr $part \* 2 + 2) \| head \-n $(expr $part + 2)\)
 
-# Loop for tracer
+# Loop for TraCer
 echo for f in $i 
 echo do
 echo if \[ \-d $tracer\/\$\(cut \-d \".\" \-f1 \<\<\< \$f \| sed \'s/..$//\'\) \]\; then
@@ -110,8 +111,8 @@ done
 module purge
 module load java/1.8.0u66 fastqc
 
-# Perform quality control of RNA-seq using FastQC tool for all processed samples and output a common pdf file
-# Run fastqc for each .fastq.gz file and save results file in different folders in fastqc_analysis directory
+# Perform quality control of RNAseq using FastQC tool for all processed samples and output a common pdf file
+# Run FastQC for each .fastq.gz file and save results file in different folders in fastqc_analysis directory
 for f in $(find ./fastq_files -name "*.gz" -exec basename {} \;)
 do
 mkdir fastqc/$(cut -d "." -f1 <<< $f)  
@@ -126,7 +127,6 @@ done
 convert fastqc/*.png fastqc/fastqc_summary.pdf
 
 # Merge read counts and summarize tracer output
-
 while [ $(find ./$alig_folder -type f -name "*Read*" -print | wc -l) != $(find ./fastq_files -type f -name "*_1*.gz" -print | wc -l) ]
 do
 sleep 300;
@@ -137,7 +137,6 @@ module load gcc/7.2.0 R/3.6.3
 
 
 # Merge all ReadPerGene dataframe column 2 (unstranded) into a unique dataframe for analysis with R, once all jobs are done.
-
 {
 echo RPG_list \<\- list.files\(path=paste0\(getwd\(\),\"/$alig_folder\"\), pattern= \"*ReadsPerGene*\"\)
 echo for \(g in 1\:length\(RPG_list\)\)\{
@@ -155,8 +154,7 @@ echo write.table\(all_reads, \
 } > Smart.R
 R < Smart.R --save
 
-# summarise tracer
-
+# Summarise TraCer
 while [ $(ls $tracer| wc -l) != $(find ./fastq_files -type f -name "*_1*.gz" -print | wc -l) ]
 do
 sleep 300;
@@ -166,5 +164,4 @@ module purge
 module load singularity
 
 singularity exec /apps/TRACER/SRC/images/tracer-0.6.0.sif tracer summarise -p 16 -s Mmus $tracer
-
 
