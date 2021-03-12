@@ -2,7 +2,7 @@
 
 Chromium Single Cell data (10x data) can be analyzed using Cell Ranger and Seurat. First, the analysis pipeline in Cell Ranger performs sample demultiplexing, barcode processing, and single cell 3' gene counting. Then, gene count matrices can be used in Seurat to perform clustering and differential expression analysis.
 
-# CellRanger :crystal_ball:
+# Cell Ranger :crystal_ball:
 
 Cell Ranger is a set of analysis pipelines that process Chromium single-cell RNA-seq output to align reads, generate feature-barcode matrices and perform clustering and gene expression analysis. Cell Ranger includes four pipelines relevant to single-cell gene expression experiments:
 
@@ -18,7 +18,7 @@ Cell Ranger is a set of analysis pipelines that process Chromium single-cell RNA
 ## Workflows
 If you are beginning with raw base call (BCL) files, the Cell Ranger workflow starts with demultiplexing the BCL files for each flowcell directory with `cellranger mkfastq`. If you are beginning with FASTQ files that have already been demultiplexed, you can jump right to `cellranger count`.
 
-The exact steps of the workflow vary depending on how many samples, GEM wells, and flowcells you have. In general, samples processed in the same flowcell (sequencing in parellel) can be converted using `cellranger mkfastq` all together. Afterwards, `cellranger count` needs to be run for all the files (FASTQ files) for each sample and GEM (only one sample run in different GEM would need independent `cellranger count`). Finally, provided that you run more than one `cellranger count` analysis, you need to run `cellranger aggr` to normalize to the same sequencing depth and recomptuting the feature-barcdoe matrices in order to analyse combinedly the data. 
+The exact steps of the workflow vary depending on how many samples, GEM wells, and flowcells you have. In general, samples processed in the same flowcell (sequenced in parallel) can be converted using `cellranger mkfastq` all together. Afterwards, `cellranger count` needs to be run for all the files (FASTQ files) for each sample and GEM (only one sample run in different GEM would need independent `cellranger count`). Finally, provided that you run more than one `cellranger count` analysis, you need to run `cellranger aggr` to normalize to the same sequencing depth and recomptuting the feature-barcode matrices in order to analyse combinedly the data. 
 
 Moreover, `cellranger reanalyze` takes feature-barcode matrices produced by `cellranger count` or `cellranger aggr` and reruns the dimensionality reduction, clustering, and gene expression algorithms using tunable parameter settings.
 
@@ -36,7 +36,7 @@ Where Read Type is one of:
 * R1: Read 1
 * R2: Read 2
 
-If you do not have your files already named this way, rename them and make sure you do not miss which is which, as file name will determine the analysis performed.
+If you do not have your files already named this way, rename them and make sure you do not mix which is which, as file name will determine the analysis performed.
 
 If you are working with data from CNAG you can use your project information data sheet (Excel) and add a column with the following code in order to get your sample names, then you will only need to rename your files accordingly with Cyberduck or with the `mv` command:
 
@@ -45,7 +45,7 @@ If you are working with data from CNAG you can use your project information data
 ````
 
 ### Transcriptome
-In order to align your samples you need your species reference dataset for CellRanger. Download and upload it to the Cluster and decompress it (for instance with `gzip -d`). * Note that you cannot download files directly in the Cluster. You need to download it first in you computer and then move it to your working directory (in the Cluster, if that is the case).
+In order to align your samples you need your species reference dataset from Cell Ranger. Download and upload it to the Cluster and decompress it (for instance with `gzip -d`). * Note that you cannot download files directly in the Cluster. You need to download it first in you computer and then move it to your working directory (in the Cluster, if that is the case).
 
 For mouse you can use:
 ````
