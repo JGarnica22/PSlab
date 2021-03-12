@@ -1,5 +1,6 @@
 # Analysis of V(D)J, Gene Expression and Feature Barcode single-cell data :art:
-The 5' Chromium Single Cell Immune Profiling Solution with Feature Barcode technology enables simultaneous profiling of V(D)J repertoire, cell surface protein, antigen specificity and gene expression data.
+The 5' Chromium Single Cell Immune Profiling Solution with Feature Barcode technology enables simultaneous profiling of V(D)J repertoire, cell surface protein, antigen specificity and gene expression data.  
+</br>
 
 ## cellranger multi :octopus:
 
@@ -7,7 +8,8 @@ The cellranger multi pipeline enables the analysis of these multiple library typ
 
 **Note**: These guide lines assume that you already have fastq files either recieved from the facility or produced with `cellranger mkfastq`.
 
-For more information visit [10X genomics webpage](https://support.10xgenomics.com/single-cell-vdj/software/pipelines/latest/using/multi).
+For more information visit [10X genomics webpage](https://support.10xgenomics.com/single-cell-vdj/software/pipelines/latest/using/multi).  
+
 
 ### Run cellranger multi
 
@@ -32,7 +34,6 @@ Where Read Type is one of:
 * R2: Read 2
 
 
-
 Basically, in the multi-config.csv file it must be indicated reference genome for gene expression and vdj respective analysis, location of the fastq files and the features included in the libraries (*‘Gene Expression’, ‘VDJ’, ‘VDJ-T’, ‘VDJ-B’, ‘Antibody Capture’, ‘CRISPR Guide Capture’, or ‘Antigen Capture’*).
 
 Optional arguments can also be added, such as previously seen --force-cells. For more information visit [10X genomics](https://support.10xgenomics.com/single-cell-vdj/software/pipelines/latest/using/multi).
@@ -50,7 +51,7 @@ yyyy-mm-dd hh:mm:ss Shutting down.
 Saving pipestance info to "samples365.mri.tgz"
 ````
 
-The output of the pipeline will be contained in a folder named with the **run ID** you specified (e.g. samples345). The subfolder named outs will contain the main pipeline outputs with the following structure:
+The output of the pipeline will be contained in a folder named with the **run ID** you specified (e.g. samples345). The subfolder named _outs_ will contain the main pipeline outputs with the following structure:
 
 ![](https://support.10xgenomics.com/img/single-cell-vdj/multi-output-dir-structure.png)
 
@@ -64,7 +65,6 @@ The files in the `multi` folder contain raw data, i.e., the data for all barcode
 | `count`                | The results of any gene-expression and feature barcode analysis, similar to cellranger count |
 | `vdj_b`                | The results of any V(D)J Immune Profiling analysis for any B cells, similar to cellranger vdj |
 | `vdj_t`                | The results of any V(D)J Immune Profiling analysis for any T cells, similar to cellranger vdj |
-
 
 
 ***Note**: The gene expression library is representative of the entire pool of poly-adenylated mRNA transcripts captured within each partition (droplet). The TCR or BCR transcripts are then selectively amplified to create the V(D)J library. Therefore, the gene expression library has more power to detect partitions containing cells compared to the V(D)J library. If the multi pipeline is run with both gene expression and VDJ data, then barcodes which are not called as cells by using the gene expression data will be deleted from the V(D)J cell set.
