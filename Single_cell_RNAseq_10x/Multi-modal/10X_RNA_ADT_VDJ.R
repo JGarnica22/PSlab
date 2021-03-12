@@ -1,10 +1,9 @@
-# This script show how to load from 10X multi-modal experiments
-# including gene expression, antibody capture (or ADT: Antibody-derived tags)
-# and vdj data.
+# This script shows how to load data from 10X multi-modal experiments including
+# gene expression, antibody capture (or ADT: Antibody-derived tags) and VDJ data.
 
-# In this script it is assumed previous knowledge in Seurat package
-# and non-multi-modal data analysis. Here will be shown only the differences
-# in multi-modal analysis. For more info visit 
+# In this script it is assumed previous knowledge on Seurat package and non-multi-modal 
+# data analysis. Here only the differences in multi-modal analysis will be shown. 
+# For more info visit 
 # https://satijalab.org/seurat/articles/multimodal_vignette.html
 
 library(Seurat)
@@ -13,10 +12,9 @@ library(ggplot2)
 library(patchwork)
 
 
-# Seurat is able to analyze data from multimodal 10X experiments,
-# in this case gene expression and ADT data are comprised in the same file,
-# while vdj data is found in another one and must be added as metada to the
-# Seurat object.
+# Seurat is able to analyze data from multimodal 10X experiments, in this case
+# gene expression and ADT data are comprised in the same file, while VDJ data
+# is found in another one and must be added as metada to the Seurat object.
 
 # Load 10X data as usual, you will be informed that this is a list of 2
 # including gene expression and ADT data.
@@ -32,7 +30,7 @@ scdata <- NormalizeData(scdata, normalization.method = "LogNormalize",
                         scale.factor = 10000) #only if not normalized in cellranger!!
 
 
-# After this you can add the ADT data to the Seurat object by running this:
+# After that you can add the ADT data to the Seurat object
 scdata[["ADT"]] <-  CreateAssayObject(data[["Antibody Capture"]][,colnames(scdata),
                                       drop = F])
 
@@ -42,37 +40,37 @@ scdata <- NormalizeData(scdata, assay = "TET", normalization.method = "CLR")
 
 # Add VDJ data, in this example TCR.
 # VDJ data cannot be included as an assay and must be added as metadata, as
-# is a categorical data. Then clonotypes can be filtered and represented accordingly.
+# is categorical data. Then clonotypes can be filtered and represented accordingly.
 
 # Import vdj data coming from cellranger pipeline, saved in vdj_t directory
 tcr <- read.csv("data/vdj_t/filtered_contig_annotations.csv", sep=",")
 # This file gives us the productive alpha and beta chain of each cell
-# In order to analyze the data we need each cell to appear only one,
+# In order to analyze the data we need each cell to appear only once,
 # so we will be using the clonotypes:
 
 # Remove the -1 at the end of each barcode.
 # Subsets so only the first line of each barcode is kept,
-# as each entry for given barcode will have same clonotype.
+# as each entry for given barcode will have the same clonotype.
 tcr$barcode <- gsub("-1", "", tcr$barcode)
 tcr <- tcr[!duplicated(tcr$barcode), ]
 
-# Only keep the barcode and clonotype columns. 
+# Only keep the barcode and clonotype columns
 # We'll get additional clonotype info from the clonotype table.
 tcr <- tcr[,c("barcode", "raw_clonotype_id")]
 names(tcr)[names(tcr) == "raw_clonotype_id"] <- "clonotype_id"
 
-# Load the clonotype-centric info.
+# Load the clonotype-centric info
 clono <- read.csv("data/vdj_t/clonotypes.csv", sep=",")
 
 # Slap the nt sequences onto our original table by clonotype_id
 # you can add more columns if you want this information
 tcr <- merge(tcr, clono[, c("clonotype_id", "cdr3s_nt")])
 
-# Set barcodes as rownames.
+# Set barcodes as rownames
 rownames(tcr) <- tcr[,"barcode"]
 tcr[,"barcode"] <- NULL
 
-# Add to the Seurat object's metadata.
+# Add to the Seurat object's metadata
 scdata <- AddMetaData(scdata, metadata=tcr)
 
 
@@ -83,14 +81,14 @@ scdata <- AddMetaData(scdata, metadata=tcr)
 
 # Label cells based on clonotype id on tSNE plots:
 DimPlot(scdata, group.by = "clonotype_id", reduction = "tsne", dims = c(1,2))
-# Do the same as previous but only show cells with productive clonotype assignation:
+# Do the same as above but only show cells with productive clonotype assignation:
 DimPlot(subset(scdata, subset = clonotype_id != "NA") , group.by = "clonotype_id",
         reduction = "tsne", dims = c(1,2))
 
-# if you have multiple ADT variables you can do scatter plot with those
+# If you have multiple ADT variables you can do a scatter plot with those
 # and even plot data from different assays
 
-# Note that when working with different assays you should specify with which
+# Note that when working with different assays you should specify which
 # you want to work with by:
 DefaultAssay(scdata) <- "ADT"
 
@@ -101,10 +99,10 @@ Key(cbmc[["RNA"]])
 Key(cbmc[["ADT"]])
 ## [1] "adt_"
 
-# Scatter for the same genes of different 
+# Scatter for the same genes of different ??????
 FeatureScatter(pbmc10k, feature1 = "adt_CD3", feature2 = "rna_CD3E", pt.size = 1)
 
-# Feature plot for a ADT
+# Feature plot for an ADT
 FeaturePlot(scdata, reduction = "tsne",
             features = "PE-TotalSeqC", 
             max.cutoff = 3,
