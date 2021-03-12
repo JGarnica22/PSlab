@@ -62,33 +62,31 @@ library(stringr)
 setwd("C:/Users/jgarn/OneDrive - Universitat de Barcelona/Documentos/Bioinformatics/Terminal/SmartSeq2/Seurat")
 
 # Specify parameters to be used along the script:
-#Indicate species working with (typically mouse or human)
+# Indicate species working with (typically mouse or human)
 species <- "mouse"
-#Indicate samples you sequenced separatedly (for example, you sorted your treated
-#and control populations separatedly):
-#It's better to indicate sample type as TREATMENT_CONDITION
-#Load your sample-condition dataframe in order to link every cell to each condition:
-samples <- read_xls(paste0(getwd(),"/data/SANTAMARIA_03.xls"), col_names = T,skip = 1)
+# Indicate samples you sequenced separately (for example, you sorted your treated and control populations separately):
+# It's better to indicate sample type as TREATMENT_CONDITION
+# Load your sample-condition dataframe in order to link every cell to each condition:
+samples <- read_xls(paste0(getwd(),"/data/SANTAMARIA_03.xls"), col_names = T, skip = 1)
 names(samples)[10] <- "name"
 samples <- samples[order(samples$name),] %>% as.data.frame()
 rownames(samples) <- samples$name
 
 
 # Read the data:
-# To convert your data into a Seurat objects you should import a dataframe which each row names is a gene and each column
+# To convert your data into a Seurat objects you should import a dataframe in which each row is a gene and each column
 # represents a cell.
-
 all <- read.table("data/Reads_all_samples.txt", sep = "\t", quote = "",
                   dec = ".", header = T, na.strings = T)
-# Discard all rows with only 0 in all the cells
+
+# Discard all rows with 0 counts in all the cells
 all2 <- all[rowSums(all)>0, ]
 # Arrange cell names
 names(all2)[671:length(names(all2))] <- sapply(strsplit(names(all2)[671:length(names(all2))], "_1", fixed = T), "[", 1)
 names(all2) <- str_replace_all(names(all2), "[.]" , "-")
 
 
-
-# if using STAR or other programs that use ensembl_id, convert them to gene_with biomaRt
+# If using STAR or other programs that use ensembl_id, convert them to gene with biomaRt:
 en <- sapply(strsplit(rownames(all2), ".", fixed = T), "[", 1) %>% as.data.frame()
 names(en) <- "ensembl_gene_id"
 if (species == "mouse"){
@@ -107,12 +105,11 @@ BM <- getBM(attributes=c("ensembl_gene_id", "external_gene_name", "chromosome_na
 enbm <- merge(en, BM, by="ensembl_gene_id")
 row.names(all2) <- make.names(enbm$external_gene_name, unique = T)
 
-# We next use the count matrix to create a Seurat object. The object serves as a 
-# container that contains both data (like the count matrix) and analysis (like PCA, 
-# or clustering results) for a single-cell dataset.
-    # min.cells: Include features detected in at least this many cells. Will subset the counts matrix as well. 
+# We next use the count matrix to create a Seurat object. The object serves as a container that includes
+# both data (like the count matrix) and analysis (like PCA, or clustering results) for a single-cell dataset.
+    # min.cells: Include features detected in at least these many cells. Will subset the counts matrix as well. 
     # To reintroduce excluded features, create a new object with a lower cutoff.
-    # min.features: Include cells where at least this many features are detected.
+    # min.features: Include cells where at least these many features are detected.
 
 scdata <- CreateSeuratObject(counts = all2, min.cells = 3, min.features = 200)
 
@@ -125,7 +122,7 @@ for (i in rownames(scdata@meta.data)){
 scdata@meta.data[is.na(scdata@meta.data$sampletype), "sampletype"] <- "Tet+_BDC"
 
 
-# conditions
+# Conditions
 scdata@meta.data$condition <- NA
 for (t in c("Tet[+]","Tet[-]")){
   scdata@meta.data[grep(t, scdata@meta.data$sampletype),"condition"] <- t
@@ -143,11 +140,10 @@ rownames(scdata@meta.data) <- scdata@meta.data$cell_name
 scdata@meta.data <- scdata@meta.data %>% dplyr::select(-cell_name) %>% filter(is.na(sampletype) == F)
 
 
-# Perform quality control of Selection and filtration of cells based on QC metrics
-# before integration as it needs to be done on raw RNA counts.
+# Perform quality control (Filter bad quality cells based on QC metrics) at the beginning as it needs to be done on raw RNA counts.
 
 # QC and selecting cells for further analysis
-#Criteria:
+# Criteria:
 # * The number of unique genes detected in each cell (Low-quality cells or empty droplets will 
 # often have very few genes and cell doublets or multiplets may exhibit an aberrantly high gene count
 # * The percentage of reads that map to the mitochondrial genome (Low-quality/dying cells often
@@ -188,8 +184,7 @@ DimPlot(scdata, group.by = "A_produc_TRV", reduction = "tsne", dims = c(1,2))
 scdata <- RunUMAP(scdata, reduction = "pca", dims = 1:20)
 DimPlot(scdata, reduction = "umap", dims = c(1,2)) + DimPlot(scdata, group.by = "project", reduction = "umap", dims = c(1,2))
 
-
-## seurat clustering
+## Seurat clustering
 scdata <- FindNeighbors(scdata, dims = 1:10)
 scdata <- FindClusters(scdata, resolution = 0.5)
 DimPlot(scdata, reduction = "tsne", dims = c(1,2))
@@ -200,7 +195,6 @@ TSNEPlot(scdata, group.by = "seurat_clusters", pt.size = 3) + theme(
   axis.title = element_blank(),
   axis.ticks = element_blank()) + coord_flip() + scale_x_reverse()
 
-
 # Clustering
 #In order to find clusters, we use a external function named kmeans
 #This is a particular algorithm that finds cluster for an already defined number of clusters
@@ -208,7 +202,7 @@ TSNEPlot(scdata, group.by = "seurat_clusters", pt.size = 3) + theme(
 numberofclusters <- 3
 #You should perform clustering analysis with different number of clusters and decide which is the
 #correct (real) number of clusters as the last number before the algorithm starts finding clusters
-#that give no information (small group of some cells that are found as a cluster)
+#that give no information (small groups of some cells that are found as a cluster)
 
 set.seed(1)
 scdata$kmeans <- kmeans(scdata@reductions[["pca"]]@cell.embeddings, centers = numberofclusters)$cluster
@@ -286,7 +280,6 @@ ggsave(
 #Read your txt containing the list of genes of interest:
 features <- read.table("data/Table1.txt", header = F, stringsAsFactors = F)$V1
 
-
 p <- FeaturePlot(scdata, reduction = "tsne",
                  features = features, 
                  #if there are too many features to plot at once,
@@ -299,9 +292,8 @@ for(i in 1:length(p)) {
   p[[i]] <- p[[i]] + NoAxes() + NoLegend() + coord_flip() + scale_x_reverse()
 }
 
-cowplot::plot_grid(plotlist = p, ncol = 6)
-#Determine the number of columns you want to distribute the plots in, depending on the total number
-#of plots you want to make.
+cowplot::plot_grid(plotlist = p, ncol = 6) #Determine the number of columns you want to distribute the plots in
+# depending on the total number of plots you want to make.
 
 ggsave(
   "figs/feature_plots.pdf",
@@ -318,13 +310,13 @@ ggsave(
 
 
 #Another type of visualization are heatmaps. You can see gene expression on each cluster for a set
-#genes of interest in the format of a heatmap
-Idents(scdata) <- "kmeans" #To determine the kmeans clustering as the feature to group cells in the heatmap
+#genes of interest in the format of a heatmap.
+Idents(scdata) <- "kmeans" #to determine the kmeans clustering as the feature to group cells in the heatmap
+#can change it to condition, sample type, etc.
 Idents(scdata) <- factor(Idents(scdata), levels = 1:length(levels(Idents(scdata))))
 DoHeatmap(subset(scdata, downsample = 1000), features = features[features %in% rownames(scdata)],
           size = 3, angle = 0) + 
   scale_fill_gradient2(low = "blue", mid = "white", high = "red")
-
 
 
 # Finding differentially expressed features (cluster biomarkers)
@@ -340,16 +332,11 @@ markers <- FindAllMarkers(scdata,
                           test.use = "negbinom", min.pct = 0.05)
 write.table(markers, "output/Cluster_markers.txt", quote = F, sep = "\t")
 
-#You can compare cluster or conditions 1 vs 1:
+# You can compare cluster or conditions 1 vs 1:
 Idents(scdata) <- "condition"
 COND <- FindMarkers(scdata, ident.1 = levels(Idents(scdata))[2], ident.2 = levels(Idents(scdata))[1],
                     verbose = T, test.use = "negbinom",
                     logfc.threshold = 0, min.pct = 0.01)
 
 write.table(COND, "output/Condition_markers.txt", quote = F, sep = "\t")
-
-
-
-#### Compare with other files
-prev <- readRDS(paste0(getwd(), "/previous/RDS/SANTAMARIA_01+03_clustered.rds"))
 
