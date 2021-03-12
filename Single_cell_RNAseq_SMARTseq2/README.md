@@ -7,12 +7,14 @@ This pipeline processes every cell separately during alignment and gene expressi
 
 All these tools are run within a loop to cover all the files, taking into account that in the case of STAR and TraCer pair-end fastq files must be paired for analysis while for FastQC each fastq file is analyzed separately.
 
-[STAR_TraCer_loop.sh](https://github.com/patriciasolesanchez/PSlab/blob/master/SmartSeq2/STAR_TraCer_loop.sh) script generates different jobs with respective loops to process many samples in short time, then the outcome is pooled into objects to be analyzed on Seurat.
+[STAR_TraCer_loop.sh](https://github.com/patriciasolesanchez/PSlab/blob/master/SmartSeq2/STAR_TraCer_loop.sh) script generates different jobs with respective loops to process many samples in short time, then the outcome is pooled into objects to be analyzed on Seurat.  
+</br>
 
 ### STAR :star:
 This pipelines uses the STAR aligner in order to both align fastq files and quantify the levels of transcripts for every gene with `--quantMode GeneCounts`. Unless previously created, you must download your genome and annotation files and generate a STAR index (see [RNAseq_analysis_fastq](https://github.com/patriciasolesanchez/PSlab/tree/master/RNAseq_analysis_fastq) pipeline for more information).
 
-Since there are at least 1 fastq file (2 if paired-end) for each cell, the best option is to do a loop for every file (see [STAR_TraCer_loop.sh](https://github.com/patriciasolesanchez/PSlab/blob/master/SmartSeq2/STAR_TraCer_loop.sh)). When making the loop for pair-end analysis make sure that files called indeed correspond to the same sample.
+Since there are at least 1 fastq file (2 if paired-end) for each cell, the best option is to do a loop for every file (see [STAR_TraCer_loop.sh](https://github.com/patriciasolesanchez/PSlab/blob/master/SmartSeq2/STAR_TraCer_loop.sh)). When making the loop for pair-end analysis make sure that files called indeed correspond to the same sample.  
+</br>
 
 ### TraCer :dog:
 
@@ -24,15 +26,15 @@ In NordIII cluster all these dependencies are contained in a singularity image. 
 singularity exec /apps/TRACER/SRC/images/tracer-0.6.0.sif <Command> <Options>
 ````
 
-For more details and installation instructions see [TraCer webpage](https://github.com/Teichlab/tracer#installation).
+For more details and installation instructions see [TraCer webpage](https://github.com/Teichlab/tracer#installation).  
 
 ### Usage
 
-Tracer has three modes: assemble, summarise and build. We will be indicating how to use assemble and summarise.
+TraCer has three modes: assemble, summarise and build. We will be indicating how to use assemble and summarise.
 
 * **Assemble** takes fastq files of paired-end RNA-seq reads from a single-cell and reconstructs TCR sequences.
-* **Summarise** takes a set of directories containing output from the assemble phase (each directory represents a single cell) and summarises TCR recovery rates as well as generating clonotype networks.
-* **Build** creates new combinatorial recombinomes for species other than the inbuilt Human and Mouse.
+* **Summarise** takes a set of directories containing output from the assemble phase (each directory represents a single cell) and summarises TCR recovery rates as well as generates clonotype networks.
+* **Build** creates new combinatorial recombinome for species other than the inbuilt Human and Mouse.  
 
 #### TraCer: Assemble
 ````
