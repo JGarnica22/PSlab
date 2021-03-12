@@ -27,7 +27,7 @@ mkdir cellranger_counts
 mkdir to_bsub
 
 # Loop to generate cellranger counts for each sample
-# Firstly, generate a list of the sample you have
+# Firstly, generate a list of the samples you have
 for f in $(find ./fastq_files -name "*.fastq.gz" -exec basename {} \;)
 do
 echo $(cut -d'_' -f1 <<< $f)_$(cut -d'_' -f2 <<< $f) >> samples.txt
@@ -63,7 +63,7 @@ bsub < to_bsub/cellranger_count_$f.sh
 done
 
 
-# Do not start next steps until previous pipelines are over
+# Next steps will be on hold until previous pipelines are over
 while [ $(sort -u samples.txt | wc -l) != $(find ./cellranger_counts -type f -name "*_info.h5" -print | wc -l) ]
 do
 sleep 300;
@@ -95,8 +95,7 @@ cellranger aggr --id=$aggr_id \
                 --normalize=mapped
 
 
-
-
 # Remove used scripts
 rm -r ../to_bsub
 rm ../experiment.txt
+
