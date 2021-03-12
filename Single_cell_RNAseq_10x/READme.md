@@ -128,4 +128,4 @@ The input for Seurat is the output of Cell Ranger, basically an aggr ("aggregate
 
 In Seurat you can normalize and scale data, calculate dimensionality reductions (PCA, tSNE, uMAP), draw heatmaps, feature plots, violin plots, etc. and perform DE analysis.
 
-Use _Seurat.R_ to analyze your single cell raw count data after running Cell Ranger.
+Use _Seurat.R_ to analyze your single cell raw count data after running Cell Ranger. If you need to work with data coming from 2 or more different experiments (i.e. sequenced in different days) you can integrate the data. See information on how to do that in the [Data integration document] (https://github.com/patriciasolesanchez/PSlab/blob/patriciasolesanchez-patch-1/Single_cell_RNAseq_10x/Data_integration_Seurat.md)
