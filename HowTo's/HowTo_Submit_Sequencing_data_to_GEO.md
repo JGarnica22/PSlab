@@ -18,7 +18,7 @@ Every submission needs to contain raw data, processed data, and descriptive info
 </br>
 
 ### Metadata spreadsheet 
-Download and fill in this [metadata spreadsheet](https://www.ncbi.nlm.nih.gov/geo/info/examples/seq_template.xlsx). It contains the descriptive information about the overall study, individual samples, all protocols, and references to processed and raw data file names.
+Download and fill in this [metadata spreadsheet](https://www.ncbi.nlm.nih.gov/geo/info/examples/seq_template.xlsx). It contains the descriptive information about the overall study, individual samples, all protocols, and references to processed and raw data file names.  
 </br>
 
 ### Processed data files
@@ -27,7 +27,7 @@ Processed data are a required part of GEO submissions. These should be data on w
 They may be formatted either as a matrix table or individual files for each sample. Provide complete data with values for all features (e.g., genes) and all samples, not only lists of differentially-expressed genes.
 - ChIP-Seq data might include peak files with quantitative data, tag density files, etc. Common formats include WIG, bigWig, bedGraph.
 
-A description of the format and content of processed data files should be provided in the metadata spreadsheet data processing fields.
+A description of the format and content of processed data files should be provided in the metadata spreadsheet data processing fields.  
 </br>
 
 ### Raw data files
