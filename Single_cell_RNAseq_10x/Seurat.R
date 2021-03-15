@@ -55,10 +55,9 @@ library(magrittr)
 setwd("/Users/patri/Documents/LAB/TESIS DOCTORAL 2015-2020/TR1 PROJECT/2020_05_10xGenomics_BDC_INS13-21_SANTAMARIA_09/Seurat")
 
 # Specify parameters to be used along the script:
-#Indicate species working with (typicall mouse or human)
+#Indicate species working with (typically mouse or human)
 species <- "mouse"
-#Indicate samples you sequenced separatedly (for example, you sorted your treated
-#and control populations separatedly):
+#Indicate samples you sequenced separately (for example, you sorted your treated and control populations separately)
 #Indicate samples in the order they are barcoded!!
 #It's better to indicate sample type as TREATMENT_CONDITION
 sampletype <- c("BDC_CTL", "BDC_TET", "INS_CTL", "INS_TET")
@@ -68,20 +67,18 @@ sampletype <- c("BDC_CTL", "BDC_TET", "INS_CTL", "INS_TET")
 # Read the data:
 # The Read10X function reads in the output of the cellranger pipeline from 10X 
 # (https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/what-is-cell-ranger)
-# returning a unique molecular identified (UMI) count matrix. The values in this 
-# matrix represent the number of molecules for each feature (i.e. gene; row) that 
-# are detected in each cell (column).
-# Use filtered data
+# returning a unique molecular identified (UMI) count matrix. The values in this matrix represent the number of
+# molecules for each feature (i.e. gene; row) that are detected in each cell (column).
+# NOTE: Use filtered data
 
 # Indicate in the Read10X function, the directory of your input files (3 files must be
 # found in the data.dir: matrix.mt.gz, barcodes.tsv.gz and features.tsv.gz)
 data <- Read10X(data.dir = paste0(getwd(), "/data/aggr/filtered_feature_bc_matrix/"))
 
-# We next use the count matrix to create a Seurat object. The object serves as a 
-# container that contains both data (like the count matrix) and analysis (like PCA, 
-# or clustering results) for a single-cell dataset.
-# min.cells: Include features detected in at least this many cells. Will subset the counts matrix as well. 
-# min.features: Include cells where at least this many features are detected.
+# We next use the count matrix to create a Seurat object. The object serves as a container that includes
+# both data (like the count matrix) and analysis (like PCA, or clustering results) for a single-cell dataset.
+# min.cells: Include features detected in at least these many cells. Will subset the counts matrix as well. 
+# min.features: Include cells where at least these many features are detected.
 scdata <- CreateSeuratObject(counts = data, min.cells = 3, min.features = 200)
 
 # Check the expression (counts) for some genes in the first 100 cells:
@@ -195,7 +192,7 @@ ggsave(
 )
 
 # You can determine the factor by which you color/group the cells using group.by
-#You can color/group cells by condition:
+# You can color/group cells by condition:
 TSNEPlot(scdata, group.by = "condition", order = "CTL", 
          cols = c("#00BFC4", "#F8766D"), pt.size = 0.025) + theme(
            axis.line = element_blank(),
@@ -325,9 +322,10 @@ markers <- FindAllMarkers(scdata,
                           test.use = "negbinom", min.pct = 0.01)
 write.table(markers, "output/Cluster_markers.txt", quote = F, sep = "\t")
 
-#You can compare cluster or conditions 1 vs 1:
+# You can compare cluster or conditions 1 vs 1:
 Idents(scdata) <- "condition"
 COND <- FindMarkers(scdata, ident.1 = levels(Idents(scdata))[2], ident.2 = levels(Idents(scdata))[1],
                     verbose = T, test.use = "negbinom")
 
 write.table(COND, "output/Condition_markers.txt", quote = F, sep = "\t")
+

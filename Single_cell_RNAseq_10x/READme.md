@@ -1,8 +1,9 @@
 # Single cell RNAseq analysis :zap:
 
-Chromium Single Cell data (10x data) can be analyzed using Cell Ranger and Seurat. First, the analysis pipeline in Cell Ranger performs sample demultiplexing, barcode processing, and single cell 3' gene counting. Then, gene count matrices can be used in Seurat to perform clustering and differential expression analysis.
+Chromium Single Cell data (10x data) can be analyzed using Cell Ranger and Seurat. First, the analysis pipeline in Cell Ranger performs sample demultiplexing, barcode processing, and single cell 3' gene counting. Then, gene count matrices can be used in Seurat to perform clustering and differential expression analysis.  
+</br>
 
-# CellRanger :crystal_ball:
+# Cell Ranger :crystal_ball:
 
 Cell Ranger is a set of analysis pipelines that process Chromium single-cell RNA-seq output to align reads, generate feature-barcode matrices and perform clustering and gene expression analysis. Cell Ranger includes four pipelines relevant to single-cell gene expression experiments:
 
@@ -18,7 +19,7 @@ Cell Ranger is a set of analysis pipelines that process Chromium single-cell RNA
 ## Workflows
 If you are beginning with raw base call (BCL) files, the Cell Ranger workflow starts with demultiplexing the BCL files for each flowcell directory with `cellranger mkfastq`. If you are beginning with FASTQ files that have already been demultiplexed, you can jump right to `cellranger count`.
 
-The exact steps of the workflow vary depending on how many samples, GEM wells, and flowcells you have. In general, samples processed in the same flowcell (sequencing in parellel) can be converted using `cellranger mkfastq` all together. Afterwards, `cellranger count` needs to be run for all the files (FASTQ files) for each sample and GEM (only one sample run in different GEM would need independent `cellranger count`). Finally, provided that you run more than one `cellranger count` analysis, you need to run `cellranger aggr` to normalize to the same sequencing depth and recomptuting the feature-barcdoe matrices in order to analyse combinedly the data. 
+The exact steps of the workflow vary depending on how many samples, GEM wells, and flowcells you have. In general, samples processed in the same flowcell (sequenced in parallel) can be converted using `cellranger mkfastq` all together. Afterwards, `cellranger count` needs to be run for all the files (FASTQ files) for each sample and GEM (only one sample run in different GEM would need independent `cellranger count`). Finally, provided that you run more than one `cellranger count` analysis, you need to run `cellranger aggr` to normalize to the same sequencing depth and recomptuting the feature-barcode matrices in order to analyse combinedly the data. 
 
 Moreover, `cellranger reanalyze` takes feature-barcode matrices produced by `cellranger count` or `cellranger aggr` and reruns the dimensionality reduction, clustering, and gene expression algorithms using tunable parameter settings.
 
@@ -36,7 +37,7 @@ Where Read Type is one of:
 * R1: Read 1
 * R2: Read 2
 
-If you do not have your files already named this way, rename them and make sure you do not miss which is which, as file name will determine the analysis performed.
+If you do not have your files already named this way, rename them and make sure you do not mix which is which, as file name will determine the analysis performed.
 
 If you are working with data from CNAG you can use your project information data sheet (Excel) and add a column with the following code in order to get your sample names, then you will only need to rename your files accordingly with Cyberduck or with the `mv` command:
 
@@ -45,7 +46,7 @@ If you are working with data from CNAG you can use your project information data
 ````
 
 ### Transcriptome
-In order to align your samples you need your species reference dataset for CellRanger. Download and upload it to the Cluster and decompress it (for instance with `gzip -d`). * Note that you cannot download files directly in the Cluster. You need to download it first in you computer and then move it to your working directory (in the Cluster, if that is the case).
+In order to align your samples you need your species reference dataset from Cell Ranger. Download and upload it to the Cluster and decompress it (for instance with `gzip -d`). * Note that you cannot download files directly in the Cluster. You need to download it first in you computer and then move it to your working directory (in the Cluster, if that is the case).
 
 For mouse you can use:
 ````
@@ -64,9 +65,9 @@ cellranger count --id=[title of this run] \
                  --sample=[Sample Name]
 ````
 * **id**: title of this run, in order to avoid mistakes the most convenient is to use [Sample Name] as id too. Make sure it does not exist a previous folder with this same name before running the pipeline since a new directory with this name will be generated to store the outputs.
-* **transcriptome**: here you need to indicate the directory of yor transcriptome once already decompressed.
+* **transcriptome**: here you need to indicate the directory of your transcriptome once already decompressed.
 * **expected-cells**: aproximate number of cells that you pressume has been processed.
-* **sample**: the name of you sample as indicated in the first part of your FASTQ file. Note that all samples must have the same sample name and will be processed together, regardless of their lane or read.
+* **sample**: the name of your sample as indicated in the first part of your FASTQ file. Note that all samples must have the same sample name and will be processed together, regardless of their lane or read.
 
 Other arguments can be used for this command; for a complete list, see the [Command Line Argument Reference](https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/using/count#args), or run `cellranger count --help`.
 
@@ -75,7 +76,7 @@ Other arguments can be used for this command; for a complete list, see the [Comm
 ### CellRanger count outputs
 A successful CellRanger run should end with a message similar to `Pipestance completed successfully!`. The output of the pipeline will be contained in a folder named with the sample ID you specified. The subfolder named **outs** will contain the main pipeline output files. _.bam_ and _.bai_ files, _molecule_info.h5_, raw and filtered feature bc matrices and a _.cloupe_ file among others.
 
-Moreover, it will be generated a _web_summary.html_ which is highly recommended to check in order to review the main parameters of the run such as number of cells, as well as visualize a preliminar t-SNE projection. The process may take up to 9-10 hours, regardless of the number of samples if jobs are run in parallel. After this step, we recommend checking the summary metrics and then proceed to aggregate step in case you are working with more than one sample or GEM. Otherwise, proceed to `Seurat` analysis using the <ins>filtered</ins> matrices.  
+Moreover, a _web_summary.html_ will be generated, which is highly recommended to check in order to review the main parameters of the run such as number of cells, as well as to visualize a preliminar t-SNE projection. The process may take up to 9-10 hours, regardless of the number of samples if jobs are run in parallel. After this step, we recommend checking the summary metrics and then proceed to aggregate step in case you are working with more than one sample or GEM. Otherwise, proceed to `Seurat` analysis using the <ins>filtered</ins> matrices.  
 </br>
 
 ## Cellranger aggr :milky_way:
@@ -103,7 +104,7 @@ cellranger aggr --id=[Run id] \
                   --normalize=mapped
 ````
 * **id**: A unique run ID string. In this case, also a directory will be created with this name in order to store the outputs.
-* **csv**: directory to your aggregation CSV
+* **csv**: directory to your aggregation CSV.
 * **normalize**: (Optional) String specifying how to normalize depth across the input libraries. Valid values: `mapped` (default), or `none`.
 
 ### Cellranger aggr outputs
@@ -127,4 +128,4 @@ The input for Seurat is the output of Cell Ranger, basically an aggr ("aggregate
 
 In Seurat you can normalize and scale data, calculate dimensionality reductions (PCA, tSNE, uMAP), draw heatmaps, feature plots, violin plots, etc. and perform DE analysis.
 
-Use _Seurat.R_ to analyze your single cell raw count data after running Cell Ranger.
+Use _Seurat.R_ to analyze your single cell raw count data after running Cell Ranger. If you need to work with data coming from 2 or more different experiments (i.e. sequenced in different days) you can integrate the data. See information on how to do that in the [Data integration document](https://github.com/patriciasolesanchez/PSlab/blob/patriciasolesanchez-patch-1/Single_cell_RNAseq_10x/Data_integration_Seurat.md).

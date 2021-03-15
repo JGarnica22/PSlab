@@ -22,10 +22,10 @@
 
 wd=/gpfs/projects/cek26/project #working directory
 
-fastq_AC=/gpfs/projects/cek26/project/fastq_files # path directory of fastq files with features or ADT data
-fastq_RNA=/gpfs/projects/cek26/project/fastq_files # path directory of fastq files with gene expression data
-fastq_VDJ=/gpfs/projects/cek26/project/fastq_files # path directory of fastq files with v(d)j data
-# Create folders results and store FASTQfiles in a new folder [i.e. /fastq_files] inside the working directory
+fastq_AC=/gpfs/projects/cek26/project/fastq_files # path to fastq files with features or ADT data
+fastq_RNA=/gpfs/projects/cek26/project/fastq_files # path to fastq files with gene expression data
+fastq_VDJ=/gpfs/projects/cek26/project/fastq_files # path to fastq files with V(D)J data
+# Create folders results and store fastq files in a new folder [i.e. /fastq_files] inside the working directory
 # Use the correct name nomenclature!!
 # 	[Sample Name-type(FB/GEX/VDJ)]_S1_L00[Lane Number]_[Read Type]_001.fastq.gz
 # 	Where Read Type is one of:
@@ -33,19 +33,19 @@ fastq_VDJ=/gpfs/projects/cek26/project/fastq_files # path directory of fastq fil
 # 	R1: Read 1
 # 	R2: Read 2
 
-reference_RNA=  # Path of folder containing 10x-compatible reference.
+reference_RNA=  # Path to the folder containing 10x-compatible reference.
 reference_AC= #/path/to/feature/reference, Feature reference CSV file, declaring Feature Barcode constructs and associated barcodes.
-reference_VDJ= # Path of folder containing 10x-compatible VDJ reference. Required for Immune Profiling libraries.
+reference_VDJ= # Path to the folder containing 10x-compatible VDJ reference. Required for Immune Profiling libraries.
+## SÓN CORRECTES AQUESTES INFO DE DALT???
 
-id=PS # Tittle of the project
-exp_cells=3000 #Expected number of recovered cells. Default: 3,000 cells. Switch code into --force-cells to force number of cells,
+id=PS # Title of the project
+exp_cells=3000 # Expected number of recovered cells. Default: 3,000 cells. Switch code into --force-cells to force number of cells,
 			   # bypassing the cell detection algorithm. Use this if the number of cells estimated by Cell Ranger is 
 			   # not consistent with the barcode rank plot.
-bam=true #skip generation of bam file, if false .bam and .bai files will be generated, if true not.
+bam=true # If true, skip generation of bam files. If false .bam and .bai files will be generated.
 
 ## IMPORTANT: cellranger aggr is set for samples coming from differents donors (see donor and origin at 10X_multi_VDJ_RNA_ADT.md)
 ## if otherwise aggr csv config file must be modified!!
-
 
 
 #################################################################################################################################
@@ -131,6 +131,7 @@ done
 
 echo running cellranger aggr
 module load CELLRANGER/6.0 #check proper version!!
+
 # Run cellranger aggr
 mkdir cellranger_multi_aggr && cd cellranger_multi_aggr
 
@@ -141,3 +142,4 @@ cellranger aggr --id=$id \
 
 echo cellranger aggr completed
 echo PIPELINE $id COMPLETED, proceed to Seurat analysis!
+

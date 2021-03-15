@@ -2,23 +2,23 @@
 In this tutorial we aim to describe the tools and steps needed to analyse Chromium Single Cell Multiome ATAC + Gene Expression sequencing data. This will allow us to study both gene expression and chromatin accessibility, and their relationship, since both measurements are taken on the very same cell.
 
 As in other single-cell pipelines guides, there is a first part run in shell based on cellranger pipelines which basically involves alignment, filtering, barcode counting and peak calling. These should preferably be run in the cluster and a loop to run all cellranger steps for all the samples can be found in [cellranger_arc_loop.sh](https://github.com/patriciasolesanchez/PSlab/blob/master/Single_cell_RNAseq_10x/Multi-modal/cellranger_arc_loop.sh).
-After this,this guideline recommends downloading cellranger outputs and import them into Seurat package to do the downstream analysis and visualization. A script with Seurat functions to use is found at [10X_ATAC_RNA.R](https://github.com/patriciasolesanchez/PSlab/blob/master/Single_cell_RNAseq_10x/Multi-modal/10X_ATAC_RNA.R).
+After this, this guideline recommends downloading cellranger outputs and importing them into Seurat package to do the downstream analysis and visualization. A script with Seurat functions to use is found at [10X_ATAC_RNA.R](https://github.com/patriciasolesanchez/PSlab/blob/master/Single_cell_RNAseq_10x/Multi-modal/10X_ATAC_RNA.R).
 
-**Before start** :heavy_exclamation_mark:: This guide assumes that you are already have the fastq files for analysis with `cellranger-arc`. If you are beginning with raw base call (BCL) files or more information about cellranger-arc visit [10X webpage](https://support.10xgenomics.com/single-cell-multiome-atac-gex/software/pipelines/latest/what-is-cell-ranger-arc).
-
+**Before starting** :heavy_exclamation_mark:: This guide assumes that you are already have the fastq files for analysis with `cellranger-arc`. If you are beginning with raw base call (BCL) files or more information about cellranger-arc visit [10X webpage](https://support.10xgenomics.com/single-cell-multiome-atac-gex/software/pipelines/latest/what-is-cell-ranger-arc).  
+</br>
 
 ## cellranger-arc count :rainbow:
 **Guideline for cellranger-arc **v1.0***
 
-#### Get cellranger-arc-compatible reference
+### Get cellranger-arc-compatible reference
 Before starting make sure to download the right cellranger-arc-compatible reference files (reference for human and mouse to donwload [here](https://support.10xgenomics.com/single-cell-multiome-atac-gex/software/downloads/latest)). You can also create a reference package using `cellranger-arc mkref` starting with a genome assembly FASTA file, a GTF file of gene annotations, and optionally a file of transcription factor motifs in JASPAR format.
 
-#### Create CSV file with libraries
-Next, construct a 3-column libraries CSV file that specifies the location of the ATAC and GEX FASTQ files associated with the sample. You can do this once you have uploaded your files to the cluster in the appropriate folder.
+### Create CSV file with libraries
+Next, construct a 3-column CSV file that specifies the location of the ATAC and GEX FASTQ files associated with the sample. You can do this once you have uploaded your files into the cluster in the appropriate folder.
 
 | Column name/parameter | Description                              |
 |-----------------------|------------------------------------------|
-| `fastqs`                | A fully qualified path to the *directory* containing the demultiplexed FASTQ files for this sample. This field does not accept comma-delimited paths. If you have multiple sets of fastqs for this library, add an additional row, and use the same `library_type` value. |
+| `fastqs`                | A fully qualified path to the *directory* containing the demultiplexed FASTQ files for this sample. This field does not accept comma-delimited paths. If you have multiple sets of fastq files for this library, add an additional row, and use the same `library_type` value. |
 | `sample`                | Sample name. Important, sample name must have this format: SampleName_S1_L001_R1_001.fastq.gz |
 | `library_type`          | This field is case-sensitive and must exactly match `Chromatin Accessibility` for a Multiome ATAC library and `Gene Expression` for a Multiome GEX library. |
 
@@ -28,9 +28,9 @@ For instance, a library CSV file would look like this:
 fastqs,sample,library_type
 /fastq_files/GEX_fastq,sample1,Gene Expression
 /fastq_files/ATAC_fastq,sample1,Chromatin Accessibility
-````
+````  
 
-#### Run cellranger-arc count
+### Run cellranger-arc count
 NOTE: Run a separate instance of `cellranger-arc count` for each GEM well that was demultiplexed!
 
 Run `cellranger-arc count` with the following arguments:
@@ -45,7 +45,7 @@ By default, `cellranger-arc` will use all the cores available on your system to 
 
 The pipeline will create a new folder named with the **sample ID** you specified for its output. If this folder already exists, `cellranger-arc` will assume it is an existing pipestance and attempt to resume running it.
 
-To see other command-line argument run cellranger-arc count --help, here are some useful:
+To see other command-line arguments run cellranger-arc count --help, here are some useful:
 | Argument                      | Description                              |
 |-------------------------------|------------------------------------------|
 | `--gex-exclude-introns`       | Disable counting of intronic reads. In this mode we only count reads that are exonic and compatible with annotated splice junctions in the reference. Note: using this mode will reduce the UMI counts in the count matrix. |
@@ -54,9 +54,7 @@ To see other command-line argument run cellranger-arc count --help, here are som
 | `--peaks`                     | **Peak-caller override**: specify peaks to use in downstream analyses from supplied BED file. Note that the file must only contain three columns specifying the contig, start, and end of the peaks with no comment lines. The peaks must not overlap each other. The file must be sorted by position with the same chromosome order as the reference package. |
 
 
-
-
-#### Output files
+### Output files
 A successful cellranger-arc count run should conclude with a message similar to this:
 
 ````
@@ -94,6 +92,8 @@ The output of the pipeline will be contained in the folder named with the sample
 
 
 ## Aggregation of samples 
-:question: cellranger-arc do not offer tools to aggregate data from differents replicates, this should be done in Seurat.
+:question: cellranger-arc does not offer tools to aggregate data from differents replicates yet, this should be done in Seurat.  
+</br>
 
 ## Seurat WNN analysis RNA+ATAC :twisted_rightwards_arrows:
+

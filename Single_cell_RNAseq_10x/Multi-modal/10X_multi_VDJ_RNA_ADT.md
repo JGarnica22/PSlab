@@ -1,5 +1,6 @@
 # Analysis of V(D)J, Gene Expression and Feature Barcode single-cell data :art:
-The 5' Chromium Single Cell Immune Profiling Solution with Feature Barcode technology enables simultaneous profiling of V(D)J repertoire, cell surface protein, antigen specificity and gene expression data.
+The 5' Chromium Single Cell Immune Profiling Solution with Feature Barcode technology enables simultaneous profiling of V(D)J repertoire, cell surface protein, antigen specificity and gene expression data.  
+</br>
 
 ## cellranger multi :octopus:
 
@@ -7,7 +8,8 @@ The cellranger multi pipeline enables the analysis of these multiple library typ
 
 **Note**: These guide lines assume that you already have fastq files either recieved from the facility or produced with `cellranger mkfastq`.
 
-For more information visit [10X genomics webpage](https://support.10xgenomics.com/single-cell-vdj/software/pipelines/latest/using/multi).
+For more information visit [10X genomics webpage](https://support.10xgenomics.com/single-cell-vdj/software/pipelines/latest/using/multi).  
+
 
 ### Run cellranger multi
 
@@ -32,7 +34,6 @@ Where Read Type is one of:
 * R2: Read 2
 
 
-
 Basically, in the multi-config.csv file it must be indicated reference genome for gene expression and vdj respective analysis, location of the fastq files and the features included in the libraries (*‘Gene Expression’, ‘VDJ’, ‘VDJ-T’, ‘VDJ-B’, ‘Antibody Capture’, ‘CRISPR Guide Capture’, or ‘Antigen Capture’*).
 
 Optional arguments can also be added, such as previously seen --force-cells. For more information visit [10X genomics](https://support.10xgenomics.com/single-cell-vdj/software/pipelines/latest/using/multi).
@@ -50,7 +51,7 @@ yyyy-mm-dd hh:mm:ss Shutting down.
 Saving pipestance info to "samples365.mri.tgz"
 ````
 
-The output of the pipeline will be contained in a folder named with the **run ID** you specified (e.g. samples345). The subfolder named outs will contain the main pipeline outputs with the following structure:
+The output of the pipeline will be contained in a folder named with the **run ID** you specified (e.g. samples345). The subfolder named _outs_ will contain the main pipeline outputs with the following structure:
 
 ![](https://support.10xgenomics.com/img/single-cell-vdj/multi-output-dir-structure.png)
 
@@ -66,11 +67,10 @@ The files in the `multi` folder contain raw data, i.e., the data for all barcode
 | `vdj_t`                | The results of any V(D)J Immune Profiling analysis for any T cells, similar to cellranger vdj |
 
 
-
 ***Note**: The gene expression library is representative of the entire pool of poly-adenylated mRNA transcripts captured within each partition (droplet). The TCR or BCR transcripts are then selectively amplified to create the V(D)J library. Therefore, the gene expression library has more power to detect partitions containing cells compared to the V(D)J library. If the multi pipeline is run with both gene expression and VDJ data, then barcodes which are not called as cells by using the gene expression data will be deleted from the V(D)J cell set.
 
 
-## Agregate data with cellranger aggr
+## Aggregate data with cellranger aggr
 Many experiments involve generating multiple 10x libraries processed through different Gel Bead-in Emulsion (GEM) Wells on the Chromium instrument. Depending on the experimental design, these could be replicates from the same set of cells, cells from different tissue/time points from the same individual, or cells from different individuals. The `cellranger count`, `cellranger vdj`, and `cellranger multi` pipelines process data from a single GEM well. The aggr pipeline aggregates the outputs from multiple runs of `cellranger count/vdj/multi` and performs analysis on the combined data.
 `cellranger aggr` is not designed for combining multiple sequencing runs from the same GEM Well (i.e., resequenced libraries). For that, pass the FASTQ files from multiple sequencing runs of the same GEM well to the count, vdj, or multi pipeline, as appropriate.
 
@@ -93,7 +93,7 @@ Create a CSV containing the following columns:
 
 In addition to CSV columns described above, `cellranger aggr` accepts optional columns that may contain additional meta-data (e.g., vaccination status). These custom library annotations do not affect the analysis pipeline but can be visualized downstream in the Loupe V(D)J Browser.
 
-`cellranger aggr` will auto-detect the presence of various libraries based on the structure and contents of the per sample outs folders. Apart from the change in the input CSV column (sample_outs instead of molecule_h5), the sections on aggregating outputs from cellranger count (depth normalization, batch correction etc.) applies here as well.
+`cellranger aggr` will auto-detect the presence of various libraries based on the structure and contents of the per sample outs folders. Apart from the change in the input CSV column (sample_outs instead of molecule_h5), the sections on aggregating outputs from cellranger count (depth normalization, batch correction, etc.) applies here as well.
 
 Here is an example of a config file:
 ````
@@ -103,13 +103,15 @@ Sample2,/opt/runs/Sample2/outs/per_sample_outs/Sample2,D1,pbmc_t1,Post-Vaccinati
 ````
 
 ### cellranger aggr output files
-Output files of `cellranger aggr` pipeline will be the same directories and files as individual jobs from `cellranger multi` but will be alocated in a single folder named as indiated in `--id`. `cellranger aggr` does not perform a cell-calling step, it simply aggregates the cell calls from each input job into a final set of cell calls.
+Output files of `cellranger aggr` pipeline will be the same directories and files as individual jobs from `cellranger multi` but will be alocated in a single folder named as indicated in `--id`. `cellranger aggr` does not perform a cell-calling step, it simply aggregates the cell calls from each input job into a final set of cell calls.
 
 # :construction: IMPORTANT:
-All these tools are integrated in [cellranger_multi_loop.sh](https://github.com/patriciasolesanchez/PSlab/blob/master/Single_cell_RNAseq_10x/Multi-modal/cellranger_multi_loop.sh), in order to just change few parameters and run all of them alone. **Pipeline still to be tested!!**
+All these tools are integrated in [cellranger_multi_loop.sh](https://github.com/patriciasolesanchez/PSlab/blob/master/Single_cell_RNAseq_10x/Multi-modal/cellranger_multi_loop.sh), in order to just change a few parameters and run all of them at once. **Pipeline still to be tested!!**  
+</br>
 
 ## Seurat analysis :globe_with_meridians:
 
-To analysis cellranger pipelines data on Seurat download `cellranger aggr` files, in case you have multiple GEM samples, otherwise download files directly from `cellranger multi` output. We recommend download and work with filtered matrixs.
+To analyse cellranger output data in Seurat download the `cellranger aggr` files, in case you have multiple GEM samples, otherwise download files directly from `cellranger multi` output. We recommend downloading and working with filtered matrices.
 
 Details on how to import and integrate different data type are detailed in [10X_RNA_VDJ_ADT.R](https://github.com/patriciasolesanchez/PSlab/blob/master/Single_cell_RNAseq_10x/Multi-modal/10X_RNA_ADT_VDJ.R)
+
