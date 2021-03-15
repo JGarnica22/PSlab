@@ -62,7 +62,7 @@ library(stringr)
 setwd("C:/Users/jgarn/OneDrive - Universitat de Barcelona/Documentos/Bioinformatics/Terminal/SmartSeq2/Seurat")
 
 # Specify parameters to be used along the script:
-#Indicate species working with (typicall mouse or human)
+#Indicate species working with (typically mouse or human)
 species <- "mouse"
 #Indicate samples you sequenced separatedly (for example, you sorted your treated
 #and control populations separatedly):
@@ -131,14 +131,6 @@ for (t in c("Tet[+]","Tet[-]")){
   scdata@meta.data[grep(t, scdata@meta.data$sampletype),"condition"] <- t
 }
 
-### Integration of diferents projects ###
-# Set up a column to identify from which project or tech comes every cell:
-scdata@meta.data$project <- NA
-for (i in rownames(scdata@meta.data)){
-  if (scdata@meta.data[i, "sampletype"] == "Tet+_BDC") {
-    scdata@meta.data[i, "project"] <- "BDC"
-  } else {scdata@meta.data[i, "project"] <- "Ins" }
-}
 
 ## Add TCR clonotype information
 tracer <- read.csv(paste0(getwd(),"/data/cell_data.csv"))
@@ -180,51 +172,11 @@ VlnPlot(scdata, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), pt.siz
 # Subset data (these parameters by default, modify thresholds if you like to filter differently)
 scdata <- subset(scdata, subset = nFeature_RNA>300 & nFeature_RNA<2000 & percent.mt<10)
 
-
-## START DATA INTEGRATION ##
-
-# Split object based on the projects or tech you want to integrate
-list <- SplitObject(scdata, split.by = "project")
-
-# Prior to finding anchors, we perform standard preprocessing (log-normalization), and identify 
-# variable features individually for each. Note that Seurat v3 implements an improved method
-# for variable feature selection based on a variance stabilizing transformation ("vst")
-for (i in 1:length(list)) {
-  list[[i]] <- NormalizeData(list[[i]], verbose = FALSE)
-  list[[i]] <- FindVariableFeatures(list[[i]], selection.method = "vst", 
-                                             nfeatures = 2000, verbose = FALSE)
-}
-
-# Next, we identify anchors using the FindIntegrationAnchors function, which takes a list of Seurat objects as input. 
-# We use all default parameters here for identifying anchors, including the 'dimensionality' of the dataset (30;
-# feel free to try varying this parameter over a broad range, for example between 10 and 50).
-
-anchors <- FindIntegrationAnchors(object.list = list, dims = 1:30)
-
-# We then pass these anchors to the IntegrateData function, which returns a Seurat object.
-# The returned object will contain a new Assay, which holds an integrated (or 'batch-corrected') expression matrix
-# for all cells, enabling them to be jointly analyzed.
-
-integrated <- IntegrateData(anchorset = anchors, dims = 1:30)
-
-# After running IntegrateData, the Seurat object will contain a new Assay with the integrated expression matrix. 
-# Note that the original (uncorrected values) are still stored in the object in the "RNA" assay,
-# so you can switch back and forth.
-
-scdata <- integrated
-
-
-# After integration follow with the downstream analysis and visualization.
-# - scaling
-# - Detection of highly variable features
-
-# switch to integrated assay. The variable features of this assay are automatically
-# set during IntegrateData
-DefaultAssay(scdata) <- "integrated"
-
 # Run workflow for visualization and clustering normally
 all.genes <- rownames(scdata)
 scdata@meta.data$clonal_group <- as.factor(scdata@meta.data$clonal_group)
+scdata <- NormalizeData(scdata, normalization.method = "LogNormalize", scale.factor = 10000)
+scdata <- FindVariableFeatures(scdata, selection.method = "vst", nfeatures = 2000)
 scdata <- ScaleData(scdata, verbose = TRUE, features = all.genes)
 scdata <- RunPCA(scdata, verbose = TRUE)
 DimPlot(scdata, reduction = "pca", dims = c(1,2))
