@@ -94,7 +94,7 @@ echo RPG_list \<\- list.files\(path=paste0\(getwd\(\),\"/$alignment_counts\"\), 
 echo for \(g in 1\:length\(RPG_list\)\)\{
 echo   x \<\- read.table\(paste0\(getwd\(\), \"/$alignment_counts/\", RPG_list\[g\]\)\) 
 echo  x1 \<\- x[\-\(1\:4\),c\(1,2\)]
-echo  names\(x1\) \<\- c\(\"Ensembl_id\", strsplit\(as.character\(RPG_list[g]\), split=\"_\", fixed=TRUE\)[[1]][1]\)
+echo  names\(x1\) \<\- c\(\"Ensembl_id\", strsplit\(as.character\(RPG_list[g]\), split=\"_R\", fixed=TRUE\)[[1]][1]\)
 echo if \(g == 1\)\{ all_reads \<\- x1 \} else \{all_reads \<\- merge\(all_reads, x1, by=\"Ensembl_id\"\) \}\}
 
 echo rownames\(all_reads\) \<\- all_reads\$Ensembl_id
