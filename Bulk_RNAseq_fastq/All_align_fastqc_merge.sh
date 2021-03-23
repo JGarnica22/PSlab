@@ -102,7 +102,7 @@ echo all_reads \<\- all_reads[,\-1]
       
 echo write.table\(all_reads, \
             file = paste0\(getwd\(\),\"/$alignment_counts/Reads_all_samples.txt\"\), \
-            sep = "\t", quote = F, dec = ".", row.names = T, col.names = T\) 
+            sep = \"\t\", quote = F, dec = \".\", row.names = T, col.names = T\) 
 } > Merge_reads.R
 R < Merge_reads.R --save
 
