@@ -77,6 +77,9 @@ The following output files are generated:
 * clonotype_sizes.pdf and clonotype_sizes.txt: Distribution of clonotype sizes as bar graph and text file.
 * clonotype_network_[with|without]_identifiers.<graph_format>: graphical representation of clonotype networks.
 
+#### Generate comprehensive table of TraCer results
+Sometimes TraCer describes more than one productive TCR chain for each cell, if you want to create a table describing all productive TCR sequences for each cell use [TraCer_recombinants.R](https://github.com/patriciasolesanchez/PSlab/blob/JGarnica22-patch-1/Single_cell_RNAseq_SMARTseq2/TraCer_recombinants.R) to convert recombinants.txt into a comprehensive table.
+
 
 ## Seurat analysis :raised_hands:
 Seurat analysis for SmartSeq2 is based on [Seurat.R](https://github.com/patriciasolesanchez/PSlab/blob/master/Single_cell_RNAseq_10x/Seurat.R) script of 10X pipeline with few modifications here detailed. After applying these modifications you can run the rest of the commands to analyze and generate graphs.
