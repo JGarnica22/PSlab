@@ -30,7 +30,7 @@ For more information visit [Cellranger Website](https://support.10xgenomics.com/
 ### FASTQ files names
 The first thing for running `cellranger count` is to localize and check the names of your FASTQ files. It is essential that file names are in this format, otherwise pipeline will not recognize them:
 
-**[Sample Name]_S1_L00[Lane Number]_[Read Type]_001.fastq.gz**
+**[Sample Name]\_S1_L00[Lane Number]_[Read Type]_001.fastq.gz**
 
 Where Read Type is one of:
 * I1: Sample index read (optional)
