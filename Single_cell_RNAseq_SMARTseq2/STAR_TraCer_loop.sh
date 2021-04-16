@@ -15,9 +15,9 @@ wd=/gpfs/projects/cek26/SMARTseq2_BDC_INS
 in=/gpfs/home/cek26/cek26527/mouse
 cd $wd
 mkdir to_bsub
-alig_folder=alignment5
+align_folder=alignment5
 tracer=tracer2
-mkdir $alig_folder $tracer fastqc
+mkdir $align_folder $tracer fastqc
 
 # Split fastq files in groups to parallelize the jobs, here we will be splitting the files in 3:
 part=$(expr $(ls fastq_files/*_1*.gz | wc -l) / 3)
@@ -51,14 +51,14 @@ echo Group_3\=\$\(echo \"\$all\" \| tail \-n $(expr $part \* 2 + 2) \| head \-n 
 # Loop for STAR alignment and gene count
 echo for f in $i 
 echo do
-echo if \[ \-f $alig_folder\/\$\(cut \-d \".\" \-f1 \<\<\< \$f \| sed \'s/..$//\'\)_ReadsPerGene.out.tab \]\; then
+echo if \[ \-f $align_folder\/\$\(cut \-d \".\" \-f1 \<\<\< \$f \| sed \'s/..$//\'\)_ReadsPerGene.out.tab \]\; then
 echo echo \$\(cut \-d \".\" \-f1 \<\<\< \$f \| sed \'s/..$//\'\) "done"
 echo else
 
 # Perform alignment
 echo echo doing STAR \$\(cut \-d \".\" \-f1 \<\<\< \$f \| sed \'s/..$//\'\)
 echo STAR --runMode alignReads --genomeDir $in/STAR_index --readFilesIn fastq_files/\$f fastq_files/\$\(cut \-d \".\" \-f1 \<\<\< \$f \| sed \'s/..$//\'\)_2*.gz --readFilesCommand zcat \
---outFileNamePrefix $alig_folder\/\$\(cut \-d \".\" \-f1 \<\<\< \$f \| sed \'s/..$//\'\) \
+--outFileNamePrefix $align_folder\/\$\(cut \-d \".\" \-f1 \<\<\< \$f \| sed \'s/..$//\'\) \
 --outReadsUnmapped Fastx --outSAMtype BAM SortedByCoordinate --sjdbGTFfile $in/gencode.vM25.annotation.gtf \
 --twopassMode Basic --quantMode GeneCounts --runThreadN 64
 echo fi
