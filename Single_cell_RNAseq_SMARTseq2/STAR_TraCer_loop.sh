@@ -133,7 +133,7 @@ sleep 300;
 done
 
 module purge
-module load gcc/7.2.0 R/3.6.3
+module load gcc/8.4.0 openmpi/4.0.2 MKL/2017.4 R/4.0.4 
 
 
 # Merge all ReadPerGene dataframe column 2 (unstranded) into a unique dataframe for analysis with R, once all jobs are done.
@@ -142,7 +142,7 @@ echo RPG_list \<\- list.files\(path=paste0\(getwd\(\),\"/$alig_folder\"\), patte
 echo for \(g in 1\:length\(RPG_list\)\)\{
 echo   x \<\- read.table\(paste0\(getwd\(\), \"/$alig_folder/\", RPG_list\[g\]\)\) 
 echo  x1 \<\- x[\-\(1\:4\),c\(1,2\)]
-echo  names\(x1\) \<\- c\(\"Ensembl_id\", strsplit\(as.character\(RPG_list[g]\), split=\"_Re\", fixed=TRUE\)[[1]][1]\)
+echo  names\(x1\) \<\- c\(\"Ensembl_id\", strsplit\(as.character\(RPG_list[g]\), split=\"Re\", fixed=TRUE\)[[1]][1]\)
 echo if \(g == 1\)\{ all_reads \<\- x1 \} else \{all_reads \<\- merge\(all_reads, x1, by=\"Ensembl_id\"\) \}\}
 
 echo rownames\(all_reads\) \<\- all_reads\$Ensembl_id
@@ -150,7 +150,7 @@ echo all_reads \<\- all_reads[,\-1]
       
 echo write.table\(all_reads, \
             file = paste0\(getwd\(\),\"/$alig_folder/Reads_all_samples.txt\"\), \
-            sep = "\t", quote = F, dec = ".", row.names = T, col.names = T\) 
+            sep = \"\t\", quote = F, dec = \".\", row.names = T, col.names = T\) 
 } > Smart.R
 R < Smart.R --save
 
