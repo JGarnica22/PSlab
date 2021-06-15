@@ -20,7 +20,11 @@ tracer=tracer2
 mkdir $alig_folder $tracer fastqc
 
 # Split fastq files in groups to parallelize the jobs, here we will be splitting the files in 3:
-part=$(expr $(ls fastq_files/*_1*.gz | wc -l) / 3)
+part=$(expr $(ls fastq_files/
+
+
+
+.fastq.gz | wc -l) / 3)
 
 for i in \$Group_1 \$Group_2 \$Group_3
 do
@@ -43,7 +47,7 @@ echo module load java/1.8.0u66 fastqc intel/2017.4 impi/2017.4 mkl/2017.4 gcc/7.
 python/3.7.4_pip STAR/2.7.5a
 
 echo cd $wd
-echo all=\$\(find ./fastq_files -name "*_1*.gz" -exec basename {} "\;" \)
+echo all=\$\(find ./fastq_files -name "*_1.fastq.gz" -exec basename {} "\;" \)
 echo Group_1\=\$\(echo \"\$all\" \| head \-n $part\)
 echo Group_2\=\$\(echo \"\$all\" \| tail \-n $part\)
 echo Group_3\=\$\(echo \"\$all\" \| tail \-n $(expr $part \* 2 + 2) \| head \-n $(expr $part + 2)\)
@@ -85,7 +89,7 @@ echo module purge
 echo module load singularity
 
 echo cd $wd
-echo all=\$\(find ./fastq_files -name "*_1*.gz" -exec basename {} "\;" \)
+echo all=\$\(find ./fastq_files -name "*_1.fastq.gz" -exec basename {} "\;" \)
 echo Group_1\=\$\(echo \"\$all\" \| head \-n $part\)
 echo Group_2\=\$\(echo \"\$all\" \| tail \-n $part\)
 echo Group_3\=\$\(echo \"\$all\" \| tail \-n $(expr $part \* 2 + 2) \| head \-n $(expr $part + 2)\)
@@ -127,7 +131,7 @@ done
 convert fastqc/*.png fastqc/fastqc_summary.pdf
 
 # Merge read counts and summarize tracer output
-while [ $(find ./$alig_folder -type f -name "*Read*" -print | wc -l) != $(find ./fastq_files -type f -name "*_1*.gz" -print | wc -l) ]
+while [ $(find ./$alig_folder -type f -name "*Read*" -print | wc -l) != $(find ./fastq_files -type f -name "*_1.fastq.gz" -print | wc -l) ]
 do
 sleep 300;
 done
@@ -150,12 +154,12 @@ echo all_reads \<\- all_reads[,\-1]
       
 echo write.table\(all_reads, \
             file = paste0\(getwd\(\),\"/$alig_folder/Reads_all_samples.txt\"\), \
-            sep = \"\t\", quote = F, dec = \".\", row.names = T, col.names = T\) 
+            sep = \"\\t\", quote = F, dec = \".\", row.names = T, col.names = T\) 
 } > Smart.R
 R < Smart.R --save
 
 # Summarise TraCer
-while [ $(ls $tracer| wc -l) != $(find ./fastq_files -type f -name "*_1*.gz" -print | wc -l) ]
+while [ $(ls $tracer| wc -l) != $(find ./fastq_files -type f -name "*_1.fastq.gz" -print | wc -l) ]
 do
 sleep 300;
 done
