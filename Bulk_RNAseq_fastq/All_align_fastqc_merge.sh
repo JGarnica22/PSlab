@@ -38,11 +38,11 @@ do
 {
 echo \#!/bin/bash
 echo \#BSUB cwd $wd
-echo \#BSUB -J aligment_counts_$(cut -d'.' -f1 <<< $f)
+echo \#BSUB -J alignment_counts_$(cut -d'.' -f1 <<< $f)
 echo \#BSUB -q bsc_ls
 echo \#BSUB -W 2:00
-echo \#BSUB -eo $wd/$bsub_reports/aligment_counts_$(cut -d'.' -f1 <<< $f).err
-echo \#BSUB -oo $wd/$bsub_reports/aligment_counts_$(cut -d'.' -f1 <<< $f).out
+echo \#BSUB -eo $wd/$bsub_reports/alignment_counts_$(cut -d'.' -f1 <<< $f).err
+echo \#BSUB -oo $wd/$bsub_reports/alignment_counts_$(cut -d'.' -f1 <<< $f).out
 echo \#BSUB -M 1800
 echo \#BSUB -n 32
 echo \#BSUB "span[ptile=16]"
@@ -56,9 +56,9 @@ echo STAR --runMode alignReads --genomeDir $STAR_index --readFilesIn fastq_files
 
 echo samtools index $alignment_counts/$(cut -d'.' -f1 <<< $f)*.bam
 echo bamCoverage -b $alignment_counts/$(cut -d'.' -f1 <<< $f)*.bam -o $alignment_counts/Cover_$(cut -d'.' -f1 <<< $f).bw
-} > $to_bsub/aligment_reads_$(cut -d'.' -f1 <<< $f).sh
-sed -i -e 's/\r$//' $to_bsub/aligment_reads_$(cut -d'.' -f1 <<< $f).sh
-bsub < $to_bsub/aligment_reads_$(cut -d'.' -f1 <<< $f).sh
+} > $to_bsub/alignment_reads_$(cut -d'.' -f1 <<< $f).sh
+sed -i -e 's/\r$//' $to_bsub/alignment_reads_$(cut -d'.' -f1 <<< $f).sh
+bsub < $to_bsub/alignment_reads_$(cut -d'.' -f1 <<< $f).sh
 done
 
 # Perform quality control of RNAseq using FastQC tool for all processed samples and output a common pdf file
