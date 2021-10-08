@@ -31,7 +31,7 @@ echo \#!/bin/bash
 echo \#BSUB cwd $wd
 echo \#BSUB -J atacseq_$(cut -d'_' -f1 <<< $f)
 echo \#BSUB -q bsc_ls
-echo \#BSUB -W 8:00
+echo \#BSUB -W 12:00
 echo \#BSUB -eo $wd/bsub_reports/atacseq_$(cut -d'_' -f1 <<< $f).err
 echo \#BSUB -oo $wd/bsub_reports/atacseq_$(cut -d'_' -f1 <<< $f).out
 echo \#BSUB -M 1800
@@ -43,14 +43,15 @@ echo module purge
 echo module load java/1.8.0u66 intel/2017.4 impi/2017.4 MKL/2017.4 gcc/5.3.0 OPENSSL/1.1.1c PYTHON/3.7.4_pip \
 BOWTIE/2.4.2 SAMTOOLS/1.9
 echo cd $wd
+## !!! check adapters
 echo java -jar ../software/Trimmomatic-0.39/trimmomatic-0.39.jar SE -threads 64 \
 fastq_files/$f trimmed/trim_$f \
 ILLUMINACLIP:../software/Trimmomatic-0.39/adapters/NexteraSE.fa:2:30:10 LEADING:2 TRAILING:2 SLIDINGWINDOW:4:8 MINLEN:15
-echo bowtie2 -p 32 --very-sensitive -X 2000 -x ../genome_mus/bowtie2/genome -U trimmed/trim_$f \
-\| samtools view -u - \| samtools sort - \> alignment/bowtie_$(cut -d'.' -f1 <<< $f).bam
+echo bowtie2 -p 64 --very-sensitive -X 2000 -x ../genome_mus/bowtie2/genome -U trimmed/trim_$f \
+\| samtools view -@ 64 -u - \| samtools sort -@ 64 - \> alignment/bowtie_$(cut -d'.' -f1 <<< $f).bam
 echo java -jar ../software/picard.jar MarkDuplicates -I alignment/bowtie_$(cut -d'.' -f1 <<< $f).bam -O alignment/no_dup/nd_$(cut -d'.' -f1 <<< $f).bam \
 -M alignment/no_dup/$(cut -d'.' -f1 <<< $f)_log_dups.txt -REMOVE_DUPLICATES true
-echo samtools index alignment/no_dup/nd_$(cut -d'.' -f1 <<< $f).bam
+echo samtools index -@ 64 alignment/no_dup/nd_$(cut -d'.' -f1 <<< $f).bam
 echo macs2 callpeak -t alignment/no_dup/nd_$(cut -d'.' -f1 <<< $f).bam -f BAM -g 1.87e9 -q 0.05 --nomodel --shift 4 --extsize 150 --keep-dup all \
 -n macs_$(cut -d'.' -f1 <<< $f) --outdir peak_calling 2\> peak_calling/macs_$(cut -d'.' -f1 <<< $f).log
 } > to_bsub/atacseq_$(cut -d'_' -f1 <<< $f).sh
