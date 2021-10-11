@@ -26,13 +26,12 @@ module purge
 module load java/1.8.0u66 intel/2017.4 impi/2017.4 MKL/2017.4 gcc/5.3.0 OPENSSL/1.1.1c PYTHON/3.7.4_pip \
 BOWTIE/2.4.2 SAMTOOLS/1.9
 
-c=$(find ./fastq_files -name "Input*2.fastq.gz" -exec basename {} \;)
+c=$(find ./fastq_files -name "Input1*2.fastq.gz" -exec basename {} \;)
 
-############################## check adapters!!!!! #################################################
-java -jar ../software/Trimmomatic-0.39/trimmomatic-0.39.jar SE -threads 64 \
-fastq_files/$c trimmed/trim_$c \
-java -jar ../software/Trimmomatic-0.39/trimmomatic-0.39.jar SE -threads 64 \
-fastq_files/$(cut -d'_' -f1,2,3 <<< $c).fastq.gz trimmed/trim_$(cut -d'_' -f1,2,3 <<< $c).fastq.gz \
+java -jar ../software/Trimmomatic-0.39/trimmomatic-0.39.jar PE -threads 64 \
+fastq_files/$(cut -d'_' -f1,2,3 <<< $c).fastq.gz fastq_files/$c  \
+trimmed/trim_$(cut -d'_' -f1,2,3 <<< $c).fastq.gz trimmed/trim_1U_$(cut -d'_' -f1,2,3 <<< $c).fastq.gz \
+trimmed/trim_$c trimmed/trim_2U_$c\
 ILLUMINACLIP:../software/Trimmomatic-0.39/adapters/NexteraPE-PE.fa:2:30:10 LEADING:2 TRAILING:2 SLIDINGWINDOW:4:8 MINLEN:15
 bowtie2 -p 64 --very-sensitive -X 2000 -x ../genome_mus/chr_bowtie2/mm10 \
 -1 trimmed/trim_$(cut -d'_' -f1,2,3 <<< $c).fastq.gz  -2 trimmed/trim_$c \
@@ -40,6 +39,20 @@ bowtie2 -p 64 --very-sensitive -X 2000 -x ../genome_mus/chr_bowtie2/mm10 \
 java -jar ../software/picard.jar MarkDuplicates -I alignment/bowtie_$(cut -d'_' -f1 <<< $c).bam -O alignment/no_dup/nd_$(cut -d'_' -f1 <<< $c).bam \
 -M alignment/no_dup/$(cut -d'.' -f1 <<< $c)_log_dups.txt -REMOVE_DUPLICATES true
 samtools index -@ 64 alignment/no_dup/nd_$(cut -d'_' -f1 <<< $c).bam
+
+d=$(find ./fastq_files -name "Input2*2.fastq.gz" -exec basename {} \;)
+
+java -jar ../software/Trimmomatic-0.39/trimmomatic-0.39.jar SE -threads 64 \
+fastq_files/$(cut -d'_' -f1,2,3 <<< $d).fastq.gz fastq_files/$d  \
+trimmed/trim_$(cut -d'_' -f1,2,3 <<< $d).fastq.gz trimmed/trim_1U_$(cut -d'_' -f1,2,3 <<< $d).fastq.gz \
+trimmed/trim_$d trimmed/trim_2U_$d\
+ILLUMINACLIP:../software/Trimmomatic-0.39/adapters/NexteraPE-PE.fa:2:30:10 LEADING:2 TRAILING:2 SLIDINGWINDOW:4:8 MINLEN:15
+bowtie2 -p 64 --very-sensitive -X 2000 -x ../genome_mus/chr_bowtie2/mm10 \
+-1 trimmed/trim_$(cut -d'_' -f1,2,3 <<< $d).fastq.gz  -2 trimmed/trim_$d \
+\| samtools view -@ 64 -u - \| samtools sort -@ 64 - \> alignment/bowtie_$(cut -d'_' -f1 <<< $d).bam
+java -jar ../software/picard.jar MarkDuplicates -I alignment/bowtie_$(cut -d'_' -f1 <<< $d).bam -O alignment/no_dup/nd_$(cut -d'_' -f1 <<< $d).bam \
+-M alignment/no_dup/$(cut -d'.' -f1 <<< $d)_log_dups.txt -REMOVE_DUPLICATES true
+samtools index -@ 64 alignment/no_dup/nd_$(cut -d'_' -f1 <<< $d).bam
 
 
 for f in $(find ./fastq_files -name "T*2.fastq.gz" -exec basename {} \;)
@@ -72,7 +85,7 @@ echo bowtie2 -p 64 --very-sensitive -X 2000 -x ../genome_mus/chr_bowtie2/mm10 \
 echo java -jar ../software/picard.jar MarkDuplicates -I alignment/bowtie_$(cut -d'_' -f1 <<< $f).bam -O alignment/no_dup/nd_$(cut -d'_' -f1 <<< $f).bam \
 -M alignment/no_dup/$(cut -d'.' -f1 <<< $f)_log_dups.txt -REMOVE_DUPLICATES true
 echo samtools index -@ 64 alignment/no_dup/nd_$(cut -d'_' -f1 <<< $f).bam
-echo macs2 callpeak -t alignment/no_dup/nd_$(cut -d'_' -f1 <<< $f).bam -c alignment/no_dup/nd_$(cut -d'_' -f1 <<< $c).bam \
+echo macs2 callpeak -t alignment/no_dup/nd_$(cut -d'_' -f1 <<< $f).bam -c alignment/no_dup/nd_$(cut -d'_' -f1 <<< $c).bam alignment/no_dup/nd_$(cut -d'_' -f1 <<< $d).bam \
  -f BAM -g 1.87e9 -q 0.05 --keep-dup all \
 -n macs_$(cut -d'_' -f1 <<< $f) --outdir peak_calling 2\> peak_calling/macs_$(cut -d'_' -f1 <<< $f).log
 } > to_bsub/atacseq_$(cut -d'_' -f1 <<< $f).sh
