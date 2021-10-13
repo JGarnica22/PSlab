@@ -192,7 +192,7 @@ The number of tasks for the job. In MPI executions corresponds to the number of 
 Use the nodes exclusively. This is the default behaviour except for sequential executions.
 
     #BSUB -M number
-?????  INDICATE WHAT -M MEANS
+?????  INDICATE WHAT -M MEANS (SOLVE)
 
 Then you can start writing your code, remember that if you want to add comments to your code use `# `  with a blank space afterwards.
 
