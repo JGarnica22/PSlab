@@ -53,6 +53,20 @@ We strongly recommend using **[Cyberduck](https://cyberduck.io/download/)** as a
 After having installed Cyberduck, start a new conexion, then indicate connection as SFTP. Indicate one of the blades as server  **{nord1,nord2,nord3}.bsc.es** and finally insert our user name _cek26664_ and password.
 
 Once linked, you will be able to easily upload, download and modify files and directories in the cluster machine.  
+
+### 3.2. Mount remote file system
+SSHFS allows you to mount a remote directory from remote server on your local machine using a mount point, and have it treated just like any other directory of your personal physical device. 
+
+The following command can be used to perform such action, according to the user credentials 
+
+````
+sshfs <username>@dt01.bsc.es:<virtual_path>  <local_path>
+````
+Example:
+
+````
+sshfs cek26664@dt01.bsc.es:/gpfs/projects/cek26  /home/joelmoro/MN/
+````
 </br>
 
 ## 4. Modules environment
