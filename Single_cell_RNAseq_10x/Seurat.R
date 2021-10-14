@@ -73,13 +73,58 @@ sampletype <- c("BDC_CTL", "BDC_TET", "INS_CTL", "INS_TET")
 
 # Indicate in the Read10X function, the directory of your input files (3 files must be
 # found in the data.dir: matrix.mt.gz, barcodes.tsv.gz and features.tsv.gz)
-data <- Read10X(data.dir = paste0(getwd(), "/data/aggr/filtered_feature_bc_matrix/"))
+data <- Read10X(data.dir = "/data/aggr/filtered_feature_bc_matrix/"
+               #Number of column in features.tsv, by default 2
+                gene.column = 2,
+                #Number of column in barcode.tsv, by default 1  
+                cell.column = 1,
+                #Make feature names unique or not
+                unique.features = TRUE,
+                #Remove trailing -1 if present in all barcodes
+                strip.suffix = FALSE)
+
+# In case we are not working with gene symbols we can map it with select() from AnnotationDbi
+# It needs an EnsDb object, since we work mainly in mouse and human, we can use org.Mm.eg.db
+# Remember to perform this step only in the case that our data is not originally in genesymbol
+# It can be also used if we prefer not to use genesymbol and and another gene identificator
+x <- select(x = org.Mm.eg.db, 
+            #Select the keys for which we are looking values (like python dictionary)
+            keys = rownames(data),
+            #Value that we want to be retrieved
+            columns = "SYMBOL",
+            #Key type that we are using
+            keytype = "ENSEMBL",
+            #In case multiple values for one key choose first
+          multivals = "first", asNA=F)
+# Check the table obtained
+head(x)
+# Creating another column such that we ignore NA values
+x$NoNa <- ifelse(is.na(x$SYMBOL), x$ENSEMBL, x$SYMBOL)
+
+# Modifiying original data
+for (n in rownames(data)){
+  rownames(data)[match(n, rownames(data))] <- x$NoNa[match(n, x$ENSEMBL)]
+}
+head(rownames(data))
+
 
 # We next use the count matrix to create a Seurat object. The object serves as a container that includes
 # both data (like the count matrix) and analysis (like PCA, or clustering results) for a single-cell dataset.
 # min.cells: Include features detected in at least these many cells. Will subset the counts matrix as well. 
 # min.features: Include cells where at least these many features are detected.
-scdata <- CreateSeuratObject(counts = data, min.cells = 3, min.features = 200)
+scdata <- CreateSeuratObject(counts = data, 
+                             #Project name for the object
+                             project = "SANTAMARIA_09",
+                             #Threshold of different cells where a certain feature is detected
+                             min.cells = 3, 
+                             #Threshold to select cells with a certain number of features detected
+                             min.features = 200,
+                             #Choose the field from the cell's name
+                             names.field = 1,
+                             #Choose the delimeters from the cell's column name
+                             names.delim = "_" ,
+                             #In case any cell-level metadata can be added
+                             meta.data = NULL)
 
 # Check the expression (counts) for some genes in the first 100 cells:
 # Change genes for those you want to check:
@@ -111,9 +156,23 @@ if (species == "mouse") {
 
 # QC metrics can be found in the Seurat object metadata:
 head(scdata@meta.data)
+range(scdata[["percent.mt"]])
+range(scdata[["percent.rb"]])
 
+# Add sample information to each cell
+scdata$sampletype <- colnames(scdata)
+for (i in 1:length(sampletype)){
+  scdata@meta.data[grep(paste0("-", i), colnames(scdata)), "sampletype"] <- sampletype[i]
+}
 # Visualize QC metrics as a violin plot:
-VlnPlot(scdata, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), pt.size = 0.5, ncol = 3)
+VlnPlot(scdata, 
+        features = c("nFeature_RNA", "nCount_RNA", "percent.mt", "percent.rb"),
+        group.by = "sample",
+        pt.size = 0.5, ncol = 4)
+
+#Visualize QC metric as an scatter plot
+FeatureScatter(scdata,"nCount_RNA", "percent.mt", group.by = "sample", pt.size = 0.5)
+FeatureScatter(scdata, "nCount_RNA", "nFeature_RNA", group.by = "sample", pt.size = 0.5)
 
 # Subset data (these parameters by default, modify thresholds to filter differently based on your data)
 # QC filtering is performed based on the cell distribution depending on the above mentioned parameters.
@@ -136,11 +195,6 @@ scdata <- NormalizeData(scdata, normalization.method = "LogNormalize", scale.fac
 # By default, we return 2,000 features per dataset. These will be used in downstream analysis, like PCA.
 scdata <- FindVariableFeatures(scdata, selection.method = "vst", nfeatures = 2000)
 
-# Add sample information to each cell
-scdata$sampletype <- colnames(scdata)
-for (i in 1:length(sampletype)){
-  scdata@meta.data[grep(paste0("-", i), colnames(scdata)), "sampletype"] <- sampletype[i]
-}
 #Some times you can pool sample types into conditions
 #For example, if you have several treated and several control samples
 #you can build 2 conditions, TREATED and CTL:
@@ -150,13 +204,17 @@ scdata$condition <- gsub("^.*?_", "", scdata$sampletype)
 all.genes <- rownames(scdata)
 scdata <- ScaleData(scdata, verbose = TRUE, features = all.genes)
 scdata <- RunPCA(scdata, verbose = TRUE)
-DimPlot(scdata, reduction = "pca", dims = c(1,2))
+DimPlot(scdata, reduction = "pca", dims = c(1,2), group.by = "sampletype")
 
-# t-SNE and uMAP
+# t-SNE
 scdata <- RunTSNE(scdata, reduction = "pca", dims = 1:20)
-DimPlot(scdata, reduction = "tsne", dims = c(1,2))
+DimPlot(scdata, reduction = "tsne", dims = c(1,2), group.by = "sampletype")
+DimPlot(scdata, reduction = "tsne", dims = c(1,2), group.by = "condition")
+
+# UMAP
 scdata <- RunUMAP(scdata, reduction = "pca", dims = 1:20)
-DimPlot(scdata, reduction = "umap", dims = c(1,2))
+DimPlot(scdata, reduction = "umap", dims = c(1,2), group.by = "sampletype")
+DimPlot(scdata, reduction = "umap", dims = c(1,2), group.by = "condition")
 
 # Clustering
 #In order to find clusters, we use a external function named kmeans
