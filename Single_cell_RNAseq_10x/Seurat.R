@@ -244,8 +244,10 @@ ggsave(
 
 #Read your txt containing the list of genes of interest:
 features <- read.table("data/Table1.txt", header = F, stringsAsFactors = F)$V1
-
-
+#Since we used top genes before, we can use that subset too.
+#NOTE: It might be unorthodox to set a variable to another variable, 
+#but its purpose is not to modify the rest of the code according to features.
+featrures <– top10
 p <- FeaturePlot(scdata, reduction = "tsne",
                  features = features, 
                  #if there are too many features to plot at once,
@@ -258,9 +260,13 @@ for(i in 1:length(p)) {
   p[[i]] <- p[[i]] + NoAxes() + NoLegend() + coord_flip() + scale_x_reverse()
 }
 
+
 cowplot::plot_grid(plotlist = p, ncol = 6)
 #Determine the number of columns you want to distribute the plots in, depending on the total number
 #of plots you want to make.
+#If using top10 if fits to use ncol = 5
+cowplot::plot_grid(plotlist = p, ncol = 6)
+
 
 ggsave(
   "figs/feature_plots.pdf",
