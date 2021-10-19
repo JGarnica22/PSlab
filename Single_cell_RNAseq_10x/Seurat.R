@@ -322,10 +322,70 @@ markers <- FindAllMarkers(scdata,
                           test.use = "negbinom", min.pct = 0.01)
 write.table(markers, "output/Cluster_markers.txt", quote = F, sep = "\t")
 
+# And obtain an overall idea of the markers experssion according to each cell with a simple heatmap:
+
+markers %>%
+    group_by(cluster) %>%
+    top_n(n = 10, wt = avg_log2FC) -> top10
+DoHeatmap(scdata, features = top10$gene, group.by = "condition")
+
 # You can compare cluster or conditions 1 vs 1:
-Idents(scdata) <- "condition"
-COND <- FindMarkers(scdata, ident.1 = levels(Idents(scdata))[2], ident.2 = levels(Idents(scdata))[1],
+Idents(scdata) <- "kmeans"
+#Markers TR1 vs TH0
+tr1_th0 <- FindMarkers(scdata, ident.1 = levels(Idents(scdata))[2], ident.2 = levels(Idents(scdata))[1],
                     verbose = T, test.use = "negbinom")
+write.table(tr1_th0, "output/tr1_markers.txt", quote = F, sep = "\t")
 
-write.table(COND, "output/Condition_markers.txt", quote = F, sep = "\t")
+#Markers TFH vs TH0
+tfh_th0 <- FindMarkers(scdata, ident.1 = levels(Idents(scdata))[3], ident.2 = levels(Idents(scdata))[1],
+                    verbose = T, test.use = "negbinom")
+write.table(tfh, "output/tfh_markers.txt", quote = F, sep = "\t")
 
+# With two sets of markers a comparison can be performed with an scatterplot.
+# Allows to identify correlation or discrepancies in terms of gene expression.
+#Add absolute percentage of expressed cells
+tr1_th0 <- tr1_th0 %>% 
+  mutate(abs_pct = abs(pct.1 - pct.2))
+
+tfh_th0 <- tfh_th0 %>% 
+  mutate(abs_pct = abs(pct.1 - pct.2))
+
+#Merge comparison dataframes in a single dataframe
+df <- merge(tr1_th0, tfh_th0, by = "row.names", all.x = TRUE, all.y = TRUE)
+
+#Correct names for cleaner use
+names(df)[names(df) == 'avg_log2FC.x'] <- 'fc_tr1'
+names(df)[names(df) == 'avg_log2FC.y'] <- 'fc_tfh'
+names(df)[names(df) == 'Row.names'] <- 'gene'
+
+df <- data.frame(df)
+df[is.na(df)] <- 0
+
+#Classify by quadrant according to expression
+df <- df %>% 
+  mutate(quadrant = case_when(fc_tr1 < 0 & fc_tfh > 0 ~ "Down TR1 x Up TFH",
+                              fc_tr1 > 0 & fc_tfh > 0 ~ "Up TR1 x Up TFH",
+                              fc_tr1 < 0 & fc_tfh < 0 ~ "Down TR1 x Down TFH",
+                              fc_tr1 > 0 & fc_tfh < 0 ~ "Up TR1 x Down TFH",
+                              fc_tr1 < 0 & fc_tfh == 0 ~ "Down TR1 x No TFH",
+                              fc_tr1 > 0 & fc_tfh == 0 ~ "Up TR1 x No TFH",
+                              fc_tr1 == 0 & fc_tfh < 0 ~ "No Tr1 x Up TFH",
+                              fc_tr1 == 0 & fc_tfh > 0 ~ "No TR1 x Down TFH"
+                            )) 
+
+#Scatterplot
+ggplot(df, aes(fc_tr1, fc_tfh, color = quadrant, label = gene)) +
+  geom_point()+
+  labs(x = "TR1 vs TH0", y = "TFH vs TH0")+
+  #Change order of the legend labels and legend title
+  scale_color_discrete(name = "Regulation", 
+                       limits = c("Down TR1 x Up TFH","Up TR1 x Up TFH","Down TR1 x Down TFH",
+                              "Up TR1 x Down TFH","Down TR1 x No TFH","Up TR1 x No TFH",
+                              "No Tr1 x Up TFH","No TR1 x Down TFH"))+
+  #Label the points at a certain expression level
+  geom_text(aes(label= ifelse((quadrant=="Down TR1 x Up TFH" | quadrant=="Up TR1 x Down TFH") 
+                              & fc_tr1 != 0 | (fc_tr1 > 1 | fc_tfh > 1) |
+                                (fc_tr1 < -1 | fc_tfh < -1) ,gene, NA)),
+            hjust = -0.1, vjust = 1)+
+  theme_bw()+theme(panel.border = element_blank())+
+  scale_color_brewer(palette = "Dark2")
