@@ -1,0 +1,442 @@
+---
+title: "Seurat_integration.Rmd"
+author: "Joel Moro"
+date: "10/22/2021"
+output: html_document
+---
+
+
+# 0. Load Data
+
+
+Load the libraries, the species under study and the sample type labels.
+```{r message=FALSE, warning=FALSE}
+
+#Loading Libraries
+
+library(devtools)
+library(ggpubr)
+library(harmony)
+library(Seurat)
+library(org.Mm.eg.db)
+library(AnnotationDbi)
+library(SeuratData)
+library(dplyr)
+library(patchwork)
+library(ggplot2)
+library(cowplot)
+library(magrittr)
+library(data.table)
+library(SeuratData)
+library(SeuratDisk)
+
+# Specify parameters to be used along the script:
+#Indicate species working with (typically mouse or human)
+species <- "mouse"
+#Indicate samples you sequenced separately (for example, you sorted your treated and control populations separately)
+#Indicate samples in the order they are barcoded!!
+#It's better to indicate sample type as TREATMENT_CONDITION
+sampletype <- c("BDC_CTL", "BDC_TET", "INS_CTL", "INS_TET")
+sampletype2 <- c("BDC_CD4cre", "BDC_Blimp1", "BDC_cMaf", "BDC_Tbet", "BDC_CreBlimp1")
+#Usually, those samples can be identified by the cell name. Each cell has a -number
+#at the end that identifies the sample.
+
+```
+
+
+ Read datset as 10x matrix:
+ 
+```{r}
+
+#Loading both datasets
+path = "filtered_feature_bc_matrix_original2"
+path2 = "TR1TF_filtered_feature_bc_matrix"
+data <- Read10X(data.dir = path, 
+                #Number of column in features.tsv, by default 2
+                gene.column = 2,
+                #Number of column in barcode.tsv, by default 1  
+                cell.column = 1,
+                #Make feature names unique or not
+                unique.features = TRUE,
+                #Remove trailing -1 if present in all barcodes
+                strip.suffix = FALSE)
+data_calg <- Read10X(data.dir = path2, 
+                #Number of column in features.tsv, by default 2
+                gene.column = 2,
+                #Number of column in barcode.tsv, by default 1  
+                cell.column = 1,
+                #Make feature names unique or not
+                unique.features = TRUE,
+                #Remove trailing -1 if present in all barcodes
+                strip.suffix = FALSE)
+```
+
+ 
+ Create seurat object from 10 matrix:
+ 
+```{r}
+scdata_sm09 <- CreateSeuratObject(counts = data, 
+                             #Project name for the object
+                             project = "SM09",
+                             #Threshold of different cells where a certain feature is detected
+                             min.cells = 3, 
+                             #Threshold to select cells with a certain number of features detected
+                             min.features = 200,
+                             #Choose the field from the cell's name
+                             names.field = 1,
+                             #Choose the delimeters from the cell's column name
+                             names.delim = "_" ,
+                             #In case any cell-level metadata can be added
+                             meta.data = NULL)
+
+scdata_calg <- CreateSeuratObject(counts = data_calg, 
+                             #Project name for the object
+                             project = "CalgKO",
+                             #Threshold of different cells where a certain feature is detected
+                             min.cells = 3, 
+                             #Threshold to select cells with a certain number of features detected
+                             min.features = 200,
+                             #Choose the field from the cell's name
+                             names.field = 1,
+                             #Choose the delimeters from the cell's column name
+                             names.delim = "_" ,
+                             #In case any cell-level metadata can be added
+                             meta.data = NULL)
+```
+
+# 1. QC Metrics
+
+ 
+ Perform QC metrix to filtrate low quality data that would add noise to our study.
+
+```{r}
+
+# Calculate mitochondrial QC metrics with the PercentageFeatureSet function:
+# Calculare ribosomal QC metrics with the PercentageFeatureSet function:
+# Regex pattern parameter is different across species .
+
+
+if (species == "mouse") {
+    scdata_calg <- PercentageFeatureSet(scdata_calg, pattern = "^mt-", col.name = "percent.mt")
+    scdata_calg <- PercentageFeatureSet(scdata_calg, "^Rpl", col.name = "percent.rb")
+    
+} else {
+    scdata_calg <- PercentageFeatureSet(scdata_calg, pattern = "^MT-", col.name = "percent.mt")
+    scdata_calg <- PercentageFeatureSet(scdata_calg, "^RPL", col.name = "percent.rb")
+}
+
+
+if (species == "mouse") {
+    scdata_sm09 <- PercentageFeatureSet(scdata_sm09, pattern = "^mt-", col.name = "percent.mt")
+    scdata_sm09 <- PercentageFeatureSet(scdata_sm09, "^Rpl", col.name = "percent.rb")
+    
+} else {
+    scdata_sm09 <- PercentageFeatureSet(scdata_sm09, pattern = "^MT-", col.name = "percent.mt")
+    scdata_sm09 <- PercentageFeatureSet(scdata_sm09, "^RPL", col.name = "percent.rb")
+  }
+
+```
+
+```{r}
+# Add sample information to each cell
+scdata_sm09$sampletype <- colnames(scdata_sm09)
+for (i in 1:length(sampletype)){
+  scdata_sm09@meta.data[grep(paste0("-", i), colnames(scdata_sm09)), "sampletype"] <- sampletype[i]
+}
+
+# Add sample information to each cell
+scdata_calg$sampletype <- colnames(scdata_calg)
+for (i in 1:length(sampletype2)){
+  scdata_calg@meta.data[grep(paste0("-", i), colnames(scdata_calg)), "sampletype"] <- sampletype2[i]
+}
+
+```
+
+
+ 
+```{r}
+
+# Visualize QC metrics as a violin plot:
+
+vpl1 <- VlnPlot(scdata_sm09, 
+        features = c("nFeature_RNA", "nCount_RNA", "percent.mt", "percent.rb"),
+        group.by = "sampletype",
+        pt.size = 0.5, ncol = 4)
+
+vpl2 <-VlnPlot(scdata_calg, 
+        features = c("nFeature_RNA", "nCount_RNA", "percent.mt", "percent.rb"),
+        group.by = "sampletype",
+        pt.size = 0.5, ncol = 4)
+
+ggarrange(vpl1, vpl2, labels = c("SM09", "CalgKO"), nrow = 2, ncol = 1)
+```
+
+```{r}
+
+#Visualize QC metric as an scatter plot
+fs1 <- FeatureScatter(scdata_sm09,"nCount_RNA", "percent.mt", group.by = "sampletype", pt.size = 0.5)
+fs2 <- FeatureScatter(scdata_sm09, "nCount_RNA", "nFeature_RNA", group.by = "sampletype", pt.size = 0.5)
+
+#Visualize QC metric as an scatter plot
+fs3 <- FeatureScatter(scdata_calg,"nCount_RNA", "percent.mt", group.by = "sampletype", pt.size = 0.5)
+fs4 <- FeatureScatter(scdata_calg, "nCount_RNA", "nFeature_RNA", group.by = "sampletype", pt.size = 0.5)
+
+ggarrange(fs1, fs2, fs3, fs4, labels = c("SM09", "SM09", "CalgKO", "CalgKO"),
+         ncol = 2, nrow = 2)
+```
+
+```{r}
+
+dist1 <- scdata_sm09@meta.data %>%
+  ggplot(aes(color=sampletype, x=nCount_RNA, fill= sampletype)) + 
+  geom_density(alpha = 0.3) + 
+  scale_x_log10() + 
+  theme_classic() +
+  ylab("Log 10 cell Density") +
+  geom_vline(xintercept = 1000, linetype = "dashed" )+
+  geom_vline(xintercept = 500)+
+  labs(fill = "Sample Type")+
+  guides(color = FALSE)
+
+dist2 <- scdata_calg@meta.data %>%
+  ggplot(aes(color=sampletype, x=nCount_RNA, fill= sampletype)) + 
+  geom_density(alpha = 0.3) + 
+  scale_x_log10() + 
+  theme_classic() +
+  ylab("Log 10 cell Density") +
+  geom_vline(xintercept = 1000, linetype = "dashed" )+
+  geom_vline(xintercept = 500)+
+  labs(fill = "Sample Type")+
+  guides(color = FALSE)
+
+ggarrange(dist1, dist2, labels = c("SM09", "CalgKO"),
+          nrow = 1, ncol = 2)
+
+# Visualize the distribution of genes detected per cell
+dist3 <- scdata_sm09@meta.data %>% 
+  	ggplot(aes(color=sampletype, x=nFeature_RNA, fill= sampletype)) + 
+  	geom_density(alpha = 0.2) + 
+  	theme_classic() +
+  	scale_x_log10() + 
+  	geom_vline(xintercept = 2200, linetype = "dashed")+
+    labs(fill = "Sample Type")+
+    guides(color = FALSE)
+
+# Visualize the distribution of genes detected per cell
+dist4 <- scdata_calg@meta.data %>% 
+  	ggplot(aes(color=sampletype, x=nFeature_RNA, fill= sampletype)) + 
+  	geom_density(alpha = 0.2) + 
+  	theme_classic() +
+  	scale_x_log10() + 
+  	geom_vline(xintercept = 5000, linetype = "dashed")+
+    labs(fill = "Sample Type")+
+    guides(color = FALSE)
+
+
+ggarrange(dist1, dist2, dist3, dist4, labels = c("SM09", "CalgKO"),
+          nrow = 2, ncol = 2, hjust = -3)
+
+
+
+```
+
+For the sake of saving time in this test of different integration methods, the sampletypes will be reduced. Also, the quality reductions are applied according to the previous results.
+
+```{r}
+
+#Subsetting
+scdata_calg_onlyctl <- subset(scdata_calg, subset = nCount_RNA>500 & nFeature_RNA<5000 & percent.mt<20 & percent.rb > 0.05 & 
+                              sampletype == "BDC_CD4cre")
+scdata_sm09_onlyctl <- subset(scdata_sm09, subset = nCount_RNA>1000 & nFeature_RNA<3000 & percent.mt<20 & percent.rb > 0.05 &
+                                sampletype == "BDC_TET")
+
+
+```
+
+# 2.Integration
+ 
+ 
+### 2.1 Integration with seurat. (Correction MNN)
+
+```{r}
+
+#combined seurat object
+scdata_merged_ctl <- merge(scdata_sm09_onlyctl, y = scdata_calg_onlyctl, add.cell.ids = c("SM09", "CalgKO"), project = "SM09_CalgKO_onlyctl")
+
+#Try to split by batch
+list_onlyctl <- SplitObject(scdata_merged_ctl, split.by = "orig.ident")
+
+for (i in 1:length(list_onlyctl)) {
+    list_onlyctl[[i]] <- NormalizeData(list_onlyctl[[i]], verbose = FALSE)
+    list_onlyctl[[i]] <- FindVariableFeatures(list_onlyctl[[i]], selection.method = "vst", 
+        nfeatures = 2000, verbose = FALSE)
+}
+anchors <- FindIntegrationAnchors(object.list = list_onlyctl, dims = 1:30)
+
+integrated_ctl <- IntegrateData(anchorset = anchors, dims = 1:30)
+DefaultAssay(integrated_ctl) <- "integrated"
+
+
+
+```
+
+ 
+
+```{r message=FALSE, warning=FALSE}
+
+integrated_ctl$condition <- gsub("^.*?_", "", integrated_ctl$sampletype)
+
+all.genes <- rownames(integrated_ctl)
+integrated_ctl <- ScaleData(integrated_ctl, verbose = TRUE, features = all.genes)
+integrated_ctl <- RunPCA(integrated_ctl, verbose = TRUE)
+integrated_ctl <- RunTSNE(integrated_ctl, reduction = "pca", dims = 1:20)
+
+```
+
+ 
+ Normalizing also not corrected merge to use as a control.
+ 
+```{r message=FALSE}
+
+#Case with no corrections
+scdata_merged_ctl <- NormalizeData(scdata_merged_ctl, verbose = FALSE)
+scdata_merged_ctl <- FindVariableFeatures(scdata_merged_ctl, selection.method = "vst")
+scdata_merged_ctl$condition <- gsub("^.*?_", "", scdata_merged_ctl$sampletype)
+all.genes <- rownames(scdata_merged_ctl)
+scdata_merged_ctl <- ScaleData(scdata_merged_ctl, verbose = TRUE, features = all.genes)
+scdata_merged_ctl <- RunPCA(scdata_merged_ctl, verbose = TRUE)
+scdata_merged_ctl <- RunTSNE(scdata_merged_ctl, reduction = "pca", dims = 1:20)
+
+
+
+```
+
+### 2.2 Integration with Harmony (Correction Ridge)
+
+```{r}
+
+#Seurat command that runs Harmony algorithm to integrated data as well as performing ridge correction
+#Use group.by.vars to specify which is the batch under correction
+integrated_harmony = RunHarmony(object = scdata_merged_ctl, group.by.vars = "orig.ident")
+#Performing tsne
+integrated_harmony<- RunTSNE(integrated_harmony, reduction = "harmony", dims = 1:20)
+
+
+```
+
+ We have to save our data  and load it into scanpy to perform the other batch effect corrections.
+ It is also mandatory to convert the data to a readable input for scanpy. In addition, we can remove the data that will not be under use anymore and can be reobtained with ease in order to reduce the vectorial memory occupied by our objects.
+
+# 2.3 Save data and Load Scanpy corrected data
+
+ In order to be able to use scanorama and combat corrections, it is needed to save and convert our data to a format input friendly with scanpy. 
+
+```{r message=FALSE}
+#Save the integrated object!
+saveRDS(integrated_ctl, file="intagrated_ctl")
+#Save the merged object
+SaveH5Seurat(scdata_merged_ctl, "scdata_merged")
+#Conversion from h5adseurat to h5ad
+Convert("scdata_merged.h5seurat", dest = "h5ad", overwrite = TRUE)
+#Removing some objects...
+remove(anchors)
+remove(data)
+remove(data_calg)
+remove(list_onlyctl)
+remove(scdata_calg)
+remove(scdata_calg_onlyctl)
+remove(scdata_sm09)
+remove(scdata_sm09_onlyctl)
+
+```
+
+ 
+ After ScanPy performance (see scanpy_integration.py), data with both corrections can be loaded.
+
+```{r message=FALSE}
+#Convert to readable input for seurat
+Convert("scdata_merged_scanorama.h5ad", dest = "h5seurat", overwrite = TRUE)
+Convert("scdata_merged_combat.h5ad", dest = "h5seurat", overwrite = TRUE)#L
+#Load data
+integrated_combat <- LoadH5Seurat("scdata_merged_combat.h5seurat")
+integrated_scanorama <- LoadH5Seurat("scdata_merged_scanorama.h5seurat")
+```
+
+
+# 3. Comparison
+
+### 3.1 Visual comparison
+
+ 
+ The following chunk stores the different seurat objects with the different corrections and performs 2 tSNEs, one grouping by sampletype that allows us to look for batch effect and another tsne predicting cell types. The comparison between the two plots gives us the capability of determining if the clusterts are rather decided by the effect of the mathematical differences between samples or the biological differences between cell types.
+ 
+```{r}
+
+#tSNE predicting clusters
+set.seed(1)
+scdata_list <- list(scdata_merged_ctl, integrated_ctl, integrated_combat, integrated_scanorama, integrated_harmony)
+cluster.names <- c("TR1", "TFH", "TH0")
+numberofclusters = 3
+for (i in 1:length(scdata_list)) {
+  scdata_list[[i]]$kmeans <- kmeans(scdata_list[[i]]@reductions[["pca"]]@cell.embeddings, centers = numberofclusters)$cluster
+  tsne2 <- TSNEPlot(scdata_list[[i]], group.by = "kmeans") + theme(
+  axis.line = element_blank(),
+  axis.text.x = element_blank(),
+  axis.text.y = element_blank(),
+  axis.title = element_blank(),
+  axis.ticks = element_blank()) + coord_flip() + scale_x_reverse()+
+  scale_color_discrete(name = "Cell Type", labels = cluster.names)
+  tsne1 <- DimPlot(scdata_list[[i]], reduction = "tsne", dims = c(1,2), 
+        group.by = "sampletype")
+  print(ggarrange(tsne1, tsne2))
+}
+
+```
+
+### 3.2 Numeric comparison using LISI metric
+
+
+```{r}
+library(lisi)
+
+#MNN seurat correction
+my_x_corr <- integrated_ctl@reductions[["tsne"]]@cell.embeddings
+res_corr <- compute_lisi(my_x_corr, integrated_ctl@meta.data, "sampletype")
+table(integrated_ctl@meta.data$sampletype)
+
+#No corrected
+my_x <- scdata_merged_ctl@reductions[["tsne"]]@cell.embeddings
+res <- compute_lisi(my_x, scdata_merged_ctl@meta.data, "sampletype")
+table(scdata_merged_ctl@meta.data$sampletype)
+
+#Combat correction
+my_x_comb <- integrated_combat@reductions[["tsne"]]@cell.embeddings
+res_comb <- compute_lisi(my_x_comb, integrated_combat@meta.data, "sampletype")
+table(integrated_combat@meta.data$sampletype)
+
+#Scanorma correction
+my_x_scan <- integrated_scanorama@reductions[["tsne"]]@cell.embeddings
+res_scan <- compute_lisi(my_x_scan, integrated_scanorama@meta.data, "sampletype")
+table(integrated_scanorama@meta.data$sampletype)
+
+#Ridge harmony correction
+my_x_harm <- integrated_harmony@reductions[["tsne"]]@cell.embeddings
+res_harmony <- compute_lisi(my_x_harm, integrated_harmony@meta.data, "sampletype")
+table(integrated_harmony@meta.data$sampletype)
+
+
+```
+ 
+ 
+ The closer the median from LISI gets to the number of categories on our batch, the better the performance of our correction.
+
+```{r}
+print(paste("No correction -->", median(res$sampletype)))
+print(paste("Seurat MNN -->", median(res_corr$sampletype))) #Takes some time but seems to be better than harmony
+print(paste("Scanpy combat -->", median(res_comb$sampletype))) #Decent time and good correction
+print(paste("Scanpy Scanorama -->", median(res_scan$sampletype)))
+print(paste("Harmony ridge -->", median(res_harmony$sampletype))) #Fast and easy
+```
+
+
+
