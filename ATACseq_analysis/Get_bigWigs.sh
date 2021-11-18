@@ -16,7 +16,8 @@
 # .bw FILES CAN BE THEN USED FOR GENOMIC VIEWERS UTILITIES
 ################################################################################################
 
-
+module purge
+module load intel/2021.4 mkl/2021.4 python/3.7.12 # Careful with old and new Nord III cluster
 
 # Set your working directory
 wd=/gpfs/projects/cek26/experiments/SANTAMARIA_31/alignment/no_dup
