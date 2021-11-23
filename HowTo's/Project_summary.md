@@ -5,7 +5,7 @@
 
 
 ## Overview
-This analysis is based on ChIP-seq data obtained from SANTAMARIA_16 project on September 2020. It included 3 samples for K27Ac, 3 for K4me3 and 2 inputs samples. More information at sequencing project[https://docs.google.com/spreadsheets/d/1lBpYgDUl5U1M_560ZxvkfJOyA9f4P76L/edit#gid=1548358353] on drive.
+This analysis is based on ChIP-seq data obtained from SANTAMARIA_16 project on September 2020. It included 3 samples for K27Ac, 3 for K4me3 and 2 inputs samples. More information at [sequencing projects](https://docs.google.com/spreadsheets/d/1lBpYgDUl5U1M_560ZxvkfJOyA9f4P76L/edit#gid=1548358353) on drive.
 
 ## Data
 Data for this analysis involve bam files and peak datasets (.xlsx). These were obtained using bowtie2 and macs2, as described in the file `bowtie2_macs.sh` file (*download and save in the folder the bash script too*!).
