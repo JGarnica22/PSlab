@@ -27,10 +27,13 @@ echo \#SBATCH -n 2
 echo \#SBATCH -c 1
 
 echo module load intel/2021.4.0 impi/2021.4.0 hdf5 szip kallisto
-echo kallisto quant -i $gdir/kallisto/GRCm38.p6.idx -o alignment -b 50 --single -t 16 -l 200 -s 30 $f
+echo kallisto quant -i $gdir/kallisto/GRCm38.p6.idx -o alignment -b 50 --single -t 16 -l 200 -s 30 \<\(zcat $f\)
 
 } > $to_sbatch/align_k_$(cut -d'_' -f2 <<< $f).sh
 sed -i -e 's/\r$//' $to_sbatch/align_k_$(cut -d'_' -f2 <<< $f).sh
 sbatch $to_sbatch/align_k_$(cut -d'_' -f2 <<< $f).sh
 done
+
+
+
 
