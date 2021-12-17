@@ -3,8 +3,8 @@
 #BSUB -J Loop_fastqc
 #BSUB -q sequential
 #BSUB -W 12:00
-#BSUB -eo /gpfs/projects/cek26/project/Loop_fastqc.err
-#BSUB -oo /gpfs/projects/cek26/project/Loop_fastqc.out
+#BSUB -eo /gpfs/projects/cek26/experiments/all_rna/bsub_reports/Loop_fastqc.err
+#BSUB -oo /gpfs/projects/cek26/experiments/all_rna/bsub_reports/Loop_fastqc.out
 #BSUB -M 1800
 
 # Load modules in order to run FastQC and STAR
@@ -12,10 +12,11 @@ module purge
 module load java/1.8.0u66 fastqc intel/2017.4 impi/2017.4 mkl/2017.4 gcc/5.3.0 gcc/4.9.1 openssl/1.1.1c python/3.7.4_pip STAR/2.7.5a
 
 # Set you working directory
-wd=/gpfs/projects/cek26/project
+wd=/gpfs/projects/cek26/experiments/all_rna
 
 # Create a folder to store 'fastq_files' and upload all of them there
-# mkdir fastq_files
+# also create directory before running the script for the reports
+# mkdir fastq_files bsub_reports
 
 # Create folders to store FastQC and STAR alignment
 cd $wd
@@ -24,25 +25,22 @@ alignment_counts=alignment_counts
 to_bsub=to_bsub
 bsub_reports=bsub_reports
 
-mkdir $fastqc
-mkdir $alignment_counts
-mkdir $to_bsub
-mkdir $bsub_reports
+mkdir $fastqc $alignment_counts $to_bsub
 
 # indicate location of STAR indexes and annotation file
-STAR_index=STAR_index
-annotation=gencode.vM25.annotation.gtf
+STAR_index=/gpfs/projects/cek26/data/genomes/genome_mus/STAR_M25/
+annotation=/gpfs/projects/cek26/data/genomes/genome_mus/gencode.vM25.annotation.gtf
 
 for f in $(find ./fastq_files -name "*.fastq.gz" -exec basename {} \;)
 do
 {
 echo \#!/bin/bash
 echo \#BSUB cwd $wd
-echo \#BSUB -J alignment_counts_$(cut -d'.' -f1 <<< $f)
+echo \#BSUB -J alignment_counts_$(cut -d'_' -f2 <<< $f)
 echo \#BSUB -q bsc_ls
-echo \#BSUB -W 2:00
-echo \#BSUB -eo $wd/$bsub_reports/alignment_counts_$(cut -d'.' -f1 <<< $f).err
-echo \#BSUB -oo $wd/$bsub_reports/alignment_counts_$(cut -d'.' -f1 <<< $f).out
+echo \#BSUB -W 4:00
+echo \#BSUB -eo $wd/$bsub_reports/alignment_counts_$(cut -d'_' -f2 <<< $f).err
+echo \#BSUB -oo $wd/$bsub_reports/alignment_counts_$(cut -d'_' -f2 <<< $f).out
 echo \#BSUB -M 1800
 echo \#BSUB -n 32
 echo \#BSUB "span[ptile=16]"
@@ -52,13 +50,13 @@ echo module purge
 echo module load java/1.8.0u66 fastqc intel/2017.4 impi/2017.4 mkl/2017.4 gcc/5.3.0 gcc/4.9.1 openssl/1.1.1c python/3.7.4_pip STAR/2.7.5a SAMTOOLS/1.9 BEDTOOLS/2.25.0
 
 echo cd $wd
-echo STAR --runMode alignReads --genomeDir $STAR_index --readFilesIn fastq_files/$f --readFilesCommand zcat --outFileNamePrefix $alignment_counts/$(cut -d'.' -f1 <<< $f)_ --outReadsUnmapped Fastx --outSAMtype BAM SortedByCoordinate --sjdbGTFfile $annotation --twopassMode Basic --quantMode GeneCounts --runThreadN 32
+echo STAR --runMode alignReads --genomeDir $STAR_index --readFilesIn fastq_files/$f --readFilesCommand zcat --outFileNamePrefix $alignment_counts/$(cut -d'_' -f2 <<< $f) --outReadsUnmapped Fastx --outSAMtype BAM SortedByCoordinate --sjdbGTFfile $annotation --twopassMode Basic --quantMode GeneCounts --runThreadN 32
 
-echo samtools index $alignment_counts/$(cut -d'.' -f1 <<< $f)*.bam
-echo bamCoverage -b $alignment_counts/$(cut -d'.' -f1 <<< $f)*.bam -o $alignment_counts/Cover_$(cut -d'.' -f1 <<< $f).bw
-} > $to_bsub/alignment_reads_$(cut -d'.' -f1 <<< $f).sh
-sed -i -e 's/\r$//' $to_bsub/alignment_reads_$(cut -d'.' -f1 <<< $f).sh
-bsub < $to_bsub/alignment_reads_$(cut -d'.' -f1 <<< $f).sh
+echo samtools index $alignment_counts/$(cut -d'_' -f2 <<< $f)\*.bam
+echo bamCoverage -b $alignment_counts/$(cut -d'_' -f2 <<< $f)\*.bam -o $alignment_counts/Cover_$(cut -d'_' -f2 <<< $f).bw
+} > $to_bsub/alignment_reads_$(cut -d'_' -f2 <<< $f).sh
+sed -i -e 's/\r$//' $to_bsub/alignment_reads_$(cut -d'_' -f2 <<< $f).sh
+bsub < $to_bsub/alignment_reads_$(cut -d'_' -f2 <<< $f).sh
 done
 
 # Perform quality control of RNAseq using FastQC tool for all processed samples and output a common pdf file
@@ -102,7 +100,7 @@ echo all_reads \<\- all_reads[,\-1]
       
 echo write.table\(all_reads, \
             file = paste0\(getwd\(\),\"/$alignment_counts/Reads_all_samples.txt\"\), \
-            sep = \"\t\", quote = F, dec = \".\", row.names = T, col.names = T\) 
+            sep = \"\\t\", quote = F, dec = \".\", row.names = T, col.names = T\) 
 } > Merge_reads.R
 R < Merge_reads.R --save
 
@@ -112,7 +110,8 @@ rm -r $alignment_counts/*_STARgenome $alignment_counts/*_STARpass1
 
 for f in $(find fastq_files -name "*.fastq.gz" -exec basename {} \;)
 do
-mkdir $alignment_counts/$(cut -d'.' -f1 <<< $f)_Logs 
-mv $alignment_counts/$(cut -d'.' -f1 <<< $f)*Log*.out $alignment_counts/$(cut -d'.' -f1 <<< $f)_Logs
+mkdir $alignment_counts/$(cut -d'_' -f2 <<< $f)_Logs 
+mv $alignment_counts/$(cut -d'_' -f2 <<< $f)*Log*.out $alignment_counts/$(cut -d'_' -f2 <<< $f)_Logs
 done
+
 
