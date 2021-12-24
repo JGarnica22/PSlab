@@ -1,0 +1,152 @@
+---
+title: "Look around function"
+---
+
+
+# Load packages and databases
+```{r, setup, include=F, message=F}
+knitr::opts_knit$set(root.dir = '~/Bioinformatics/SANTAMARIA_28/')
+library(biomaRt)
+library(tidyverse)
+library(TxDb.Mmusculus.UCSC.mm10.knownGene)
+library(org.Mm.eg.db)
+library(plyr)
+
+species <- "mouse" # say here either "mouse" or "human"
+if (species == "mouse") {
+  bsgen <- "BSgenome.Mmusculus.UCSC.mm10"
+  gm <- "mm10"
+  TxDb <- TxDb.Mmusculus.UCSC.mm10.knownGene
+  org.SYMBOL2EG <- org.Mm.egSYMBOL2EG
+  org.SYMBOL <- org.Mm.egSYMBOL
+  # CHECK GENOME VERSION!!!
+  ensembl <- useMart("ENSEMBL_MART_ENSEMBL", dataset="mmusculus_gene_ensembl",
+                     host = "https://jul2019.archive.ensembl.org")
+} else {
+  bsgen <- "BSgenome.Hsapiens.UCSC.hg38"
+  gm <- "hg38"
+  TxDb <- TxDb.Hsapiens.UCSC.hg38.knownGene
+  org.SYMBOL2EG <- org.Hs.egSYMBOL2EG
+  org.SYMBOL <- org.Hs.egSYMBOL
+  ensembl <- useMart("ENSEMBL_MART_ENSEMBL", dataset="hsapiens_gene_ensembl")
+}
+
+```
+
+
+
+# Load biomaRt and Look around function
+Make sure you use mm10
+```{r include=FALSE, warnings=F}
+BM <- getBM (attributes=c("entrezgene_id", "chromosome_name", "start_position",
+                          "end_position" , "ensembl_gene_id", "external_gene_name",
+                          "strand", "transcription_start_site"),
+             mart = ensembl, verbose = T)
+prom <- promoters(TxDb)
+# Create Granges object from BM database
+# Take out mithocondrial and weird chromosome annotations
+BMgr <- subset(BM, as.numeric(chromosome_name)>= 1 & as.numeric(chromosome_name) <=50 |
+                 chromosome_name == "X" | chromosome_name == "Y")
+# Nomenclature for chromosomes should be "chrX"
+BMgr$chromosome_name <- sapply(BMgr$chromosome_name, function(x) {paste0("chr",x)})
+BMgr$strand <- sapply(BMgr$strand, function(x){if (x ==1){print("+")} else {print("-")}})
+# GRanges generated
+grBM <- GRanges(seqnames = BMgr$chromosome_name, 
+                ranges = paste0 (BMgr$start_position, "-", BMgr$end_position), 
+                strand = BMgr$strand,
+                gene_name = BMgr$external_gene_name,
+                tss = BMgr$transcription_start_site)
+BMgenes <- BMgr[, c(2,3,4,6,7)]
+names(BMgenes)[c(1:4)] <- c("Chr", "Start", "End", "gene_name")
+
+
+# Define look around function
+look.around <- function(x){
+  g_around_more_rows <- data.frame(matrix(ncol = 8, nrow = 0))
+  names(g_around_more_rows) <- c("element","Chr","Start", "End", "gene_strand",
+                                 "gene_name", "distance", "type")
+  #g_around <- g_around_more_rows
+  for (a in 1:length(x)){
+    gr100kb <- resize(x[a], width(x[a])+100000, fix = "center")
+    gene.by.act.enh <- subsetByOverlaps(grBM, gr100kb)
+    if (length(gene.by.act.enh)>0){
+      dist <- c()
+      type <- c()
+      for (tt in 1:length(gene.by.act.enh)){
+        if (as.vector(strand(gene.by.act.enh)[tt]) == "+"){
+          td <- c(start(x[a]), end(x[a])) - mcols(gene.by.act.enh)[tt,2]
+          td <- td[which.max(abs(td))]*-1
+        } else if (as.vector(strand(gene.by.act.enh)[tt]) == "-"){
+          td <- c(start(x[a]), end(x[a])) - mcols(gene.by.act.enh)[tt,2]
+          td <- td[which.max(abs(td))]
+        }
+        dist <- append(dist, td)
+        if (length(subsetByOverlaps(x[a], gene.by.act.enh))>0){
+          ty <- "gene_body"
+        } else if (td > -5000 & td < 0) {
+          ty <- "promoter"
+        } else {
+          ty <- "intergenic"
+        }
+        type <- append(type, ty)  
+      }
+      df1 <- data.frame(element = rep(a, length(gene.by.act.enh)),
+                        Chr = rep(seqnames(x[a]), length(gene.by.act.enh)),
+                        Start = rep(start(ranges(x[a])), length(gene.by.act.enh)),
+                        End = rep(end(ranges(x[a])), length(gene.by.act.enh)),
+                        gene_strand = strand(gene.by.act.enh),
+                        gene_name = mcols(gene.by.act.enh)[1],
+                        distance = dist,
+                        type = type)
+      # df2 <- ddply(df1, .(element), summarize, 
+      #              element=paste(unique(element), collapse=","),
+      #              Chr = paste(unique(Chr), collapse=","),
+      #              Start = paste(unique(Start), collapse=","),
+      #              End = paste(unique(End), collapse=","),
+      #              gene_strand = paste(gene_strand, collapse=","),
+      #              gene_name = paste(unique(gene_name), collapse=","))
+    } else {
+      df1 <-data.frame(element = a,
+                       Chr = seqnames(x[a]),
+                       Start = start(ranges(x[a])),
+                       End = end(ranges(x[a])),
+                       gene_strand = NA,
+                       gene_name = "No genes found",
+                       distance = NA,
+                       type = NA
+                       )
+      #df2 <- df1
+    }
+    g_around_more_rows <- rbind(g_around_more_rows,df1)
+    #g_around <- rbind(g_around, df2)
+  }
+  #return(list(g_around_more_rows,g_around))
+  return(g_around_more_rows)
+}
+
+```
+
+# Example of analysis
+```{r include=FALSE, warnings=F}
+# Load files with genomic cooredinates, filter if necessary!
+k <- k27gsa[[po]] %>% dplyr::filter(fdr < 0.01 & fold > 0) %>% 
+    dplyr::rename(gene = Gene.IDs) %>% 
+    separate(Region.ID, sep = ":", into=c("seqnames","ranges"), remove = F)
+#Convert it to granges, add metadata if necessary (i.e. scores)
+# if you want to include more metadata you can modifiy look.around() function
+  gr <- GRanges(seqnames = k$seqnames, 
+                   ranges = k$ranges, 
+                   strand = NULL)
+  # apply look.around(gr)
+  g.r <- look.around(gr)
+  # In some cases some regions might be overlaping with some regions of the same gene
+  # for instance, TSS, exons, introns... these should be counted as 1 overlap with 
+  # gene_body. We apply distinct to compute that.
+  g.r2 <- as.data.frame(g.r) %>% mutate(Region.ID = paste0(Chr,":",Start,"-",End)) %>% 
+    distinct(gene_name, Region.ID, type)
+# after this change we compute the number of ocr found per gene using
+# as.data.frame(table())
+  t <- as.data.frame(table(g.r2$gene_name, g.r2$type)) %>% 
+    spread(Var2, Freq)
+
+  ```
