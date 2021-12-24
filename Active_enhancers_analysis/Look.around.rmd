@@ -75,10 +75,10 @@ look.around <- function(x){
       for (tt in 1:length(gene.by.act.enh)){
         if (as.vector(strand(gene.by.act.enh)[tt]) == "+"){
           td <- c(start(x[a]), end(x[a])) - mcols(gene.by.act.enh)[tt,2]
-          td <- td[which.max(abs(td))]*-1
+          td <- td[which.min(abs(td))]
         } else if (as.vector(strand(gene.by.act.enh)[tt]) == "-"){
           td <- c(start(x[a]), end(x[a])) - mcols(gene.by.act.enh)[tt,2]
-          td <- td[which.max(abs(td))]
+          td <- td[which.min(abs(td))]*-1
         }
         dist <- append(dist, td)
         if (length(subsetByOverlaps(x[a], gene.by.act.enh))>0){
