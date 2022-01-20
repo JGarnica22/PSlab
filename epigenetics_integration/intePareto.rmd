@@ -1,0 +1,437 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+```{r setup}
+knitr::opts_knit$set(root.dir = normalizePath("~/Bioinformatics/epigenetics_integration")) 
+```
+
+# Load packages and set wd
+```{r, message=F}
+library(intePareto)
+library(tidyverse)
+library(biomaRt)
+library(TxDb.Mmusculus.UCSC.mm10.knownGene)
+library(org.Mm.eg.db)
+library(ggcorrplot)
+library(heatmaply)
+library(corrplot)
+library(future)
+library(parallel)
+
+pop <- c("Th0", "TFH", "Tet")
+species <- "mouse" # say here either "mouse" or "human"
+if (species == "mouse") {
+  bsgen <- "BSgenome.Mmusculus.UCSC.mm10"
+  gm <- "mm10"
+  TxDb <- TxDb.Mmusculus.UCSC.mm10.knownGene
+  org.SYMBOL2EG <- org.Mm.egSYMBOL2EG
+  org.SYMBOL <- org.Mm.egSYMBOL
+  ensembl <- useMart("ENSEMBL_MART_ENSEMBL", dataset="mmusculus_gene_ensembl",
+                     host = "https://jul2019.archive.ensembl.org")
+} else {
+  bsgen <- "BSgenome.Hsapiens.UCSC.hg38"
+  gm <- "hg38"
+  TxDb <- TxDb.Hsapiens.UCSC.hg38.knownGene
+  org.SYMBOL2EG <- org.Hs.egSYMBOL2EG
+  org.SYMBOL <- org.Hs.egSYMBOL
+  ensembl <- useMart("ENSEMBL_MART_ENSEMBL", dataset="hsapiens_gene_ensembl")
+}
+
+features <-read.table("~/Bioinformatics/SANTMARIA_23_24/analysis_23_24/data/list_TR1.txt", header = F,
+                       stringsAsFactors = F)$V1
+```
+
+# lf_chip dataframes
+```{r}
+# First indicate control population, then sample:
+pop <- c("TH0", "TFH", "Tet")
+lf_atac <- list()
+lf_atac[["path"]] <- "E:/BAM_files_Tet_TFH_TH0/ATAC/"
+lf_atac[["files"]] <- list.files(path= lf_atac[["path"]],
+                         pattern= "*.bam$")
+lf_atac <- data.frame(path = lf_atac[["path"]], files = lf_atac[["files"]])
+lf_atac <- lf_atac %>% transmute(sample = substr(files, 4,7),
+                              condition = substr(files, 4,6),
+                              mark = "ATAC_bulk",
+                              files = paste0(path, files))
+
+l <- list.files(path= "E:/BAM_files_Tet_TFH_TH0/ChIP/")
+lf_chip <- data.frame(matrix(ncol=0, nrow=0))
+f <- 1
+for (i in 1:length(l)){
+  fi <- list.files(path= paste0("E:/BAM_files_Tet_TFH_TH0/ChIP/",l[i], "/"),
+                         pattern= "*.bam$")
+  lf_chip[f:(f+length(fi)-1),"path"] <- paste0("E:/BAM_files_Tet_TFH_TH0/ChIP/",l[i], "/")
+  lf_chip[f:(f+length(fi)-1),"files"] <- fi
+  f <- f + length(fi)
+}
+for (i in pop){
+  lf_chip[grep(i, lf_chip$files, ignore.case = T), "condition"] <- i
+}
+histmod <- c("K27Ac", "K4me3", "K27me3")
+for (i in histmod){
+  lf_chip[grep(i, lf_chip$path, ignore.case = T), "mark"] <- i
+}
+lf_chip[3, "condition"] <- "TH0"
+lf_chip <- lf_chip[complete.cases(lf_chip),]
+lf_chip <- lf_chip %>% transmute(sample = condition,
+                              condition = condition,
+                              mark = paste0(mark, "_ChIP_bulk"),
+                              files = paste0(path, files))
+
+
+l <- list.files(path= "E:/BAM_files_Tet_TFH_TH0/RNA_kallisto")
+lf_rna <- data.frame(matrix(ncol=0, nrow=0))
+for (i in 1:length(l)){
+lf_rna[i,"path"] <- paste0("E:/BAM_files_Tet_TFH_TH0/RNA_kallisto/",l[i], "/")
+lf_rna[i,"files"] <- list.files(path= lf_rna[i,"path"],
+                         pattern= "*.tsv$")
+}
+
+lf_rna <- lf_rna %>% transmute(sample = substr(path, nchar(path)-4, nchar(path)-1),
+                              condition = substr(path, nchar(path)-4, nchar(path)-2),
+                              mark = paste0("RNA_bulk"),
+                              files = paste0(path, files))
+for (i in pop){
+  lf_rna[grep(i, lf_rna$condition, ignore.case = T), "condition"] <- i
+}
+
+lf_bam <- rbind(lf_atac, lf_chip)
+
+
+```
+
+# Generate matrixs
+```{r}
+
+plan("multicore", workers = 10)
+#setwd("~/Bioinformatics/epigenetics_integration/")
+for (i in pop){
+  pdf(paste0("figs/corplot_2kb_", paste(pop[pop != i], collapse = "_"), ".pdf"),
+             width = 15, height = 15)
+  for(p in c("promoter", "genebody")){
+    lf_rna2 <- lf_rna %>% filter(condition != i)
+    lf_bam2 <- lf_bam %>% filter(condition != i)
+    res.1 <- doMatch(rnaMeta = lf_rna2, # metadata of RNA-Seq
+                      chipMeta = lf_bam2, # metadata or ChIP-Seq
+                      region = p, # specify the region
+                      method = "highest", # specify the strategy to do the match
+                      ensemblDataset = "mmusculus_gene_ensembl",
+                      host = "https://jul2019.archive.ensembl.org",
+                      # specify the dataset of corresponing species
+                      promoter.length = 2000
+                      )
+    av.exp <- res.1$matched.data
+    writexl::write_xlsx(av.exp, paste0("out/res.1_2kb_",
+                                       paste(pop[pop != i], collapse = "_"), "_",
+                                       p, ".xlsx"))
+    row.names(av.exp) <- av.exp$external_gene_name
+    av.exp <- av.exp[,-1]
+    av.exp <- av.exp[rowSums(av.exp) > 0, ]
+    names(av.exp)[1:(length(av.exp)-12)] <- paste0("RNA_", names(av.exp)[1:(length(av.exp)-12)])
+    #av.exp <- av.exp[av.exp$gene %in% features,]
+    cor.exp <- as.data.frame(round(cor(av.exp, method = "spearman",
+                                 use = "pairwise.complete.obs"),
+                                 2))
+    
+    # cor.exp$x <- rownames(cor.exp)
+    # cor.df <- tidyr::gather(data = cor.exp, y, correlation, row.names(cor.exp))
+    # ggplot(cor.df, aes(x, y, fill = correlation)) +
+    #   geom_tile() + scale_fill_gradient2(low = "blue", mid = "white", high = "red")
+    #with ggcorrplot
+    p.mat <- cor_pmat(av.exp)
+    sct.corr_all <- ggcorrplot(cor.exp, hc.order = TRUE, type = "lower",
+               outline.col = "white", lab = T, p.mat= p.mat) +
+       scale_fill_gradient2(limit = c(min(cor.exp)*1.05,max(cor.exp)*1.05),
+                              low = "blue", high =  "red", 
+                             mid = "white", midpoint = median(as.matrix(cor.exp))) +
+      ggtitle(paste0("Matrix Spearman correlation: ", p, ". ",
+                     paste(unique(lf_bam2$condition), collapse = " and ")))
+    print(sct.corr_all)
+    heatmaply_cor(cor.exp,
+                  limits = c(min(cor.exp),max(cor.exp)))
+    
+    
+    cor.exp2 <- cor(av.exp, method = "spearman",
+                                 use = "pairwise.complete.obs")
+    testRes <- cor.mtest(av.exp, conf.level = 0.95)
+    ## specialized the insignificant value according to the significant level
+    corrplot(cor.exp2, p.mat = testRes$p,
+             method= "square", type = "lower",
+             sig.level = 0.10, order = 'hclust', addrect = 5,
+             col.lim = c(min(cor.exp2),max(cor.exp2)))
+    
+    ###### only features genes #######
+    av.exp <- av.exp[row.names(av.exp) %in% features,]
+    cor.exp <- as.data.frame(round(cor(av.exp, method = "spearman",
+                                 use = "pairwise.complete.obs"),
+                                 2))
+    
+    # cor.exp$x <- rownames(cor.exp)
+    # cor.df <- tidyr::gather(data = cor.exp, y, correlation, row.names(cor.exp))
+    # ggplot(cor.df, aes(x, y, fill = correlation)) +
+    #   geom_tile() + scale_fill_gradient2(low = "blue", mid = "white", high = "red")
+    #with ggcorrplot
+    p.mat <- cor_pmat(av.exp)
+    sct.corr_all <- ggcorrplot(cor.exp, hc.order = TRUE, type = "lower",
+               outline.col = "white", lab = T, p.mat= p.mat) +
+       scale_fill_gradient2(limit = c(min(cor.exp)*1.05,max(cor.exp)*1.05),
+                              low = "blue", high =  "red", 
+                             mid = "white", midpoint = median(as.matrix(cor.exp))) +
+      ggtitle(paste0("Matrix Spearman correlation. GENE LIST: ", p, ". ",
+                     paste(unique(lf_bam2$condition), collapse = " and ")))
+    print(sct.corr_all)
+    heatmaply_cor(cor.exp,
+                  limits = c(min(cor.exp),max(cor.exp)))
+    
+    
+    cor.exp2 <- cor(av.exp, method = "spearman",
+                                 use = "pairwise.complete.obs")
+    testRes <- cor.mtest(av.exp, conf.level = 0.95)
+    ## specialized the insignificant value according to the significant level
+    corrplot(cor.exp2, p.mat = testRes$p,
+             method= "square", type = "lower",
+             sig.level = 0.10, order = 'hclust', addrect = 5,
+             col.lim = c(min(cor.exp2),max(cor.exp2)))
+      }
+  dev.off()
+
+}
+
+```
+
+# Integration
+```{r message=TRUE}
+l <- list.files(path= "out/", pattern = "^res.1_2kb*")
+
+for (i in l){
+  res0 <- readxl::read_xlsx(paste0("out/",i)) %>%
+                             as.data.frame()
+  # duplicate chip experiments to get false replicates
+  co <- grep("*ChIP*", names(res0))
+  res_dup <- ceiling(res0[, co]*1.01)
+  for(n in 1:length(res_dup)){
+    names(res_dup)[n] <- paste0(substr(names(res_dup)[n],
+                                  1, (nchar(names(res_dup)[n])-1)), "2")
+  }
+  res0 <- cbind(res0, res_dup)
+  # do a 3 long list of DF as the output of doMatch()  
+  res <- list()
+  res$matched.data <- res0
+  res$res.rna <- res0[,1:(length(res0)-17)]
+  res$res.chip <- res0[,c(1,(length(res0)-16):length(res0))]
+    
+  int <- doIntegration(res = res, # result list from "doMatch" function
+                       type = "apeglm", # shrinkage estimator, default is "apeglm"
+                       ref = strsplit(i,"_")[[1]][3], # specifying the reference level
+                       apeAdapt = F)
+  int <- int %>% mutate(external_gene_name=row.names(.))
+  writexl::write_xlsx(int, paste0("out/int_2k_",i))
+  print(paste0(i," -- integration done"))
+}
+
+```
+## plot integration
+```{r}
+DESeq2 <- read.table ("../SANTAMARIA_28/data/deseq2_all.txt",
+sep = "\t", quote = "", dec = ".", header=T)
+DESeq2 <- DESeq2 %>% filter_all(all_vars(. != "?"))
+head(DESeq2)
+ds <- list()
+ds[[1]] <- DESeq2[,c(1, 8:10)]
+ds[[2]] <- DESeq2[,c(1, 5:7)]
+ds[[3]] <- DESeq2[,c(1, 2:4)]
+
+for (i in 1:3){
+  names(ds[[i]]) <- c("gene_name", "pvalue", "fdr", "fold")
+  ds[[i]][,"fdr"] <- as.numeric(ds[[i]][,"fdr"])
+  ds[[i]][,"fold"] <- ds[[i]][,"fold"]/200
+}
+names(ds) <- c("Tet_TH0" ,"Tet_TFH", "TFH_TH0")
+
+jun <- data.frame(ds = c("TFH_TH0","TFH_TH0", "Tet_TH0", "Tet_TH0",
+                         "Tet_TFH","Tet_TFH"),
+                 int = c("TH0_TFH","TH0_TFH","TH0_Tet","TH0_Tet",
+                         "TFH_Tet","TFH_Tet"),
+                 region = rep(c("promoter","genebody"),3)
+                )
+
+########## LOad intePareto
+for (po in 1:nrow(jun)){
+  i <- paste0("int_2k_res.1_2kb_", jun[po,2],"_", jun[po,3],".xlsx")
+  fi <- readxl::read_xlsx(paste0("out/",i)) %>% as.data.frame()
+  row.names(fi) <- fi$external_gene_name
+  fi <- fi[,-length(fi)]
+  co <- grep("z.*", names(fi))
+    res_dup <- apply(fi[,co], 2, function(x) 2*pnorm(abs(x), lower.tail = F)) %>% 
+      as.data.frame()
+    for(n in 1:length(res_dup)){
+      names(res_dup)[n] <- paste0("p_val_" ,substr(names(res_dup)[n],
+                                    3, nchar(names(res_dup)[n])))
+    }
+    fi <- cbind(fi, res_dup)
+    fi$gene_name <- row.names(fi)
+    
+    d <- ds[[jun[po,1]]][,c("gene_name", "fold","pvalue")]
+    names(d)[2:3] <- c("RNAseq_log2FoldChange", "pval_RNAseq")
+    fi <- left_join(fi, d, by= "gene_name")
+    fi <- fi[,-1]
+    fi[is.na(fi)] <- 0
+    # fi[,grep("log2",names(fi))] <- apply(fi[,grep("log2", names(fi))],2,
+    #                                         scale)
+    remove(alle)  
+  for (xy in features){
+    if (xy %in% fi$gene_name){
+    gene <- fi %>% dplyr::filter(gene_name %in% xy) %>% dplyr::select(-gene_name)
+    }
+    gene <- gene %>% tidyr::gather(tech, log2FC) %>% dplyr::filter(grepl("z.*", tech)==F)
+    gene$pvalue <- NA
+    gene <- gene[c(9,4,2,1,3,10,8,6,5,7),]
+    gene[1:5,3] <- gene[6:10,2]
+    gene <- gene[1:5,]
+    gene$tech <- c("RNA", "ATAC", "K27Ac", "K4me3", "K27me3")
+    gene$gene <- xy
+    if (exists("alle") == F){
+      alle <- gene
+    } else {
+      alle <- rbind(alle, gene)
+    }
+  }
+
+
+    Vol <- data.frame(log2FC= as.numeric(alle$log2FC),
+                      sig= -log10(as.numeric(alle$pvalue)), 
+                      gene = alle$gene,
+                    tech = alle$tech)
+    Vol$sig[Vol$sig == "Inf"] <- 320
+    # Vol$S <- 0
+    # Vol[which(Vol$sig<1.5), "S"] <- "NS"
+    # Vol[which(Vol$log2FC>0.25 & Vol$S!="NS"), "S"] <- "UP"
+    # Vol[which(Vol$log2FC<(-0.25) & Vol$S!="NS"), "S"] <- "DOWN"
+    # Vol[which(Vol$S==0), "S"] <- "NS"
+    # Vol$S <- as.factor(Vol$S)
+    
+  svg("figs/test4.svg", width = 20, height = 20)
+    Vol %>% 
+     dplyr::filter(sig > 2 & abs(log2FC) > 0.1) %>% 
+    ggplot(aes(x=log2FC, y=sig, color = tech,
+               label=gene)) +
+      geom_point (size = 2, alpha= 0.65) +
+      scale_y_log10()+
+      # scale_x_log10()+
+      geom_vline(xintercept = c(-0.25, 0.25), linetype = 1, size = 0.3, col = "grey20") +
+      geom_hline(yintercept = 2, linetype = 1, size = 0.3, col = "grey20") +
+      ggrepel::geom_text_repel(size=4)+
+      theme_light() 
+  dev.off()
+    
+    
+      ggtitle(paste0("Intepareto analysis ", assay, " ", pop1, " vs ",  pop2)) +
+      xlab("avg_log2FC") + 
+      ylab("-log10 pval") +
+      # scale_y_continuous(breaks = seq(0, 350, 50),
+      #                    limits = c(-20, 350), expand = expansion(mult=0, add= c(1,0))) +
+      # scale_x_continuous(breaks = c(seq(-30,30, by = 1)),
+      #                    labels = c(2^abs(-30:30)*sign(-30:30)),
+      #                    guide = guide_axis(check.overlap = T)) +
+      theme(axis.line = element_line(size = 0.3, colour = "grey20", linetype=1),
+            panel.grid.minor.x = element_blank(),
+            panel.grid.minor.y = element_blank())+
+      ggrepel::geom_text_repel(data= subset(Vol, S != "NS"),
+                      aes(label = rownames(subset(Vol, S != "NS"))),
+                      color = "black",
+                      size = 4,
+                      vjust = -0.1, max.overlaps = 15)
+}
+
+```
+
+# Pareto
+```{r}
+l <- list.files(path= "out/", pattern = "^int_2k_*")
+
+for (i in l){
+  df_final <- readxl::read_xlsx(paste0("out/",i)) %>%
+                             as.data.frame()
+  row.names(df_final) <- df_final$external_gene_name
+  df_final <- df_final[,-length(df_final)]
+  nr.fronts <- 50 # choose a large number to include all the fronts
+  objective <- data.frame(mark = c("z.K4me3_ChIP_bulk",	"z.K27Ac_ChIP_bulk",
+                                   "z.K27me3_ChIP_bulk",	"z.ATAC_bulk"),
+                          obj = c("max","max","min","max"),
+                          stringsAsFactors=FALSE)
+  res_final <- doPareto(df_final = df_final,
+                        objective = objective,
+                        nr.fronts = nr.fronts)
+  # compute pvalue
+  co <- grep("z.*", names(res_final))
+  res_dup <- apply(res_final[,co], 2, function(x) 2*pnorm(abs(x), lower.tail = F)) %>% 
+    as.data.frame()
+  for(n in 1:length(res_dup)){
+    names(res_dup)[n] <- paste0("p_val_" ,substr(names(res_dup)[n],
+                                  3, nchar(names(res_dup)[n])))
+  }
+  res_final <- cbind(res_final, res_dup) %>% 
+    mutate(gene = row.names(.))
+  
+  writexl::write_xlsx(res_final, paste0("out/Pareto_",i))
+  print(paste0(i," -- Pareto done"))
+}
+
+```
+
+# PCA
+```{r}
+#load files and mix doMatch (res1) files for Th0, TFH and Tet
+pdf(file = paste0("figs/PCA", ".pdf"), width = 10, height = 10)
+  for(p in c("promoter", "genebody")){
+  l <- list.files(path= "out/", pattern = p)
+  l <- grep("TH0", l, value = T)
+  l <- grep("^res.1", l, value=T)
+  
+  res <- merge(readxl::read_xlsx(paste0("out/",l[1])),
+               readxl::read_xlsx(paste0("out/",l[2])))                  
+  row.names(res) <- res$external_gene_name
+  res <- res[,-1]
+  
+  pc <- prcomp(t(res))
+  pc_sum <- summary(pc)
+  PC1_varexpl <- pc_sum$importance[2,"PC1"]
+  PC2_varexpl <- pc_sum$importance[2,"PC2"]
+  
+  plot <- as.data.frame(pc$x[,1:2])
+  plot$celltype <- NA
+  for (i in pop){
+    plot[grep(i, row.names(plot), ignore.case = T), "celltype"] <- i
+  }
+  plot$tech <- "RNA"
+  for (i in c("ATAC", "K27Ac", "K4me3", "K27me3")){
+    plot[grep(i, row.names(plot), ignore.case = T), "tech"] <- i
+  }
+  
+  
+  pca <- ggplot(plot, aes(x = PC1, y= PC2, 
+                   color = tech,
+                   shape = celltype)) +
+    geom_point(size= 5) +
+    # scale_color_manual(values = c("royalblue3","green3")) + #border color, change colors if you like
+    # scale_fill_manual(values = c("steelblue2","greenyellow")) + #fill color, change colors if you like
+    # theme_minimal() +
+    #or
+    theme_light() +
+    labs(title= paste0("PCA for ", p),
+         x= paste0("PC1 (", round(PC1_varexpl*100,1), "%)"),
+         y= paste0("PC2 (", round(PC2_varexpl*100,1), "%)")) +
+    theme(legend.title = element_text(size=10, 
+                                      face="bold")) +
+    theme(#legend.background = element_rect(linetype="solid", 
+      #                                 colour ="grey"),
+      legend.title=element_blank())
+  print(pca)
+  }
+dev.off()
+
+```
