@@ -1,0 +1,326 @@
+## 1. Bulk ATAC
+Tet vs Th0 and TFH vs Th0, only regions differentially open FDR < 0.01
+```{r, echo=T,results='markup'}
+#setwd("~/Bioinformatics/SANTAMARIA_28/")
+#satan <- readxl::read_xlsx("all_exceptTF.xlsx")
+for (po in names(bulkatac)){
+  k <- bulkatac[[po]] %>% mutate(Region.ID = paste0(seqnames,":",start,"-",end))
+  # k <- head(k)
+  gr <- GRanges(seqnames = k$seqnames, 
+                   ranges = paste0(k$start, "-", k$end), 
+                   strand = NULL)
+  g.r <- look.around(gr)
+  g.r2 <- as.data.frame(g.r) %>%
+    mutate(Region.ID = paste0(Chr,":",Start,"-",End)) %>%
+    distinct(gene_name, Region.ID, type)
+  #k <- full_join(k, g.r2[, c("gene_name","Region.ID", "type")], by="Region.ID")
+  # grBM[elementMetadata(grBM)[,1] == "Rab3ip"]
+  # prom[grep("ENSMUST00000016673.6", elementMetadata(prom)[,2])]
+  t <- as.data.frame(table(g.r2$gene_name))
+  names(t) <- c("gene", paste0("ATAC_N_OCR_", po))
+  if (exists("satan") == F){
+  satan <- t
+  } else {
+    satan <- full_join(satan, t, by = "gene")
+  }
+}
+#writexl::write_xlsx(satan,"ATACbulk_lookaround.xlsx")
+#writexl::write_xlsx(satan,"table_atac_tconv_140122.xlsx")
+```
+## 2. Bulk RNAseq
+Tet vs Th0 and TFH vs Th0, upregulated: FDR < 0.01 and |FC| >= 4
+```{r, echo=T,results='markup'}
+satan <- readxl::read_xlsx("table_atac_tconv_140122.xlsx")
+for (po in c("Tet_TH0", "TFH_TH0")){
+dsd <- ds[[po]]
+dsd$sign <- "NS"
+dsd[dsd$fdr < 0.01 & dsd$fold >= 4, "sign"] <- "+"
+dsd[dsd$fdr < 0.01 & dsd$fold <= -4, "sign"] <- "-"
+names(dsd)[1] <- "gene"
+if (exists("satan2") == F){
+  satan2 <- full_join(satan, dsd[,c("gene","sign")], by = "gene")
+  } else {
+    satan2 <- full_join(satan2, dsd[,c("gene","sign")], by = "gene")
+  }
+names(satan2)[length(satan2)] <- paste0("RNAseq_Bulk_", po)
+}
+
+```
+
+
+## 4. SC Multiome
+Genes associated (closest gene, 1 gene!) to OCR that are differentially open (+) or closed (-) in TR1.1 vs Tet.TFH and TR1.2 vs Tet.TFH. 
+```{r, echo=T,results='markup'}
+setwd("~/Bioinformatics/SANTMARIA_23_24/analysis_23_24/")
+t1 <- readxl::read_xlsx("out/revisit/DE_LR_mpct_0.5_TFH.1_vs_TR1.1_ATAC.xlsx")
+  t1$sign <- "NS"
+  t1[t1$p_val_adj < 0.01 & t1$avg_log2FC > 0, "sign"] <- "-"
+  t1[t1$p_val_adj < 0.01 & t1$avg_log2FC < 0, "sign"] <- "+"
+  names(t1)[8] <- "gene"
+  t1 <- t1 %>% distinct(gene, sign) %>% dplyr::filter(sign != "NS")
+  t1[duplicated(t1$gene),"sign"] <- "+/-"
+  t1 <- t1[!(t1$gene %in% t1$gene[duplicated(t1$gene)] &
+             t1$sign  != "+/-"),]
+  
+  satan3 <- full_join(satan2, t1[,c("gene","sign")], by = "gene")
+  names(satan3)[length(satan3)] <- "scATAC_TR1.1"
+  
+t2 <- readxl::read_xlsx("out/revisit/DE_LR_mpct_0.5_TFH.1_vs_TR1.2_ATAC.xlsx")
+  t2$sign <- "NS"
+  t2[t2$p_val_adj < 0.01 & t2$avg_log2FC > 0, "sign"] <- "-"
+  t2[t2$p_val_adj < 0.01 & t2$avg_log2FC < 0, "sign"] <- "+"
+  names(t2)[8] <- "gene"
+  t2 <- t2 %>% distinct(gene, sign) %>% dplyr::filter(sign != "NS")
+  t2[duplicated(t2$gene),"sign"] <- "+/-"
+  t2 <- t2[!(t2$gene %in% t2$gene[duplicated(t2$gene)] &
+             t2$sign  != "+/-"),]
+  
+  satan3 <- full_join(satan3, t2[,c("gene","sign")], by = "gene")
+  names(satan3)[length(satan3)] <- "scATAC_TR1.2"
+
+```
+## 6. Bulk RNAseq Tet vs TFH
+Differential gene expression analysis between Tet and TFH
+
+```{r, echo=T,results='markup'}
+for (po in c("Tet_TFH")){
+dsd <- ds[[po]]
+dsd$sign <- "NS"
+dsd[dsd$fdr < 0.01 & dsd$fold >= 4, "sign"] <- "+"
+dsd[dsd$fdr < 0.01 & dsd$fold <= -4, "sign"] <- "-"
+names(dsd)[1] <- "gene"
+satan4 <- full_join(satan3, dsd[,c("gene","sign")], by = "gene")
+names(satan4)[length(satan4)] <- "RNAseq_TetvTFH"
+}
+
+```
+
+## 7. scRNAseq original
+Add scRNAseq data from BDC original experiment comparing TR1 (TR1.2 + TR1.1) vs TFH.TET+
+filter by FDR < 0.01, not fold change == over or under 0
+```{r, echo=T,results='markup'}
+scr <- readxl::read_xlsx("../SANTMARIA_23_24/analysis_23_24/out/revisit/DE_wilcox_mpct0.5_TR1_vs_TFH-Tet+_RNAoriginaldata.xlsx") %>%  filter(p_val_adj < 0.01)
+scr$sign <- "NS"
+scr[scr$avg_log2FC > 0, "sign"] <- "+"
+scr[scr$avg_log2FC < 0 , "sign"] <- "-"
+names(scr)[6] <- "gene"
+satan5 <- full_join(satan4, scr[,c("gene","sign")], by = "gene")
+names(satan5)[length(satan5)] <- "scRNA_original_TR1_TFH.TET"
+
+
+```
+
+## 9. Histone modifications
+Add all comparisons of the 3 histone modifications
+Divide in 3: promoter, gene body, and 50kb upstream of the promoter and 50kb downstream of the translational stop site
+
+```{r, echo=T,results='markup'}
+for (po in names(k27gsa)){
+  k <- k27gsa[[po]] %>% dplyr::filter(fdr < 0.01 & fold > 0) %>% 
+    dplyr::rename(gene = Gene.IDs) %>% 
+    separate(Region.ID, sep = ":", into=c("seqnames","ranges"), remove = F)
+  gr <- GRanges(seqnames = k$seqnames, 
+                   ranges = k$ranges, 
+                   strand = NULL)
+  g.r <- look.around(gr)
+  g.r2 <- as.data.frame(g.r) %>% mutate(Region.ID = paste0(Chr,":",Start,"-",End)) %>% 
+    distinct(gene_name, Region.ID, type)
+  # k <- full_join(k, g.r2[, c("gene_name","Region.ID", "type")], by="Region.ID")
+  # grBM[elementMetadata(grBM)[,1] == "Rab3ip"]
+  # prom[grep("ENSMUST00000016673.6", elementMetadata(prom)[,2])]
+  t <- as.data.frame(table(g.r2$gene_name, g.r2$type)) %>% 
+    spread(Var2, Freq)
+  names(t)[1] <- "gene"
+  for(n in 2:length(t)){
+    names(t)[n] <- paste0("K27Ac_", po, "_", names(t)[n])
+  }
+  if (exists("satan6") == F){
+  satan6 <- full_join(satan5, t, by = "gene")
+  } else {
+    satan6 <- full_join(satan6, t, by = "gene")
+  }
+}
+
+for (po in names(k4gsa)){
+  k <- k4gsa[[po]] %>% dplyr::filter(fdr < 0.01 & fold > 0) %>% 
+    dplyr::rename(gene = Gene.IDs) %>% 
+    separate(Region.ID, sep = ":", into=c("seqnames","ranges"), remove = F)
+  
+  gr <- GRanges(seqnames = k$seqnames, 
+                   ranges = k$ranges, 
+                   strand = NULL)
+  g.r <- look.around(gr)
+  g.r2 <- as.data.frame(g.r) %>% mutate(Region.ID = paste0(Chr,":",Start,"-",End)) %>% 
+    distinct(gene_name, Region.ID, type)
+  k <- full_join(k, g.r2[, c("gene_name","Region.ID", "type")], by="Region.ID")
+  #grBM[elementMetadata(grBM)[,1] == "Rab3ip"]
+  t <- as.data.frame(table(k$gene_name, k$type)) %>% 
+    spread(Var2, Freq)
+  names(t)[1] <- "gene"
+  for(n in 2:length(t)){
+    names(t)[n] <- paste0("K4me3_", po, "_", names(t)[n])
+  }
+  satan6 <- full_join(satan6, t, by="gene")
+}
+
+for (po in names(k27me3gsa)){
+  k <- k27me3gsa[[po]] %>% dplyr::filter(fdr < 0.01 & fold > 0) %>% 
+    dplyr::rename(gene = Gene.IDs) %>% 
+    separate(Region.ID, sep = ":", into=c("seqnames","ranges"), remove = F)
+  
+  gr <- GRanges(seqnames = k$seqnames, 
+                   ranges = k$ranges, 
+                   strand = NULL)
+  g.r <- look.around(gr)
+  g.r2 <- as.data.frame(g.r) %>% mutate(Region.ID = paste0(Chr,":",Start,"-",End)) %>% 
+    distinct(gene_name, Region.ID, type)
+  k <- full_join(k, g.r2[, c("gene_name","Region.ID", "type")], by="Region.ID") %>% 
+  filter(is.na(type) == F)
+  #grBM[elementMetadata(grBM)[,1] == "Rab3ip"]
+  t <- as.data.frame(table(k$gene_name, k$type)) %>% 
+    spread(Var2, Freq)
+  names(t)[1] <- "gene"
+  for(n in 2:length(t)){
+    names(t)[n] <- paste0("k27me3_", po, "_", names(t)[n])
+  }
+  satan6 <- full_join(satan6, t, by="gene")
+}
+writexl::write_xlsx(satan6, "satan_uptohistones_tconv.xlsx")
+```
+
+## 10. Active enhancers
+List number of active enhancers per gene in TetvsTh0 and TFHvsTH0
+```{r, echo=T,results='markup'}
+setwd("~/Bioinformatics/SANTAMARIA_28/")
+
+for (po in names(ae)){
+  k <- ae[[po]] %>% mutate(Region.ID = paste0(seqnames,":",start,"-",end))
+  
+  gr <- GRanges(seqnames = k$seqnames, 
+                ranges = paste0(k$start, "-", k$end), 
+                strand = NULL)
+  g.r <- look.around(gr)
+  g.r2 <- as.data.frame(g.r) %>%
+    mutate(Region.ID = paste0(Chr,":",Start,"-",End)) %>%
+    filter(is.na(type) == F) %>% 
+    distinct(gene_name, Region.ID, type)
+  #k <- full_join(k, g.r2[, c("gene_name","Region.ID", "type")], by="Region.ID")
+  # grBM[elementMetadata(grBM)[,1] == "Rab3ip"]
+  # prom[grep("ENSMUST00000016673.6", elementMetadata(prom)[,2])]
+  t <- as.data.frame(table(g.r2$gene_name))
+  names(t) <- c("gene", paste0("ActEnh_N_OCR_", po))
+  if (exists("satan7") == F){
+    satan7 <- full_join(satan6, t, by = "gene")
+  } else {
+    satan7 <- full_join(satan7, t, by = "gene")
+  }
+}    
+writexl::write_xlsx(satan7, "satan_actenh_tconv.xlsx")    
+```
+## 11. Methylation
+Comparing Tet vs Th0 and TFH vs Th0, use the scoring of the methylome
+into positive or negative
+```{r, echo=T,results='markup'}
+me <- list()
+me[["Tet_Tcon"]] <- readxl::read_xlsx("data/meth/Tconv_vs_Tet.CG_DMR.xlsx") %>% 
+  as.data.frame()
+me[["TFH_Tcon"]] <- readxl::read_xlsx("data/meth/Tconv_vs_TFH.CG_DMR.xlsx") %>% 
+  as.data.frame()
+me[["Tet_TFH"]] <- readxl::read_xlsx("data/meth/TFH_vs_Tet.CG_DMR.xlsx") %>% 
+  as.data.frame()
+
+for (po in names(me)){
+  k <- me[[po]] %>% mutate(Region.ID = paste0(chr,":",start,"-",stop))
+  k$diff <- as.numeric(k$mean_methylation_difference)*(-1)
+
+  gr <- GRanges(seqnames = k$chr, 
+                ranges = paste0(k$start, "-", k$stop), 
+                strand = NULL)
+  g.r <- look.around(gr)
+  g.r2 <- as.data.frame(g.r) %>%
+    mutate(Region.ID = paste0(Chr,":",Start,"-",End)) %>% 
+    distinct(gene_name, Region.ID, type)
+  k <- full_join(k, g.r2[, c("gene_name","Region.ID", "type")],
+                 by="Region.ID") %>%  filter(is.na(type) == F)
+  # grBM[elementMetadata(grBM)[,1] == "Rab3ip"]
+  # prom[grep("ENSMUST00000016673.6", elementMetadata(prom)[,2])]
+  t <- k %>% group_by(gene_name,type) %>%
+    dplyr::summarise(Diff_meth = mean(diff)) %>% 
+    as.data.frame() %>% spread(type, Diff_meth)
+  names(t)[1] <- "gene"
+  for(n in 2:length(t)){
+    names(t)[n] <- paste0("Meth_", po, "_", names(t)[n])
+  }
+  if (exists("satan8") == F){
+    satan8 <- full_join(satan7, t, by = "gene")
+  } else {
+    satan8 <- full_join(satan8, t, by = "gene")
+  }
+}
+writexl::write_xlsx(satan8, "satan_upMeth_tconv.xlsx")
+```
+### 12. Methylation of active enhancers
+Showing the number of differentially methylated regions that overlap with active enhancers associated for each gene, which are hypo or hypermethylated.
+```{r, echo=T,results='markup'}
+me <- list()
+me[["Tet_TH0"]] <- readxl::read_xlsx("data/meth/Tconv_vs_Tet.CG_DMR.xlsx") %>% 
+  as.data.frame()
+me[["TFH_TH0"]] <- readxl::read_xlsx("data/meth/Tconv_vs_TFH.CG_DMR.xlsx") %>% 
+  as.data.frame()
+me[["Tet_TFH"]] <- readxl::read_xlsx("data/meth/TFH_vs_Tet.CG_DMR.xlsx") %>% 
+  as.data.frame()
+for (po in names(me)){
+  k <- ae[[po]] %>% mutate(Region.ID = paste0(seqnames,":",start,"-",end))
+  
+  gr <- GRanges(seqnames = k$seqnames, 
+                ranges = paste0(k$start, "-", k$end), 
+                strand = NULL)
+  km <- me[[po]] %>% mutate(Region.ID = paste0(chr,":",start,"-",stop))
+  km$diff <- as.numeric(km$mean_methylation_difference)*(-1)
+  km[km$diff > 0, "sign"] <- "+"
+  km[km$diff < 0, "sign"] <- "-"
+  grm <- GRanges(seqnames = km$chr, 
+                 ranges = paste0(km$start, "-", km$stop), 
+                 strand = NULL,
+                 diff = km$sign)
+  
+  overlap <- subsetByOverlaps(grm, gr)
+
+  g.r <- look.around(overlap)
+  g.r2 <- as.data.frame(g.r) %>% mutate(Region.ID = paste0(Chr,":",Start,"-",End))
+  g.r3 <- right_join(km, g.r2, by = "Region.ID") %>% filter(is.na(type) == F)
+  g.r3 <- g.r3 %>% distinct(gene_name, Region.ID, type, sign)
+  t <- g.r3 %>% group_by(gene_name) %>%
+    dplyr::summarise(gene_body_hyperMet = sum(type == "gene_body" & sign == "+"),
+                     gene_body_hypoMet = sum(type == "gene_body" & sign == "-"),
+                     intergenic_hyperMet = sum(type == "intergenic" & sign == "+"),
+                     intergenic_hypoMet = sum(type == "intergenic" & sign == "-"),
+                     promoter_hyperMet = sum(type == "promoter" & sign == "+"),
+                     promoter_hypoMet = sum(type == "promoter" & sign == "-")
+                     )
+  # t <- as.data.frame(table(g.r3$gene_name, g.r3$type, g.r3$sign)) %>% 
+  #   spread(Var2, Freq)
+  # names(t)[1] <- "gene"
+  # for ( u in (length(t)-(length(t)-3)):length(t))
+  # t1 <- t[c(1,2, u)] %>% spread(Var3, 2)
+#}
+  names(t)[1] <- "gene"
+  for(n in 2:length(t)){
+    names(t)[n] <- paste0("Meth.of.Act.Enh_", po, "_", names(t)[n])
+  }
+  if (exists("satan9") == F){
+    satan9 <- full_join(satan8, t, by = "gene")
+  } else {
+    satan9 <- full_join(satan9, t, by = "gene")
+  }
+}
+writexl::write_xlsx(satan9, "all_exceptTF_Tcon_150122.xlsx")
+```
+
+## 13. Overlaps TF
+Overlaps of diferents TF with active enhancers
+```{r, echo=T,results='markup'}
+
+    
+    
+```
