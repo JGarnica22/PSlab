@@ -1,6 +1,7 @@
 ## do graphs only with avglog2FC for every cluster
 
 violplot <- function(pval,populations,comp){
+   sc <- data.frame(gene = rownames(integrated[["RNA"]]))
 # load all the excel file with the differential analysis of each populations and merge them
   for (i in populations){
     if (file.exists(paste0("out/DE_integrated_only_", i, "_KO.xlsx"))){
