@@ -28,3 +28,6 @@ for (i in unique(plot.data$sampletype)) {
           
 }
 print(figs)
+
+## prova per veure com van els canvis
+print("hello world")
