@@ -164,3 +164,10 @@ bin_i / bin_j / counts_ij
 
 
 NEXT STEPS: peak calling and differential analysis (FitHiChIP and HiChIP_peaks tools).
+
+
+## Contact Matrix (Juicer Tools)
+
+## Loop Calling (FitHiChip)
+
+## Differential Analysis
