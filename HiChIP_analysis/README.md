@@ -190,7 +190,7 @@ Firstly, it is necessary to convert our .ValidPairs obtained with HiC-Pro into a
 As a result, it will retrieve the .hic files that can be later introduced into the juicebox GUI.
 Juicebox gui can be downloaded in: https://github.com/aidenlab/Juicebox/wiki/Download. With simple GUIs for Windows and Mac and .jar for UNIX.
 
-**Result Example:
+**Result Example**:
 ![alt text](https://raw.githubusercontent.com/JGarnica22/PSlab/c4668269e6f0269a5e9db883151c7cfa340662a0/HiChIP_analysis/doc/2022.04.27.14.01.17.HiCImage.svg?token=AO2KRHY57NM2RBSBMRZCTRLCNEYUQ)
 
 ## Loop Calling (FitHiChip)
