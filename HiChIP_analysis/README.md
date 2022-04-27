@@ -168,6 +168,28 @@ NEXT STEPS: peak calling and differential analysis (FitHiChIP and HiChIP_peaks t
 
 ## Contact Matrix (Juicer Tools)
 
+Juicebox is visualization software for Hi-C data. In specific, we will take advantage of their gui to visualize the contact matrix.
+Firstly, it is necessary to convert our .ValidPairs obtained with HiC-Pro into a .hic that can be used as input for juicebox. (scripts are all available in the cluster software/ directory.
+
+**Call Format**:
+````
+/PATH/TO/hicpro2juicebox.sh -i /PATH/TO/.allValidPairs \
+    -g /PATH/TO/chrom_hg19.sizes \
+    -j juicer_tools.jar \
+    -o  OUTDIR/
+````
+
+**Example Call**: 
+````
+/gpfs/projects/cek26/software/scripts/hicpro2juicebox.sh -i /gpfs/projects/cek26/experiments/HiChip/outs27_04/hic_results/data/dixon_2M_2/dixon_2M_2.allValidPairs \
+    -g /gpfs/projects/cek26/experiments/HiChip/data/chrom_hg19.sizes \
+    -j /gpfs/projects/cek26/software/juicer_tools_1.22.01.jar \
+    -o  /gpfs/projects/cek26/experiments/HiChip/juicebox_out
+````
+
+As a result, it will retrieve the .hic files that can be later introduced into the juicebox GUI.
+Juicebox gui can be downloaded in: https://github.com/aidenlab/Juicebox/wiki/Download. With simple GUIs for Windows and Mac and .jar for UNIX.
+
 ## Loop Calling (FitHiChip)
 
 ## Differential Analysis
