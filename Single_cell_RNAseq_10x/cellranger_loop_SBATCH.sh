@@ -14,7 +14,6 @@
 wd=/gpfs/projects/cek26/experiments/SANTAMARIA_38
 cd $wd
 fq=$wd/fastq_files
-# --constraint=highmem
 
 # Set reference directory
 ref=/gpfs/projects/cek26/data/genomes/genome_mus/cellranger/refdata-gex-mm10-2020-A
@@ -37,16 +36,6 @@ for f in $(find ./fastq_files -name "*.fastq.gz" -exec basename {} \;)
 do
 echo "${f%%_S*}" >> samples.txt
 done
-f=$(sort -u samples.txt)
-
-module load cellranger/6.1.2
-cd $wd/cellranger_counts3
-cellranger count --id=CD4mitet \
-                 --transcriptome=$ref \
-                 --fastqs=$fq \
-                 --expect-cells=10000 \
-                 --sample=$f \
-                 --no-bam
 
 # Then use a loop with the unique samples to generate respective jobs to be sent to bsub
 # if expected number of cells differ, the jobs need to be changed manually
@@ -78,7 +67,7 @@ sbatch to_bsub/cellranger_count_$f.sh
 done
 
 # Next steps will be on hold until previous pipelines are over
-while [ $(sort -u samples.txt | wc -l) != $(find ./cellranger_counts -type f -name "*_info.h5" -print | wc -l) ]
+while [ $(sort -u samples.txt | wc -l) != $(find ./$cellranger_counts -type f -name "*_info.h5" -print | wc -l) ]
 do
 now=$(date)
 echo Cellranger count still running... $now
