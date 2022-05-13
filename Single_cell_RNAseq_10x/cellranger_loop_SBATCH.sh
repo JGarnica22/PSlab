@@ -48,7 +48,7 @@ echo \#SBATCH --job-name="CR_inkt_$f"
 echo \#SBATCH -q bsc_ls
 echo \#SBATCH -t 24:00:00
 echo \#SBATCH -e $wd/bsub_reports/cellranger_loop_$f.err
-echo \#SBATCH -e $wd/bsub_reports/cellranger_loop_$f.out
+echo \#SBATCH -o $wd/bsub_reports/cellranger_loop_$f.out
 echo \#SBATCH -n 32
 echo \#SBATCH --mail-type=all
 echo \#SBATCH --mail-user=garnica@clinic.cat
