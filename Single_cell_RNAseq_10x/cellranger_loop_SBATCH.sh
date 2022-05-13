@@ -73,7 +73,7 @@ now=$(date)
 echo Cellranger count still running... $now
 sleep 300;
 done
-
+echo Generating aggregation files
 # Generate aggregation CSV 
 for i in $(sort -u samples.txt)
 do
@@ -85,7 +85,7 @@ do
 aggr_id=$aggr_id'_'$u
 done
 aggr_id=Aggr$aggr_id
-echo library_id,molecule_h5 > $aggr_id.csv
+echo sample_id,molecule_h5 > $aggr_id.csv
 for i in $(sort -u samples.txt)
 do
 echo $i,$wd/$cellranger_counts/$i/outs/molecule_info.h5 >> $aggr_id.csv
@@ -93,8 +93,10 @@ done
 
 
 # Run cellranger aggr when counts finish
+module load cellranger/6.1.2
 mkdir $cellranger_aggr
 cd $cellranger_aggr
+echo Running cellranger aggr $now
 cellranger aggr --id=$aggr_id \
                 --csv=$wd/$aggr_id.csv \
                 --normalize=none
