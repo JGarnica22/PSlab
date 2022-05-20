@@ -195,4 +195,22 @@ Juicebox gui can be downloaded in: https://github.com/aidenlab/Juicebox/wiki/Dow
 
 ## Loop Calling (FitHiChip)
 
+FitHiChip is a software that analyses HiChip Pair data derived from HicPro and retrieves the statistical significant CIS interactions at a chosen distance. In the context of HiChIP, thus, we designate as loops signiciant interactions between a protein-anchor and the surrounding the genome. 
+Take into account that type of significant interactions change according to the kind of sample under analysis:
+ - Peak-to-Peak: Interaction only between anchors (like CTCF).
+ - Peak-to-All: Interaction beteen anchors and any of the surrounding genome. Like (H3k27Ac and H3k4me3).
+ - All-to-All: For non-targeted HiC data.
+
+**Important factors to take into account**:
+
+ - Resolution can be tricky! The fewer read you have, the larger the bin size must be to have enough read support to run statistics on. 
+
+### Inputs
+
+
+
+#### Configuration File:
+
+This file is provided in our repository as well as the developers repository (https://github.com/ay-lab/FitHiChIP). 
+
 ## Differential Analysis
