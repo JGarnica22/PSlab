@@ -225,10 +225,24 @@ Macs2 callpeak –t prefix.primary.aln.bed -n prefix.macs2
 
 ```
 
+#### Chromosome size file
+
+File containing the chromosome size cvalues for the corresponding reference genome. It has already been mentioned the procedure to either produce it or download it. References for mm10, hg19 and hg38 are present in this repository in data section.
+
 ### Configuration File parameters:
 
 This file is provided in our repository as well as the developers repository (https://github.com/ay-lab/FitHiChIP) and contains the paths to input files and the parameters being used.
 
-####
+#### Int-Type
+Refers to the interaction type of the peaks. 1: Peak-to-Peak, 2: Peak-to-nonPeak. 3: Peak-to-All, 4:All-to-All. Different experiments precise need different kind of int-type to make biological sense.
+
+#### Binsize
+Refers to the size of the bins for detecting interactions. The fewer the reads the larger is the binsize recommended to be.
+
+#### UseP2PBackgrnd
+Refers to the background model. 1: Uses only peak to peak loops for background modeling, 0: Uses both peak to peak and peak to noinpeak loops for background modeling. It is usually recommendded to use type 1  in case we are doing int-type peak to peak, and 0 in case of peak to all.
+
+#### Bias type
+Refers to the type of bias correction used. 1: Coverage bias regression default. 2: ICE bias regression is computed.
 
 ## Differential Analysis
