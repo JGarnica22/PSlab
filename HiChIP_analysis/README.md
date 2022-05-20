@@ -220,7 +220,7 @@ The most straightforward option in this case, would be to download a reference o
 
 **option 2:** Use -bam file from alignment step in HiCpro and convert to bed format and, after, run Macs2
 ```
-samtools –view –h –F 0x900 mapped.bam | bedtools bamtobed -i stdin > prefix.primary.aln.bed
+samtools –view –h –F 0x900 prefix.bwt2pairs.bam | bedtools bamtobed -i stdin > prefix.primary.aln.bed
 Macs2 callpeak –t prefix.primary.aln.bed -n prefix.macs2
 
 ```
