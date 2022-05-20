@@ -207,10 +207,13 @@ Take into account that type of significant interactions change according to the 
 
 ### Inputs
 
-
-
-#### Configuration File:
+### Configuration File parameters:
 
 This file is provided in our repository as well as the developers repository (https://github.com/ay-lab/FitHiChIP). 
+**Important parameters**
+ - ValidPairs: Specifify path to the .allValidPairs file output from HicPro
+ - PeakFile:
+
+####
 
 ## Differential Analysis
