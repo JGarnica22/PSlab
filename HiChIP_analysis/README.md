@@ -207,12 +207,27 @@ Take into account that type of significant interactions change according to the 
 
 ### Inputs
 
+#### Valid Pairs
+
+Specifify path to the .allValidPairs file output from HicPro following the instructions above
+
+#### PeakFile
+
+ChIP-seq peaks are necessary in this process in order to identify which molecule of the proximity-ligation step occurs at an anchor site or non-anchor site.
+The most straightforward option in this case, would be to download a reference of chip peaks for our data or to already have done the same experiment for chip and obtained the peaks. However, it is unlikely to be the case for us so we need to be able to call our chip peaks from the HiChip data.
+
+**option 1:** Inferring peaks using PeakInferHiChIP.sh script. It only needs the directory containing HicPro pairs (-H), the reference genome for macs2 (-R) the parameters for macs2 call (-M) and the length of the reads generated from HicPro (-L).
+
+**option 2:** Use -bam file from alignment step in HiCpro and convert to bed format and, after, run Macs2
+```
+samtools –view –h –F 0x900 mapped.bam | bedtools bamtobed -i stdin > prefix.primary.aln.bed
+Macs2 callpeak –t prefix.primary.aln.bed -n prefix.macs2
+
+```
+
 ### Configuration File parameters:
 
-This file is provided in our repository as well as the developers repository (https://github.com/ay-lab/FitHiChIP). 
-**Important parameters**
- - ValidPairs: Specifify path to the .allValidPairs file output from HicPro
- - PeakFile:
+This file is provided in our repository as well as the developers repository (https://github.com/ay-lab/FitHiChIP) and contains the paths to input files and the parameters being used.
 
 ####
 
