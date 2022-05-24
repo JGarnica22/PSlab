@@ -246,3 +246,12 @@ Refers to the background model. 1: Uses only peak to peak loops for background m
 Refers to the type of bias correction used. 1: Coverage bias regression default. 2: ICE bias regression is computed.
 
 ## Differential Analysis
+
+The R-package used for the generation of plots for HiChIP data is Sushi. We will be using two different inputs:
+ - **Bedgraph from the HiCPro paired alignment**
+ ```
+ samtools sort  $bam/Tet_neg_mm10.bwt2pairs.bam -o $bam/Tet_neg_mm10.bwt2pairs.sorted.bam
+ samtools index $bam/Tet_neg_mm10.bwt2pairs.sorted.bam
+ bamCoverage -b $bam/Tet_neg_mm10.bwt2pairs.sorted.bam -of bedgraph -p 36 -o $outs/tet_neg_mm10.sorted.coverage.bedgraph
+ ```
+ - **Statistically signigicant interactions from FitHiChIP**
