@@ -52,7 +52,7 @@ for (i in li){
                 " CCDS transcripts versions found for ", i,
                 " : ",
                 paste(unique(df$transcript_name), collapse = ", ")))
-  df$type <- "gene"
+  df$type <- "exon"
   df <- df %>% mutate(gene_id=paste0(gene_id,".",exon_number),
                       gene_name=paste0(gene_name,".",exon_number),
                       mgi_id=paste0(mgi_id,".",exon_number),
@@ -63,9 +63,7 @@ for (i in li){
               distinct(width, gene_id, .keep_all = T) %>%
               arrange(gene_id, desc(width))
   # repeated exon entries to be changed for "exon" for type
-  df[duplicated(df$gene_id),"type"] <- "transcript"
-  df[df$type=="gene",which(is.na(df_g))] <- NA
-  df[df$type=="transcript",which(is.na(df_t[1,]))] <- NA
+
   print(paste0(nrow(df), " exons found for ", i))
   
   # append modified entries to whole df
@@ -99,9 +97,10 @@ cat Cre.fa | grep -v "^>" | tr -d "\n" | wc -c
 ```{r}
 cre_df <- data.frame(matrix(ncol=ncol(gtf_df)))
 names(cre_df) <- names(gtf_df)
-cre_df[1,] <- c("Cre", 1, 1032, ".", "+", ".", "gene", NA, NA,
+cre_df[1,] <- c("Cre", 1, 1032, ".", "+", "ncbi", "exon", NA, NA,
                 "NC_005856.1:436-1467", NA, "protein_coding", "Cre",
-                rep(NA, ncol(gtf_df)-13))
+                NA, NA, "Cre", "Cre", "Cre",
+                rep(NA,(length(names(cre_df))-18)))
 
 gtf_df <- rbind(gtf_df, cre_df)
 ```
@@ -115,7 +114,7 @@ export(gtf2, "genes_Cre.gtf")
 
 Check out exported format and content is ok.
 ```{bash}
-grep "Irf4\>" genes_Cre.gtf
+# grep "Irf4\>" genes_Cre.gtf
 tail genes_Cre.gtf
 
 ```
