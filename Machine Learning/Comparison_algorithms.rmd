@@ -1,0 +1,817 @@
+
+
+# Load libraries and set up chunks options.
+```{r setup, include=F, warnings=F, echo=F, message=F}
+library(knitr)
+library(tidyverse)
+library(pheatmap)
+library(RColorBrewer)
+library(caret)
+library(kernlab)
+library(class)
+library(randomForest)
+library(keras)
+library(C50) 
+
+knitr::opts_chunk$set(echo = T, warning = F, include=T, message = F,
+                      results = 'show')
+knitr::opts_knit$set(root.dir = normalizePath("~/ML"))
+```
+
+# Data loading and preparation
+## Read and explore the data
+Data is already normalized.
+```{r load_data}
+rna <- read.csv("rna.csv")
+
+# Convert the cancer types to factor
+rna$Y <- factor(rna$Y)
+prop.table(table(rna$Y))
+```
+In this case, the distribution of cancer types is not equitative.
+
+
+```{r stat_descriptive}
+# We create a dataframe to store different parameters of the data
+set.seed(22)
+df <- data.frame(
+      Parámetro=c("Cancer type", "Genes"),
+      Number=c(length(unique(rna$Y)), length(rna[,-1])),
+      Content=c(paste(unique(rna$Y), collapse=", "),
+                  # para los genes indicamos solo algunos
+                  paste(c(names(rna)[sample(2:length(rna),5,)], "..."),
+                        collapse=", "))
+      )
+df
+```
+
+We also explore data with a heatmap
+
+```{r heatmap, fig.width=18, fig.height=12}
+# heatmap
+ph <- rna[,-1] %>% t()
+colnames(ph) <- rna$Y
+pheatmap(ph ,
+         scale = "row",
+         rev(brewer.pal(8, ("RdBu"))),
+         show_rownames = F,
+         cluster_rows = T, 
+         cluster_cols = T
+        )
+```
+
+## Split dataset into train and test
+We apply the same splitting of traning and test data to be used in all the algorithms. We set the traning dataset with 75% of the samples and the rest for train (25%).
+
+
+```{r split_set}
+set.seed(22)
+
+# We use Caret function to ensure the same factor distribution in test and train
+part <- createDataPartition(rna$Y, p = 0.75,
+                              list = FALSE)
+train0 <- rna[part, ]
+test0 <- rna[-part, ]
+
+prop.table(table(train0$Y))
+prop.table(table(test0$Y))
+```
+
+
+
+# Algorithms application
+We create a list to store all the models and a dataframe for their evaluation, in order to compare them all.
+```{r}
+models <- list() 
+
+df_cm <- data.frame(matrix(nrow=0,ncol=4))
+names(df_cm) <- c("metric", "value", "class", "Model")
+```
+We create a function to extract the evaluation results with the confusuionMatrix() function from Caret.
+```{r cm_results}
+store_cm <- function(cm, model){
+  overall <- data.frame(metric = names(cm$overall[1:2]),
+                        value = cm$overall[1:2] %>% as.numeric(),
+                        class = "Overall",
+                        Model = model)
+  byclass <- cm$byClass %>% as.data.frame() %>%
+    rownames_to_column(var="class") %>% 
+    pivot_longer(!class, names_to="metric", values_to="value")
+  byclass$Model <- model
+  
+  df0 <- rbind(overall, byclass)
+  return(df0)
+}
+```
+
+Also, let's create a function to show tables with kappa and accuracy values.
+
+```{r acc_kappa}
+sum_AcK <- function(model, df_cm=df_cm){
+  df <- df_cm %>% filter(grepl(model, Model, ignore.case = T),
+                 class == "Overall") %>% 
+          select(-class) %>% 
+          pivot_wider(names_from = Model, values_from = value) %>% 
+          as.data.frame()
+  pander::pander(df, style="grid", justify="left")
+}
+```
+
+
+
+## k-Nearest Neighbour
+
+Let's explore k-Nearest Neighbour for values k = 1, 3, 5, 7, 11.
+
+### Data transformation
+Data is alrady normalized, we only need to scale it.
+
+```{r}
+train <- train0
+test <- test0
+train[,-1] <- scale(train[,-1])
+test[,-1] <- scale(test[,-1])
+```
+
+### Model training
+We will use the function `kNN` from `Caret` package.
+
+
+```{r k-nearest}
+ks <- c(1,3,5,7,11) # k values to test
+
+set.seed(22)
+tr_control <- trainControl(method="repeatedcv", # method crossvalidation
+                           repeats=3) # 3-fold crossvalidation
+
+knn <- train(Y ~ ., data = train,
+             method = "knn",
+             trControl = tr_control,
+             tuneGrid = data.frame(k=ks))
+knn
+models[["kNN"]] <- knn
+
+# plot
+plot(knn)
+```
+
+
+### Prediction and evaluation of the model
+```{r knn_eval}
+ev <- grep("kNN", names(models), value = T, ignore.case = T)
+for (o in ev){
+  set.seed(22)
+  cat("##########  ", o, "  ############\n")
+  pred <- predict(models[[o]], test)
+  cm <- confusionMatrix(pred, test$Y)
+  print(cm)
+  df_cm <- rbind(df_cm, store_cm(cm, o))
+  cat("\n\n")
+}
+```
+
+### Hyperparameters variations
+Let's try increase the range of k values.
+```{r nn_tune}
+set.seed(22)
+tr_control <- trainControl(method = "repeatedcv",
+                           repeats = 10,
+                           number = 10, # increase number of repetitions
+                          classProbs = T) # take into account class probabilities
+
+knn <- train(Y ~ ., data = train,
+             method = "knn",
+             trControl = tr_control,
+             tuneLength = 30) # try 30 values for k
+knn
+models[["kNN2"]] <- knn
+
+# plot
+plot(knn)
+```
+
+#### Performance reevaluation
+```{r knn2_eval}
+ev <- grep("kNN2", names(models), value = T, ignore.case = T)
+for (o in ev){
+  set.seed(22)
+  cat("##########  ", o, "  ############\n")
+  pred <- predict(models[[o]], test)
+  cm <- confusionMatrix(pred, test$Y)
+  print(cm)
+  df_cm <- rbind(df_cm, store_cm(cm, o))
+  cat("\n\n")
+}
+```
+
+
+```{r summary_knn}
+sum_AcK("kNN", df_cm)
+```
+
+
+
+## Naive Bayes
+we use `Caret` package to apply Naive Bayes algorithm, this depends on `naivebayes` package. 
+Let's explore activation or not of *laplace*.
+
+### Data transformation
+```{r}
+train <- train0
+test <- test0
+train[,-1] <- scale(train[,-1])
+test[,-1] <- scale(test[,-1])
+```
+
+### Model training
+```{r nb}
+tg <- expand.grid(usekernel = T,
+                  # laplace value of 0 means no activation
+                         laplace = c(0, 0.5, 1 ,1.5), 
+                         adjust = 1)
+
+set.seed(22)
+tr_control <- trainControl(method="repeatedcv", # method crossvalidation
+                           repeats=3) # 10-fold crossvalidation
+
+nb <- train(Y ~ ., data = train,
+             method = "naive_bayes",
+             trControl = tr_control,
+             tuneGrid = tg)
+nb
+models[["NB"]] <- nb
+
+# plot
+plot(nb)
+```
+
+
+
+### Prediction and evaluation of the model
+```{r nb_eval}
+ev <- grep("NB", names(models), value = T, ignore.case = T)
+for (o in ev){
+  set.seed(22)
+  cat("##########  ", o, "  ############\n")
+  pred <- predict(models[[o]], test)
+  cm <- confusionMatrix(pred, test$Y)
+  print(cm)
+  df_cm <- rbind(df_cm, store_cm(cm, o))
+  cat("\n\n")
+}
+```
+
+### Hyperparameters variations
+In order to improve the mode we try to increase the values of `laplace`, and using or not `kernel`.
+
+```{r nb2}
+tg <- expand.grid(usekernel = c(T,F),
+                         laplace = 0:5, 
+                         adjust = 0:5)
+
+set.seed(22)
+tr_control <- trainControl(method="repeatedcv", # method crossvalidation
+                           repeats=3) # 10-fold crossvalidation
+
+nb <- train(Y ~ ., data = train,
+             method = "naive_bayes",
+             trControl = tr_control,
+             tuneGrid = tg)
+nb
+models[["NB2"]] <- nb
+
+# plot
+plot(nb)
+```
+
+#### Performance reevaluation
+```{r nb2_eval}
+ev <- grep("NB2", names(models), value = T, ignore.case = T)
+for (o in ev){
+  set.seed(22)
+  cat("##########  ", o, "  ############\n")
+  pred <- predict(models[[o]], test)
+  cm <- confusionMatrix(pred, test$Y)
+  print(cm)
+  df_cm <- rbind(df_cm, store_cm(cm, o))
+  cat("\n\n")
+}
+
+```
+
+
+```{r summary_nb}
+sum_AcK("NB", df_cm)
+```
+
+
+
+## Artificial Neural Network
+We will explore dense layers with two hidden layers:  1) 20
+y 10 nodes, 2) 50 y 10 nodes.
+
+### Data transformation
+On this occasion, we do need to transform the data. We transform the class values into *one hot* codification, needed for neural networks.
+
+
+```{r}
+train <- train0
+test <- test0
+train[,-1] <- scale(train[,-1])
+test[,-1] <- scale(test[,-1])
+
+# to_categorical enables the one hot transformation
+train$Y <- train$Y %>% as.numeric()  %>% to_categorical()
+test$Y <- test$Y %>% as.numeric() %>% to_categorical()
+
+train <- as.matrix(train)
+test <- as.matrix(test)
+```
+
+### Model design
+We design the model using the `keras` package.
+
+```{r ANN, fig.width=10, fig.height=10}
+nodes <- c(20,50)
+
+for (o in nodes){
+  tensorflow::set_random_seed(22)
+  ann <- keras_model_sequential() 
+  ann %>%
+    layer_dense(units = o, activation = "relu",
+                input_shape = c(200)
+                ) %>%
+    layer_dropout(rate = 0.5) %>%
+    #input shape we indicate the number of genes to analyze
+    layer_dense(units = 10, activation = "relu") %>%
+    layer_dropout(rate = 0.4) %>%
+    layer_flatten() %>% 
+    layer_dense(units = 4, 
+                # in the final layer we must assign the number of classes
+                activation = "softmax" )
+
+  print(ann)
+  
+  ann %>% compile(loss = "categorical_crossentropy",
+                  optimizer = optimizer_rmsprop(),
+                  metrics = c("accuracy")
+                  )
+  models[[paste0("ANN_",o)]] <- ann
+}
+```
+
+### Training, prediction and evaluation of the model
+```{r ann_training_eval}
+
+ev <- grep("ANN", names(models), value = T, ignore.case = T)
+for (o in ev){
+  tensorflow::set_random_seed(22)
+  history <- models[[o]] %>%
+              fit(train[,-c(1:4)], train[,1:4], 
+                epochs = 30,
+                validation_split = 0.2
+            )
+  print(plot(history)+
+          ggtitle(paste0(o, " model"))+
+          ggprism::theme_prism() +
+          theme(plot.title = element_text(hjust = 0.5))
+        )
+  
+  pred <- models[[o]] %>% predict(test[,-c(1:4)])  %>%
+    # revert one hot encoding to see classes
+            k_argmax() %>% as.vector() %>% 
+            factor(levels=c(1,2,3),
+                    labels=c("Basal", "Her2", "LumA"))
+  
+  # confusion matrix with Caret
+  cm <- confusionMatrix(pred, test0[,1])
+  cat("##########  ", o, "  ############\n")
+  print(cm)
+  df_cm <- rbind(df_cm, store_cm(cm, o))
+  cat("\n\n")
+}
+```
+
+
+
+### Hyperparameters variations
+We add more layers to the previous alrogithm, increase number of nodes and reduce the dropout rate.
+```{r ANN2, fig.width=10, fig.height=10}
+tensorflow::set_random_seed(22)
+
+ann <- keras_model_sequential() 
+ann %>%
+  layer_dense(units = 200, activation = "relu",
+              input_shape = c(200)
+              ) %>%
+  layer_dense(units = 50, activation = "relu") %>%
+  layer_dropout(rate = 0.2) %>%
+  layer_dense(units = 15, activation = "relu") %>%
+  layer_dropout(rate = 0.2) %>%
+  layer_flatten() %>% 
+  layer_dense(units = 4, activation = "softmax" )
+
+print(ann)
+
+ann %>% compile(loss = "categorical_crossentropy",
+                optimizer = optimizer_rmsprop(),
+                metrics = c("accuracy")
+              )
+models[[paste0("ANN2")]] <- ann
+
+```
+
+
+#### Training, prediction and reevaluation of the algorithm
+```{r ann2_training_eval}
+
+ev <- grep("ANN2", names(models), value = T, ignore.case = T)
+for (o in ev){
+  tensorflow::set_random_seed(22)
+  history <- models[[o]] %>%
+              fit(train[,-c(1:4)], train[,1:4], 
+                epochs = 30,
+                validation_split = 0.2
+            )
+  print(plot(history)+
+          ggtitle(paste0(o, " model"))+
+          ggprism::theme_prism() +
+          theme(plot.title = element_text(hjust = 0.5))
+        )
+  
+  pred <- models[[o]] %>% predict(test[,-c(1:4)])  %>%
+            k_argmax() %>% as.vector() %>% # revert one hot encoding
+            factor(levels=c(1,2,3),
+                    labels=c("Basal", "Her2", "LumA"))
+    # confusion matrix with caret
+  cm <- confusionMatrix(pred, test0[,1])
+  cat("##########  ", o, "  ############\n")
+  print(cm)
+  df_cm <- rbind(df_cm, store_cm(cm, o))
+  cat("\n\n")
+}
+```
+
+```{r summary_ann}
+sum_AcK("ANN", df_cm)
+```
+
+
+
+## Support Vector Machine
+Here we will explore the function of lineal and gaussian kernels.
+
+### Data transformation
+
+```{r}
+train <- train0
+test <- test0
+train[,-1] <- scale(train[,-1])
+test[,-1] <- scale(test[,-1])
+```
+
+### Model training
+```{r svmlinear}
+set.seed(22)
+
+tr_control <- trainControl(method="repeatedcv", # method crossvalidation
+                           repeats=3) # 3-fold crossvalidation
+svmlin <- train(Y ~ ., 
+                data=train,
+                method="svmLinear",
+                trControl=tr_control
+                ) 
+svmlin
+models[["SVM_lineal"]] <- svmlin
+```
+
+```{r svmRadial, fig.width=10, fig.height=10}
+set.seed(22)
+
+#Train model
+svmrad <- train(Y ~ ., 
+                data=train,
+                method="svmRadial",
+                trControl=tr_control, # same as previous lineal model
+                ) 
+svmrad
+plot(svmrad)
+models[["SVM_RBF"]] <- svmrad
+```
+
+### Prediction and evaluation of the model
+
+```{r Eval_SVM}
+ev <- grep("SVM", names(models), value = T, ignore.case = T)
+for (o in ev){
+  cat("##########  ", o, "  ############\n")
+  pred <- predict(models[[o]], test)
+  cm <- confusionMatrix(pred, test$Y)
+  print(cm)
+  df_cm <- rbind(df_cm, store_cm(cm, o))
+  cat("\n\n")
+}
+```
+
+
+### Hyperparameters variations
+
+```{r svmlinear2, fig.width=10, fig.height=10}
+set.seed(22)
+
+# We try tuning the C values close the ones obtained previously
+C <- models$SVM_lineal$bestTune %>% as.integer()
+cs <- expand.grid(C = seq(C*0.8,C*1.2,C/20)) 
+                                 
+
+svmlin <- train(Y ~ ., 
+                data=train,
+                method="svmLinear",
+                trControl=tr_control,
+                tuneGrid = cs 
+                ) 
+svmlin
+plot(svmlin)
+models[["SVM2_lineal"]] <- svmlin
+```
+
+
+```{r svmRadial2, fig.width=10, fig.height=10}
+set.seed(22)
+# We try tuning the C and sigma values close the ones obtained previously
+C <- models$SVM_RBF$bestTune[,"C"]
+sigma <- models$SVM_RBF$bestTune[,"sigma"]
+cs <- expand.grid(C = seq(C*0.7,C*1.3,C/20),
+                  sigma = seq(sigma*0.7,sigma*1.3,sigma/20)) 
+
+#Train model
+svmrad <- train(Y ~ ., 
+                data=train,
+                method="svmRadial",
+                trControl=tr_control, # same as previous lineal model
+                tuneGrid = cs # Different values for C and sigma
+                ) 
+svmrad
+plot(svmrad)
+models[["SVM2_RBF"]] <- svmrad
+```
+
+
+#### Performance reevaluation
+```{r Eval_SVM2}
+ev <- grep("SVM2", names(models), value = T, ignore.case = T)
+for (o in ev){
+  cat("##########  ", o, "  ############\n")
+  pred <- predict(models[[o]], test)
+  cm <- confusionMatrix(pred, test$Y)
+  print(cm)
+  df_cm <- rbind(df_cm, store_cm(cm, o))
+  cat("\n\n")
+}
+```
+
+```{r summary_SVM}
+sum_AcK("SVM", df_cm)
+```
+
+
+## Trees
+We will use the decision tree algorithm *C5.0* using the `C50` package.
+We will explore activation or not of the boosting.
+
+### Data transformation
+```{r}
+train <- train0
+test <- test0
+train[,-1] <- scale(train[,-1])
+test[,-1] <- scale(test[,-1])
+```
+
+### Model training
+```{r tree, fig.width=20, fig.height=13}
+for (o in c(1,10)){ 
+  set.seed(22)
+  # Loppp with noboost (1 trial) 
+  # or with 10 trials (boosting)
+  if(o == 1){ex <- "No boosting"
+  } else {ex <- paste0(o, " trials of boosting")}
+  
+  cat("#################", ex, "######################")
+  tree <- C5.0(train[,-1], train[,1], trials = o)
+  print(tree)
+  models[[paste0("Tree.B_",o)]] <- tree
+  
+  # plot
+  print(summary(tree))
+  plot(tree, main=ex)
+}
+```
+
+
+### Prediction and evaluation of the model
+```{r Eval_tree}
+ev <- grep("Tree", names(models), value = T, ignore.case = T)
+for (o in ev){
+  cat("##########  ", o, "  ############\n")
+  pred <- predict(models[[o]], test)
+  cm <- confusionMatrix(pred, test$Y)
+  print(cm)
+  df_cm <- rbind(df_cm, store_cm(cm, o))
+  cat("\n\n")
+}
+```
+
+### Hyperparameters variations
+For the analysis of this data with *decision trees* we will introduce costs to some errors.
+As we are dealing with types of tumors here, let's give a high cost to predictions of actual tumors to basal. We will also penalize as prediction an actual basal condition.
+
+```{r matrix_cost}
+matrix_dim <- list(levels(rna$Y), levels(rna$Y))
+names(matrix_dim) <- c("predicted", "actual")
+cost <- matrix(c(0,5,5,
+                 10,0,2,
+                 10,2,0),
+               nrow=3, dimnames = matrix_dim)
+cost
+```
+
+```{r tree2, fig.width=20, fig.height=13}
+for (o in c(1,10)){
+  set.seed(22)
+  # Loppp with noboost (1 trial) 
+  # or with 10 trials (boosting)
+  if(o == 1){ex <- "No boosting"
+  } else {ex <- paste0(o, " trials of boosting")}
+  
+  cat("#################", ex, "######################")
+  tree <- C5.0(train[,-1], train[,1],
+               trials = o, costs = cost)
+  print(tree)
+  models[[paste0("Tree2.B_",o)]] <- tree
+  
+  # plot
+  print(summary(tree))
+  plot(tree, main=ex)
+}
+```
+
+#### Performance reevaluation
+```{r Eval_tree2}
+ev <- grep("Tree2", names(models), value = T, ignore.case = T)
+for (o in ev){
+  cat("##########  ", o, "  ############\n")
+  pred <- predict(models[[o]], test)
+  cm <- confusionMatrix(pred, test$Y)
+  print(cm)
+  df_cm <- rbind(df_cm, store_cm(cm, o))
+  cat("\n\n")
+}
+```
+
+```{r summary_tree}
+sum_AcK("Tree", df_cm)
+```
+
+
+## Random Forest
+We will explore different number of tress: n = 50, 100.
+
+### Data transformation
+
+```{r}
+train <- train0
+test <- test0
+train[,-1] <- scale(train[,-1])
+test[,-1] <- scale(test[,-1])
+```
+
+### Model training
+We will use the function `rf`(Random forest) from `Caret`. 
+
+```{r rf}
+trees <- c(50,100) # values to try
+
+set.seed(22)
+tr_control <- trainControl(method="repeatedcv", # method crossvalidation
+                           repeats=3) # 3-fold crossvalidation
+for (nt in trees){
+  rf <- train(Y ~ ., data = train,
+               method = "rf",
+               trControl = tr_control,
+               ntree = nt)
+  cat("##########  ", nt, " arboles ############\n")
+  print(rf)
+  cat("\n\n")
+  models[[paste0("RF_",nt)]] <- rf
+  
+  # plot
+  print(plot(rf))
+}
+```
+
+### Prediction and evaluation of the model
+```{r RF_eval}
+ev <- grep("RF", names(models), value = T, ignore.case = T)
+for (o in ev){
+  cat("##########  ", o, "  ############\n")
+  pred <- predict(models[[o]], test)
+  cm <- confusionMatrix(pred, test$Y)
+  print(cm)
+  df_cm <- rbind(df_cm, store_cm(cm, o))
+  cat("\n\n")
+}
+```
+
+### Hyperparameters variations
+We will use different values for *mtry* close to the best value obtained previously.
+
+```{r rf_2}
+trees <- c(50,100) 
+mt <- c("50" = models$RF_50$bestTune %>% as.numeric(),
+        "100" = models$RF_100$bestTune %>% as.numeric()) 
+
+for (nt in trees){
+  set.seed(22)
+  m <- mt[[as.character(nt)]]
+  cat("##########  ", nt, " arboles ############\n")
+  rf <- train(Y ~ ., data = train,
+               method = "rf",
+               trControl = tr_control, # same as earlier
+               tuneGrid = data.frame(mtry = seq(m*0.7,m*1.3,m/20)),
+               ntree = nt)
+  print(rf)
+  cat("\n\n")
+  models[[paste0("RF2_",nt)]] <- rf
+  
+  # plot
+  print(plot(rf))
+}
+``` 
+
+#### Performance reevaluation
+```{r RF2_eval}
+ev <- grep("RF2", names(models), value = T, ignore.case = T)
+for (o in ev){
+  cat("##########  ", o, "  ############\n")
+  pred <- predict(models[[o]], test)
+  cm <- confusionMatrix(pred, test$Y)
+  print(cm)
+  df_cm <- rbind(df_cm, store_cm(cm, o))
+  cat("\n\n")
+}
+```
+
+```{r summary_RF}
+sum_AcK("RF", df_cm)
+```
+
+
+# Model summary
+We plot and compare the performance of the different models trained using bar plots.
+
+## Accuracy y kappa for each model.
+```{r plot models, fig.width=18, fig.height=9}
+# short values to see better differences of high accuracy and kappa
+mi <- min(df_cm[df_cm$class == "Overall", "value"])*0.95
+
+#order models
+df_cm$Model <- factor(df_cm$Model,
+                      levels=names(models))
+
+df_cm %>% filter(class == "Overall") %>%
+  ggplot(aes(Model, value, fill=metric)) +
+  geom_col()+
+  geom_text(aes(label=round(value, 2),
+                fontface="bold"))+
+  coord_cartesian(ylim=c(mi,1))+
+  facet_wrap(.~ metric) +
+  ggprism::theme_prism() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
+# Define metrics to visualize for each class
+metri <- c("Sensitivity", "Specificity",         
+          "Pos Pred Value", "Neg Pred Value",
+          "Precision", "Detection Rate")
+```
+
+Next we examine the `r paste(metri, collapse=", ")` for each type of class.
+
+```{r plot models2, fig.width=22, fig.height=16}
+df_cm %>% filter(class != "Overall" &
+                metric %in% metri) %>%
+  separate(class, into=c("out","class"),
+           sep = " ", remove = T) %>% 
+  ggplot(aes(class, value, fill=Model)) +
+  geom_bar(stat="identity", position = "dodge")+
+  facet_wrap( .~ metric, ncol = 2) +
+  ggprism::theme_prism()
+
+```
+
+Finally, we export a .xlsx file with the summary of the models.
+
+```{r export_df, include=F}
+df_cm %>%
+  pivot_wider(names_from = Model, values_from = value) %>%
+  writexl::write_xlsx("Resumen_modelos.xlsx")
+```
