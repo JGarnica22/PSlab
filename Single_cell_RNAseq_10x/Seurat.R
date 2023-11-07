@@ -73,13 +73,62 @@ sampletype <- c("BDC_CTL", "BDC_TET", "INS_CTL", "INS_TET")
 
 # Indicate in the Read10X function, the directory of your input files (3 files must be
 # found in the data.dir: matrix.mt.gz, barcodes.tsv.gz and features.tsv.gz)
-data <- Read10X(data.dir = paste0(getwd(), "/data/aggr/filtered_feature_bc_matrix/"))
+path1 = "2020_05_10xGenomics_BDC_INS13-21_SANTAMARIA_09/Seurat/data/aggr/filtered_feature_bc_matrix/"
+data <- Read10X(data.dir = path1, 
+                #Number of column in features.tsv, by default 2
+                gene.column = 2,
+                #Number of column in barcode.tsv, by default 1  
+                cell.column = 1,
+                #Make feature names unique or not
+                unique.features = TRUE,
+                #Remove trailing -1 if present in all barcodes
+                strip.suffix = FALSE)
+
+# In case we are not working with gene symbols we can map it with select() from AnnotationDbi. It needs an EnsDb object, 
+# since we work mainly in mouse and human, we can use org.Mm.eg.db.
+# *IMPORTANT:* Remember to perform this step only in the case that our data is not originally in genesymbol. It can be also
+# be used if we prefer not to use genesymbol and and another gene identificator.
+x <- select(x = org.Mm.eg.db, 
+            #Select the keys for which we are looking values (like python dictionary)
+            keys = rownames(data),
+            #Value that we want to be retrieved
+            columns = "ENSEMBL",
+            #Key type that we are using
+            keytype = "SYMBOL",
+            #In case multiple values for one key choose first
+          multivals = "first", asNA=F)
+
+#Check the table obtained
+head(x)
+
+#Creating another column such that we ignore NA values
+x$NoNa <- ifelse(is.na(x$SYMBOL), x$ENSEMBL, x$SYMBOL)
+x$NoNa <- ifelse(is.na(x$ENSEMBL), x$SYMBOL, x$ENSEMBL)
+
+#Modifiying original data
+for (n in rownames(data)){
+  rownames(data)[match(n, rownames(data))] <- x$NoNa[match(n, x$SYMBOL)]
+}
+head(rownames(data))
+
 
 # We next use the count matrix to create a Seurat object. The object serves as a container that includes
 # both data (like the count matrix) and analysis (like PCA, or clustering results) for a single-cell dataset.
 # min.cells: Include features detected in at least these many cells. Will subset the counts matrix as well. 
 # min.features: Include cells where at least these many features are detected.
-scdata <- CreateSeuratObject(counts = data, min.cells = 3, min.features = 200)
+scdata <- CreateSeuratObject(counts = data, 
+                             #Project name for the object
+                             project = "SANTAMARIA_09",
+                             #Threshold of different cells where a certain feature is detected
+                             min.cells = 3, 
+                             #Threshold to select cells with a certain number of features detected
+                             min.features = 200,
+                             #Choose the field from the cell's name
+                             names.field = 1,
+                             #Choose the delimeters from the cell's column name
+                             names.delim = "_" ,
+                             #In case any cell-level metadata can be added
+                             meta.data = NULL)
 
 # Check the expression (counts) for some genes in the first 100 cells:
 # Change genes for those you want to check:
@@ -109,11 +158,50 @@ if (species == "mouse") {
   scdata[["percent.mt"]] <- PercentageFeatureSet(scdata, pattern = "^MT-")
 }
 
+
+# Add sample information to each cell
+scdata$sampletype <- colnames(scdata)
+for (i in 1:length(sampletype)){
+  scdata@meta.data[grep(paste0("-", i), colnames(scdata)), "sampletype"] <- sampletype[i]
+}
+
 # QC metrics can be found in the Seurat object metadata:
 head(scdata@meta.data)
+range(scdata[["percent.mt"]])
+range(scdata[["percent.rb"]])
 
 # Visualize QC metrics as a violin plot:
-VlnPlot(scdata, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), pt.size = 0.5, ncol = 3)
+VlnPlot(scdata, 
+        features = c("nFeature_RNA", "nCount_RNA", "percent.mt", "percent.rb"),
+        group.by = "sampletype",
+        pt.size = 0.5, ncol = 4)
+
+#Visualize QC metric as an scatter plot
+FeatureScatter(scdata,"nCount_RNA", "percent.mt", group.by = "sampletype", pt.size = 0.5)
+FeatureScatter(scdata, "nCount_RNA", "nFeature_RNA", group.by = "sampletype", pt.size = 0.5)
+
+# Distribution of the total number of molecules detected within a cell
+scdata@meta.data %>%
+  ggplot(aes(color=sampletype, x=nCount_RNA, fill= sampletype)) + 
+  geom_density(alpha = 0.3) + 
+  scale_x_log10() + 
+  theme_classic() +
+  ylab("Log 10 cell Density") +
+  geom_vline(xintercept = 1000, linetype = "dashed" )+
+  geom_vline(xintercept = 500)+
+  labs(fill = "Sample Type")+
+  guides(color = FALSE)
+
+# Visualize the distribution of genes detected per cell
+scdata@meta.data %>% 
+  	ggplot(aes(color=sampletype, x=nFeature_RNA, fill= sampletype)) + 
+  	geom_density(alpha = 0.2) + 
+  	theme_classic() +
+  	scale_x_log10() + 
+  	geom_vline(xintercept = 2200, linetype = "dashed")+
+    labs(fill = "Sample Type")+
+    guides(color = FALSE)
+
 
 # Subset data (these parameters by default, modify thresholds to filter differently based on your data)
 # QC filtering is performed based on the cell distribution depending on the above mentioned parameters.
@@ -135,12 +223,12 @@ scdata <- NormalizeData(scdata, normalization.method = "LogNormalize", scale.fac
 # in downstream analysis helps to highlight biological signal in single-cell datasets.
 # By default, we return 2,000 features per dataset. These will be used in downstream analysis, like PCA.
 scdata <- FindVariableFeatures(scdata, selection.method = "vst", nfeatures = 2000)
+top10 <- head(VariableFeatures(scdata), 10)
+# plot variable features with and without labels
+plot1 <- VariableFeaturePlot(scdata)
+# Volcano plot
+LabelPoints(plot = plot1, points = top10, repel = TRUE)
 
-# Add sample information to each cell
-scdata$sampletype <- colnames(scdata)
-for (i in 1:length(sampletype)){
-  scdata@meta.data[grep(paste0("-", i), colnames(scdata)), "sampletype"] <- sampletype[i]
-}
 #Some times you can pool sample types into conditions
 #For example, if you have several treated and several control samples
 #you can build 2 conditions, TREATED and CTL:
@@ -170,13 +258,15 @@ numberofclusters <- 3
 # The clustering analysis is perfomed differently every time you run the algorithm. By default we set
 # the seed at 1, but try the analysis different times to ensure the clustering you performed is sensible.
 set.seed(1)
+cluster.names <- c("Th0", "TR1", "TFH")
 scdata$kmeans <- kmeans(scdata@reductions[["pca"]]@cell.embeddings, centers = numberofclusters)$cluster
 TSNEPlot(scdata, group.by = "kmeans") + theme(
   axis.line = element_blank(),
   axis.text.x = element_blank(),
   axis.text.y = element_blank(),
   axis.title = element_blank(),
-  axis.ticks = element_blank()) + coord_flip() + scale_x_reverse()
+  axis.ticks = element_blank()) + coord_flip() + scale_x_reverse()+
+  scale_color_discrete(name = "Cell Type", labels = cluster.names)
 
 ggsave(
   paste0("figs/tSNE_kmeans_clustering_", numberofclusters, ".pdf"),
@@ -222,7 +312,8 @@ TSNEPlot(scdata, split.by = "condition", group.by = "kmeans",
            axis.text.x = element_blank(),
            axis.text.y = element_blank(),
            axis.title = element_blank(),
-           axis.ticks = element_blank()) + coord_flip() + scale_x_reverse()
+           axis.ticks = element_blank()) + coord_flip() + scale_x_reverse()+
+        scale_color_discrete(name = "Cell Type", labels = cluster.names)
 
 ggsave(
   paste0("figs/tSNE_kmeans_clustering_", numberofclusters, "_by_condition", ".pdf"),
@@ -243,37 +334,33 @@ ggsave(
 #help you identify the phenotype of the different clusters you see.
 
 #Read your txt containing the list of genes of interest:
-features <- read.table("data/Table1.txt", header = F, stringsAsFactors = F)$V1
-
-
+features <- read.table("Table1.txt", header = F, stringsAsFactors = F)$V1
+#Since we used top genes before, we can use that little subset too
+#features <-  top10
 p <- FeaturePlot(scdata, reduction = "tsne",
-                 features = features, 
+                 features = features,
                  #if there are too many features to plot at once,
                  #plot first the first half of features and then the rest
                  max.cutoff = 3,
                  cols = c("grey", "red"), 
                  combine = FALSE)
 
+#By parts since it is computationaly demanding operation.
+#This loop will generate 10 plots for each page.
+#To modifty the desired plots for page residual must be replaced as well as its related operations
+pdf(paste0("figs/feature_plots_rna.pdf"),
+width = 11, height = 11)
 for(i in 1:length(p)) {
   p[[i]] <- p[[i]] + NoAxes() + NoLegend() + coord_flip() + scale_x_reverse()
+  if ((i %% 10 ) == 0) {
+    print(cowplot::plot_grid(plotlist = p[(i-9):i], ncol = 5))
+  }
+  else if(i == length(p)) {
+    print(cowplot::plot_grid(plotlist = p[(i-(i%%10)+1):i], 
+                             ncol = 5, nrow = 2))
+  }
 }
-
-cowplot::plot_grid(plotlist = p, ncol = 6)
-#Determine the number of columns you want to distribute the plots in, depending on the total number
-#of plots you want to make.
-
-ggsave(
-  "figs/feature_plots.pdf",
-  plot = last_plot(),
-  device = "pdf",
-  path = NULL,
-  scale = 1,
-  width = 7,
-  height = 1.67,
-  units = "in",
-  dpi = 300,
-  limitsize = TRUE
-)
+dev.off()
 
 
 #Another type of visualization are heatmaps. You can see gene expression on each cluster for a set
@@ -286,7 +373,6 @@ DoHeatmap(subset(scdata, downsample = 1000), features = features[features %in% r
 
 #If you know the phenotype of the clusters, you can change the names of the Idents in order to
 #show the cluster names in the heatmap
-cluster.names <- c("Th0", "TFH", "TR1")
 names(cluster.names) <- levels(scdata)
 scdata <- RenameIdents(scdata, cluster.names)
 
@@ -328,4 +414,91 @@ COND <- FindMarkers(scdata, ident.1 = levels(Idents(scdata))[2], ident.2 = level
                     verbose = T, test.use = "negbinom")
 
 write.table(COND, "output/Condition_markers.txt", quote = F, sep = "\t")
+
+
+# Given the markers we can get an expression heatmap of the top 10 genes for each cluster.
+
+markers %>%
+    group_by(cluster) %>%
+    top_n(n = 10, wt = avg_log2FC) -> top10
+DoHeatmap(scdata, features = top10$gene, group.by = "condition")
+
+# We can even perform a comparion between sets of markers
+
+Idents(scdata) <- "kmeans"
+
+#Markers TR1 vs TH0
+tr1_th0 <- FindMarkers(scdata, ident.1 = levels(Idents(scdata))[2], ident.2 = levels(Idents(scdata))[1],
+                    verbose = T, test.use = "negbinom")
+
+
+#Markers TFH vs TH0
+tfh_th0 <- FindMarkers(scdata, ident.1 = levels(Idents(scdata))[3], ident.2 = levels(Idents(scdata))[1],
+                    verbose = T, test.use = "negbinom")
+
+#Add absolute percentage of expressed cells
+tr1_th0 <- tr1_th0 %>% 
+  mutate(abs_pct = abs(pct.1 - pct.2))
+
+tfh_th0 <- tfh_th0 %>% 
+  mutate(abs_pct = abs(pct.1 - pct.2))
+
+#Merge comparison dataframes in a single dataframe
+df <- merge(tr1_th0, tfh_th0, by = "row.names", all.x = TRUE, all.y = TRUE)
+
+#Correct names for cleaner use
+names(df)[names(df) == 'avg_log2FC.x'] <- 'fc_tr1'
+names(df)[names(df) == 'avg_log2FC.y'] <- 'fc_tfh'
+names(df)[names(df) == 'Row.names'] <- 'gene'
+
+df <- data.frame(df)
+df[is.na(df)] <- 0
+
+#Classify by quadrant according to expression
+df <- df %>% 
+  mutate(expression = case_when(fc_tr1 < 0 & fc_tfh > 0 ~ "Down TR1 x Up TFH",
+                              fc_tr1 > 0 & fc_tfh > 0 ~ "Up TR1 x Up TFH",
+                              fc_tr1 < 0 & fc_tfh < 0 ~ "Down TR1 x Down TFH",
+                              fc_tr1 > 0 & fc_tfh < 0 ~ "Up TR1 x Down TFH",
+                              fc_tr1 < 0 & fc_tfh == 0 ~ "Down TR1 x No TFH",
+                              fc_tr1 > 0 & fc_tfh == 0 ~ "Up TR1 x No TFH",
+                              fc_tr1 == 0 & fc_tfh < 0 ~ "No Tr1 x Up TFH",
+                              fc_tr1 == 0 & fc_tfh > 0 ~ "No TR1 x Down TFH"
+                            )) 
+
+#Scatterplot labelling most expressed
+ggplot(df, aes(fc_tr1, fc_tfh, color = expression, label = gene)) +
+  geom_point()+
+  labs(x = "TR1 vs TH0", y = "TFH vs TH0")+
+  #Change order of the legend labels and legend title
+  scale_color_discrete(name = "Regulation", 
+                       limits = c("Down TR1 x Up TFH","Up TR1 x Up TFH","Down TR1 x Down TFH",
+                              "Up TR1 x Down TFH","Down TR1 x No TFH","Up TR1 x No TFH",
+                              "No Tr1 x Up TFH","No TR1 x Down TFH"))+
+  #Label the points at a certain expression level
+  geom_text(aes(label= ifelse((expression=="Down TR1 x Up TFH" | expression=="Up TR1 x Down TFH") 
+                              & fc_tr1 != 0 | (fc_tr1 > 1 | fc_tfh > 1) |
+                                (fc_tr1 < -1 | fc_tfh < -1) ,gene, NA)),
+            hjust = -0.1, vjust = 1)+
+  ggrepel::geom_text_repel()+
+  theme_bw()+theme(panel.border = element_blank())+
+  scale_color_brewer(palette = "Dark2")
+
+#Scatterplot labelling the list of important genes (features)
+
+#Scatterplot
+ggplot(df, aes(fc_tr1, fc_tfh, color = expression, label = gene)) +
+  geom_point()+
+  labs(x = "TR1 vs TH0", y = "TFH vs TH0")+
+  #Change order of the legend labels and legend title
+  scale_color_discrete(name = "Regulation", 
+                       limits = c("Down TR1 x Up TFH","Up TR1 x Up TFH","Down TR1 x Down TFH",
+                              "Up TR1 x Down TFH","Down TR1 x No TFH","Up TR1 x No TFH",
+                              "No Tr1 x Up TFH","No TR1 x Down TFH"))+
+  #Label the points at a certain expression level
+  geom_text(aes(label= ifelse((gene == features),gene, NA)),
+            hjust = -0.1, vjust = 1)+
+  ggrepel::geom_text_repel()+
+  theme_bw()+theme(panel.border = element_blank())+
+  scale_color_brewer(palette = "Dark2")
 
